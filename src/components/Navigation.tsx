@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Music, Menu, X } from "lucide-react";
+import { Music, Menu, X, GraduationCap } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -10,6 +10,8 @@ const Navigation = () => {
 
   const navItems = [
     { name: "Home", path: "/" },
+    { name: "Browse Classrooms", path: "/browse-classrooms" },
+    { name: "Teacher Dashboard", path: "/teacher-dashboard", icon: GraduationCap },
     { name: "Courses", path: "/courses" },
     { name: "Practice Room", path: "/practice" },
     { name: "About", path: "/about" },
@@ -29,17 +31,18 @@ const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors flex items-center gap-1 ${
                   isActive(item.path)
                     ? "text-purple-400"
                     : "text-gray-300 hover:text-white"
                 }`}
               >
+                {item.icon && <item.icon className="h-4 w-4" />}
                 {item.name}
               </Link>
             ))}
@@ -78,13 +81,14 @@ const Navigation = () => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors ${
+                  className={`text-sm font-medium transition-colors flex items-center gap-2 ${
                     isActive(item.path)
                       ? "text-purple-400"
                       : "text-gray-300 hover:text-white"
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
+                  {item.icon && <item.icon className="h-4 w-4" />}
                   {item.name}
                 </Link>
               ))}
