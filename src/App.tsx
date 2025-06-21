@@ -9,6 +9,8 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import BrowseClassrooms from "./pages/BrowseClassrooms";
 import PracticeRoom from "./components/PracticeRoom";
 import CourseCatalog from "./components/CourseCatalog";
 import NotFound from "./pages/NotFound";
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+          <Route path="/browse-classrooms" element={<BrowseClassrooms />} />
           <Route path="/practice" element={<PracticeRoom />} />
           <Route path="/courses" element={<CourseCatalog />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -3,11 +3,25 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Music, Mic, Users, Brain, Calendar, Award, Play, Star, ArrowRight, Check, Trophy, BookOpen, Target, Clock } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("students");
+  const [visibleSteps, setVisibleSteps] = useState<number[]>([]);
+
+  // Animation effect for roadmap steps
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      roadmapSteps.forEach((_, index) => {
+        setTimeout(() => {
+          setVisibleSteps(prev => [...prev, index]);
+        }, index * 200);
+      });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const pricingPlans = [
     {
@@ -124,24 +138,24 @@ const Index = () => {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-3xl"></div>
           <div className="relative container mx-auto px-6 py-20 text-center">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-8">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-8 animate-fade-in">
               <Music className="h-4 w-4 text-purple-300" />
               <span className="text-purple-100 text-sm">AI-Powered Music Learning</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in">
               Learn Music with
               <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent block">
                 MuseSync
               </span>
             </h1>
             
-            <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in">
               Experience personalized music education with AI-powered feedback, live classes, 
               and practice sessions tailored for vocal and instrumental learners.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in">
               <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 Start Learning Today
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -158,17 +172,17 @@ const Index = () => {
         <section className="py-20 bg-white/5 backdrop-blur-sm">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">
+              <h2 className="text-4xl font-bold text-white mb-4 animate-fade-in">
                 Features for Everyone
               </h2>
-              <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+              <p className="text-gray-300 text-lg max-w-2xl mx-auto animate-fade-in">
                 Whether you're a student, teacher, or parent, MuseSync has the tools you need
               </p>
             </div>
 
             {/* Feature Tabs */}
             <div className="flex justify-center mb-12">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/20">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/20 animate-scale-in">
                 <Button
                   variant={activeTab === "students" ? "default" : "ghost"}
                   onClick={() => setActiveTab("students")}
@@ -199,7 +213,7 @@ const Index = () => {
             {/* Feature Cards */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {(activeTab === "students" ? featuresForStudents : featuresForTeachers).map((feature, index) => (
-                <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
+                <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105 hover:shadow-xl animate-fade-in hover-scale" style={{ animationDelay: `${index * 100}ms` }}>
                   <CardHeader className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                       <feature.icon className="h-8 w-8 text-white" />
@@ -221,31 +235,38 @@ const Index = () => {
         <section className="py-20 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 backdrop-blur-sm">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">
+              <h2 className="text-4xl font-bold text-white mb-4 animate-fade-in">
                 Your Musical Journey Roadmap
               </h2>
-              <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+              <p className="text-gray-300 text-lg max-w-3xl mx-auto animate-fade-in">
                 Follow our structured certification path from beginner to professional musician. 
                 Each level builds upon the previous, ensuring comprehensive musical education.
               </p>
             </div>
 
             <div className="relative">
-              {/* Roadmap Line */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full hidden lg:block"></div>
+              {/* Animated Roadmap Line */}
+              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full hidden lg:block animate-fade-in" style={{ animationDelay: '300ms' }}></div>
               
               <div className="space-y-12">
                 {roadmapSteps.map((step, index) => (
-                  <div key={index} className={`flex items-center gap-8 ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
+                  <div 
+                    key={index} 
+                    className={`flex items-center gap-8 transition-all duration-700 transform ${
+                      visibleSteps.includes(index) 
+                        ? 'opacity-100 translate-y-0' 
+                        : 'opacity-0 translate-y-8'
+                    } ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}
+                  >
                     {/* Content Card */}
                     <div className="flex-1 lg:max-w-md">
-                      <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105">
+                      <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl">
                         <CardHeader>
                           <div className="flex items-center justify-between mb-4">
                             <Badge className={`${step.level === 'Beginner' ? 'bg-green-500' : 
                               step.level === 'Elementary' ? 'bg-blue-500' :
                               step.level === 'Intermediate' ? 'bg-yellow-500' :
-                              step.level === 'Advanced' ? 'bg-orange-500' : 'bg-red-500'} text-white`}>
+                              step.level === 'Advanced' ? 'bg-orange-500' : 'bg-red-500'} text-white animate-pulse`}>
                               {step.badge}
                             </Badge>
                             <div className="flex items-center gap-2 text-gray-300">
@@ -263,7 +284,7 @@ const Index = () => {
                             <h4 className="text-white font-medium">Key Skills:</h4>
                             <div className="grid grid-cols-2 gap-2">
                               {step.skills.map((skill, skillIndex) => (
-                                <div key={skillIndex} className="flex items-center gap-2">
+                                <div key={skillIndex} className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: `${(index * 200) + (skillIndex * 100)}ms` }}>
                                   <Check className="h-3 w-3 text-green-400 flex-shrink-0" />
                                   <span className="text-gray-300 text-sm">{skill}</span>
                                 </div>
@@ -274,13 +295,15 @@ const Index = () => {
                       </Card>
                     </div>
 
-                    {/* Icon Circle */}
+                    {/* Animated Icon Circle */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg border-4 border-white/20">
+                      <div className={`w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg border-4 border-white/20 transition-all duration-500 transform ${
+                        visibleSteps.includes(index) ? 'scale-100 rotate-0' : 'scale-0 rotate-180'
+                      }`}>
                         <step.icon className="h-8 w-8 text-white" />
                       </div>
                       {index < roadmapSteps.length - 1 && (
-                        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-1 h-12 bg-gradient-to-b from-purple-400 to-pink-400 lg:hidden"></div>
+                        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-1 h-12 bg-gradient-to-b from-purple-400 to-pink-400 lg:hidden animate-fade-in" style={{ animationDelay: `${index * 200 + 300}ms` }}></div>
                       )}
                     </div>
 
@@ -292,7 +315,7 @@ const Index = () => {
             </div>
 
             <div className="text-center mt-16">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-fade-in">
                 Start Your Certification Journey
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
