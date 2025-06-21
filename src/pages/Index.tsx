@@ -1,7 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Music, Mic, Users, Brain, Calendar, Award, Play, Star, ArrowRight, Check } from "lucide-react";
+import { Music, Mic, Users, Brain, Calendar, Award, Play, Star, ArrowRight, Check, Trophy, BookOpen, Target, Clock } from "lucide-react";
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
 
@@ -65,6 +66,54 @@ const Index = () => {
     { icon: Users, title: "Student Dashboard", desc: "Track progress and provide feedback" },
     { icon: Calendar, title: "Smart Scheduling", desc: "Book 1:1 or group sessions easily" },
     { icon: Music, title: "Custom Assignments", desc: "Upload sheet music and set goals" }
+  ];
+
+  const roadmapSteps = [
+    {
+      level: "Beginner",
+      title: "Foundation Certificate",
+      duration: "3-6 months",
+      icon: BookOpen,
+      skills: ["Basic music theory", "Rhythm fundamentals", "Note reading", "Basic scales"],
+      examType: "Online Assessment",
+      badge: "Foundation"
+    },
+    {
+      level: "Elementary",
+      title: "Grade 1-3 Certification",
+      duration: "6-12 months",
+      icon: Target,
+      skills: ["Intermediate theory", "Simple pieces", "Basic harmony", "Performance skills"],
+      examType: "Practical + Theory",
+      badge: "Elementary"
+    },
+    {
+      level: "Intermediate",
+      title: "Grade 4-6 Certification",
+      duration: "12-18 months",
+      icon: Star,
+      skills: ["Advanced techniques", "Complex pieces", "Improvisation", "Music analysis"],
+      examType: "Performance + Viva",
+      badge: "Intermediate"
+    },
+    {
+      level: "Advanced",
+      title: "Grade 7-8 Certification",
+      duration: "18-24 months",
+      icon: Trophy,
+      skills: ["Master techniques", "Concert pieces", "Teaching basics", "Composition"],
+      examType: "Recital + Portfolio",
+      badge: "Advanced"
+    },
+    {
+      level: "Professional",
+      title: "Diploma & Teaching",
+      duration: "2+ years",
+      icon: Award,
+      skills: ["Professional performance", "Teaching methodology", "Music research", "Mentorship"],
+      examType: "Thesis + Recital",
+      badge: "Professional"
+    }
   ];
 
   return (
@@ -164,6 +213,89 @@ const Index = () => {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Roadmap Section */}
+        <section className="py-20 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 backdrop-blur-sm">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-white mb-4">
+                Your Musical Journey Roadmap
+              </h2>
+              <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+                Follow our structured certification path from beginner to professional musician. 
+                Each level builds upon the previous, ensuring comprehensive musical education.
+              </p>
+            </div>
+
+            <div className="relative">
+              {/* Roadmap Line */}
+              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full hidden lg:block"></div>
+              
+              <div className="space-y-12">
+                {roadmapSteps.map((step, index) => (
+                  <div key={index} className={`flex items-center gap-8 ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
+                    {/* Content Card */}
+                    <div className="flex-1 lg:max-w-md">
+                      <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105">
+                        <CardHeader>
+                          <div className="flex items-center justify-between mb-4">
+                            <Badge className={`${step.level === 'Beginner' ? 'bg-green-500' : 
+                              step.level === 'Elementary' ? 'bg-blue-500' :
+                              step.level === 'Intermediate' ? 'bg-yellow-500' :
+                              step.level === 'Advanced' ? 'bg-orange-500' : 'bg-red-500'} text-white`}>
+                              {step.badge}
+                            </Badge>
+                            <div className="flex items-center gap-2 text-gray-300">
+                              <Clock className="h-4 w-4" />
+                              <span className="text-sm">{step.duration}</span>
+                            </div>
+                          </div>
+                          <CardTitle className="text-white text-xl">{step.title}</CardTitle>
+                          <CardDescription className="text-gray-300">
+                            {step.examType}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            <h4 className="text-white font-medium">Key Skills:</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                              {step.skills.map((skill, skillIndex) => (
+                                <div key={skillIndex} className="flex items-center gap-2">
+                                  <Check className="h-3 w-3 text-green-400 flex-shrink-0" />
+                                  <span className="text-gray-300 text-sm">{skill}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Icon Circle */}
+                    <div className="relative flex-shrink-0">
+                      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg border-4 border-white/20">
+                        <step.icon className="h-8 w-8 text-white" />
+                      </div>
+                      {index < roadmapSteps.length - 1 && (
+                        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-1 h-12 bg-gradient-to-b from-purple-400 to-pink-400 lg:hidden"></div>
+                      )}
+                    </div>
+
+                    {/* Spacer for alternating layout */}
+                    <div className="flex-1 lg:max-w-md hidden lg:block"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-center mt-16">
+              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                Start Your Certification Journey
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             </div>
           </div>
         </section>
