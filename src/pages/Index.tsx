@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,11 +11,11 @@ const Index = () => {
   const [selectedSubject, setSelectedSubject] = useState("");
 
   const musicSubjects = [
-    { name: "Piano", icon: Piano, color: "bg-emerald-500", students: "1,234" },
+    { name: "Piano", icon: Piano, color: "bg-blue-500", students: "1,234" },
     { name: "Guitar", icon: Guitar, color: "bg-green-500", students: "2,156" },
-    { name: "Violin", icon: Music2, color: "bg-teal-500", students: "856" },
-    { name: "Drums", icon: Drum, color: "bg-cyan-500", students: "1,023" },
-    { name: "Vocals", icon: Mic, color: "bg-blue-500", students: "1,567" },
+    { name: "Violin", icon: Music2, color: "bg-purple-500", students: "856" },
+    { name: "Drums", icon: Drum, color: "bg-red-500", students: "1,023" },
+    { name: "Vocals", icon: Mic, color: "bg-pink-500", students: "1,567" },
     { name: "Music Theory", icon: BookOpen, color: "bg-indigo-500", students: "945" }
   ];
 
@@ -94,20 +93,20 @@ const Index = () => {
     <>
       <Navigation />
       <div className="min-h-screen bg-white">
-        {/* Hero Section with Search - Fiverr Green Theme */}
-        <section className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 pt-20 pb-16">
+        {/* Hero Section with Search */}
+        <section className="bg-gradient-to-br from-blue-50 to-indigo-100 pt-20 pb-16">
           <div className="container mx-auto px-6">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
                 Find your perfect
-                <span className="text-green-600 block">music teacher</span>
+                <span className="text-blue-600 block">music teacher</span>
               </h1>
               <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
                 Learn from expert musicians and music teachers. Over 12,000 qualified teachers available for online and in-person lessons.
               </p>
 
-              {/* Search Bar - Fiverr Style */}
-              <div className="bg-white rounded-xl shadow-xl p-2 max-w-3xl mx-auto mb-8 border border-green-100">
+              {/* Search Bar */}
+              <div className="bg-white rounded-xl shadow-lg p-2 max-w-3xl mx-auto mb-8">
                 <div className="flex flex-col md:flex-row gap-2">
                   <div className="flex-1 relative">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -115,17 +114,17 @@ const Index = () => {
                       placeholder="What do you want to learn? (e.g., Piano, Guitar, Vocals)"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-12 h-14 text-lg border-0 focus:ring-2 focus:ring-green-500"
+                      className="pl-12 h-14 text-lg border-0 focus:ring-0"
                     />
                   </div>
                   <div className="flex-1 relative">
                     <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <Input
                       placeholder="Where? (Online or City)"
-                      className="pl-12 h-14 text-lg border-0 focus:ring-2 focus:ring-green-500"
+                      className="pl-12 h-14 text-lg border-0 focus:ring-0"
                     />
                   </div>
-                  <Button size="lg" className="h-14 px-8 bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg">
+                  <Button size="lg" className="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
                     Search
                   </Button>
                 </div>
@@ -135,7 +134,7 @@ const Index = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
                 {stats.map((stat, index) => (
                   <div key={index} className="text-center">
-                    <div className="text-2xl md:text-3xl font-bold text-green-600">{stat.value}</div>
+                    <div className="text-2xl md:text-3xl font-bold text-blue-600">{stat.value}</div>
                     <div className="text-gray-600">{stat.label}</div>
                   </div>
                 ))}
@@ -144,7 +143,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Popular Subjects - Superprof Blue/Green Mix */}
+        {/* Popular Subjects */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
@@ -156,11 +155,11 @@ const Index = () => {
               {musicSubjects.map((subject, index) => (
                 <Card 
                   key={index} 
-                  className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-green-200 hover:scale-105"
+                  className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-blue-200"
                   onClick={() => setSelectedSubject(subject.name)}
                 >
                   <CardContent className="p-6 text-center">
-                    <div className={`w-12 h-12 ${subject.color} rounded-full flex items-center justify-center mx-auto mb-3 shadow-md`}>
+                    <div className={`w-12 h-12 ${subject.color} rounded-full flex items-center justify-center mx-auto mb-3`}>
                       <subject.icon className="h-6 w-6 text-white" />
                     </div>
                     <h3 className="font-semibold text-gray-900 mb-1">{subject.name}</h3>
@@ -172,8 +171,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Featured Teachers - Clean Superprof Style with Green Accents */}
-        <section className="py-16 bg-gradient-to-br from-gray-50 to-green-50">
+        {/* Featured Teachers */}
+        <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Music Teachers</h2>
@@ -182,7 +181,7 @@ const Index = () => {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredTeachers.map((teacher) => (
-                <Card key={teacher.id} className="hover:shadow-2xl transition-all duration-300 cursor-pointer group bg-white border border-gray-100 hover:border-green-200">
+                <Card key={teacher.id} className="hover:shadow-xl transition-all duration-300 cursor-pointer group">
                   <CardContent className="p-0">
                     {/* Teacher Image */}
                     <div className="relative">
@@ -192,14 +191,14 @@ const Index = () => {
                         className="w-full h-48 object-cover rounded-t-lg"
                       />
                       {teacher.verified && (
-                        <Badge className="absolute top-3 right-3 bg-green-500 text-white shadow-md">
+                        <Badge className="absolute top-3 right-3 bg-green-500 text-white">
                           <Shield className="h-3 w-3 mr-1" />
                           Verified
                         </Badge>
                       )}
                       <div className="absolute bottom-3 left-3 right-3 flex gap-2">
                         {teacher.specialties.slice(0, 2).map((specialty, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs bg-white/95 text-gray-700 shadow-sm">
+                          <Badge key={idx} variant="secondary" className="text-xs bg-white/90 text-gray-700">
                             {specialty}
                           </Badge>
                         ))}
@@ -209,7 +208,7 @@ const Index = () => {
                     {/* Teacher Info */}
                     <div className="p-5">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-lg text-gray-900 group-hover:text-green-600 transition-colors">
+                        <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
                           {teacher.name}
                         </h3>
                         <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
@@ -217,7 +216,7 @@ const Index = () => {
                         </Button>
                       </div>
 
-                      <p className="text-green-600 font-medium mb-3">{teacher.subject}</p>
+                      <p className="text-blue-600 font-medium mb-3">{teacher.subject}</p>
 
                       {/* Rating */}
                       <div className="flex items-center gap-1 mb-3">
@@ -233,15 +232,15 @@ const Index = () => {
                       {/* Details */}
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <MapPin className="h-4 w-4 text-green-500" />
+                          <MapPin className="h-4 w-4" />
                           {teacher.location}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Clock className="h-4 w-4 text-green-500" />
+                          <Clock className="h-4 w-4" />
                           Responds in {teacher.responseTime}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Award className="h-4 w-4 text-green-500" />
+                          <Award className="h-4 w-4" />
                           {teacher.experience} of experience
                         </div>
                       </div>
@@ -249,7 +248,7 @@ const Index = () => {
                       {/* Languages */}
                       <div className="flex gap-1 mb-4">
                         {teacher.languages.map((lang, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs border-green-200 text-green-700">
+                          <Badge key={idx} variant="outline" className="text-xs">
                             {lang}
                           </Badge>
                         ))}
@@ -262,7 +261,7 @@ const Index = () => {
                           <span className="text-gray-500">/hour</span>
                         </div>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" className="text-green-600 border-green-600 hover:bg-green-50">
+                          <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-50">
                             <MessageCircle className="h-4 w-4 mr-1" />
                             Message
                           </Button>
@@ -275,7 +274,7 @@ const Index = () => {
             </div>
 
             <div className="text-center mt-10">
-              <Button size="lg" variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 shadow-md">
+              <Button size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
                 View All Teachers
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -283,7 +282,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* How It Works - Fiverr Green Theme */}
+        {/* How It Works */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
@@ -295,8 +294,8 @@ const Index = () => {
 
             <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
-                  <Search className="h-8 w-8 text-green-600" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="h-8 w-8 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">1. Find Your Teacher</h3>
                 <p className="text-gray-600">
@@ -305,8 +304,8 @@ const Index = () => {
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
-                  <MessageCircle className="h-8 w-8 text-emerald-600" />
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageCircle className="h-8 w-8 text-green-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">2. Book Your Lesson</h3>
                 <p className="text-gray-600">
@@ -315,8 +314,8 @@ const Index = () => {
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
-                  <Music className="h-8 w-8 text-teal-600" />
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Music className="h-8 w-8 text-purple-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">3. Start Learning</h3>
                 <p className="text-gray-600">
@@ -327,34 +326,34 @@ const Index = () => {
           </div>
         </section>
 
-        {/* CTA Section - Fiverr Green */}
-        <section className="py-16 bg-green-600">
+        {/* CTA Section */}
+        <section className="py-16 bg-blue-600">
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl font-bold text-white mb-4">
               Ready to Start Your Musical Journey?
             </h2>
-            <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
               Join thousands of students learning music with expert teachers on MuseSync
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 shadow-lg font-semibold">
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3">
                 Find a Teacher
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-3 shadow-lg">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-3">
                 Become a Teacher
               </Button>
             </div>
           </div>
         </section>
 
-        {/* Footer - Dark with Green Accents */}
+        {/* Footer */}
         <footer className="py-12 bg-gray-900">
           <div className="container mx-auto px-6">
             <div className="grid md:grid-cols-4 gap-8">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Music className="h-8 w-8 text-green-400" />
+                  <Music className="h-8 w-8 text-blue-400" />
                   <span className="text-2xl font-bold text-white">MuseSync</span>
                 </div>
                 <p className="text-gray-400">
@@ -365,27 +364,27 @@ const Index = () => {
               <div>
                 <h3 className="font-semibold text-white mb-4">For Students</h3>
                 <div className="space-y-2">
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">Find Teachers</a>
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">How it Works</a>
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">Pricing</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Find Teachers</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">How it Works</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Pricing</a>
                 </div>
               </div>
               
               <div>
                 <h3 className="font-semibold text-white mb-4">For Teachers</h3>
                 <div className="space-y-2">
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">Become a Teacher</a>
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">Teacher Dashboard</a>
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">Resources</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Become a Teacher</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Teacher Dashboard</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Resources</a>
                 </div>
               </div>
               
               <div>
                 <h3 className="font-semibold text-white mb-4">Support</h3>
                 <div className="space-y-2">
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">Help Center</a>
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">Contact Us</a>
-                  <a href="#" className="block text-gray-400 hover:text-green-400 transition-colors">Terms of Service</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Help Center</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Contact Us</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Terms of Service</a>
                 </div>
               </div>
             </div>
