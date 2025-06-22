@@ -1,9 +1,8 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Music, Search, Star, MapPin, Clock, Users, Award, Play, ArrowRight, Check, Trophy, BookOpen, Target, Guitar, Mic, Piano, Drum, Violin, MessageCircle, Heart, Shield } from "lucide-react";
+import { Music, Search, Star, MapPin, Clock, Users, Award, Play, ArrowRight, Check, Trophy, BookOpen, Target, Guitar, Mic, Piano, Drum, Music2, MessageCircle, Heart, Shield } from "lucide-react";
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
 
@@ -14,7 +13,7 @@ const Index = () => {
   const musicSubjects = [
     { name: "Piano", icon: Piano, color: "bg-blue-500", students: "1,234" },
     { name: "Guitar", icon: Guitar, color: "bg-green-500", students: "2,156" },
-    { name: "Violin", icon: Violin, color: "bg-purple-500", students: "856" },
+    { name: "Violin", icon: Music2, color: "bg-purple-500", students: "856" },
     { name: "Drums", icon: Drum, color: "bg-red-500", students: "1,023" },
     { name: "Vocals", icon: Mic, color: "bg-pink-500", students: "1,567" },
     { name: "Music Theory", icon: BookOpen, color: "bg-indigo-500", students: "945" }
