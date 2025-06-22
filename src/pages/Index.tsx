@@ -2,411 +2,395 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Music, Mic, Users, Brain, Calendar, Award, Play, Star, ArrowRight, Check, Trophy, BookOpen, Target, Clock } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Music, Search, Star, MapPin, Clock, Users, Award, Play, ArrowRight, Check, Trophy, BookOpen, Target, Guitar, Mic, Piano, Drum, Violin, MessageCircle, Heart, Shield } from "lucide-react";
+import { useState } from "react";
 import Navigation from "@/components/Navigation";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("students");
-  const [visibleSteps, setVisibleSteps] = useState<number[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
 
-  // Animation effect for roadmap steps
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      roadmapSteps.forEach((_, index) => {
-        setTimeout(() => {
-          setVisibleSteps(prev => [...prev, index]);
-        }, index * 200);
-      });
-    }, 500);
+  const musicSubjects = [
+    { name: "Piano", icon: Piano, color: "bg-blue-500", students: "1,234" },
+    { name: "Guitar", icon: Guitar, color: "bg-green-500", students: "2,156" },
+    { name: "Violin", icon: Violin, color: "bg-purple-500", students: "856" },
+    { name: "Drums", icon: Drum, color: "bg-red-500", students: "1,023" },
+    { name: "Vocals", icon: Mic, color: "bg-pink-500", students: "1,567" },
+    { name: "Music Theory", icon: BookOpen, color: "bg-indigo-500", students: "945" }
+  ];
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  const pricingPlans = [
+  const featuredTeachers = [
     {
-      name: "Free",
-      price: "$0",
-      period: "forever",
-      features: [
-        "Basic lessons access",
-        "Practice room (5 sessions/month)",
-        "Community access",
-        "Basic progress tracking"
-      ],
-      popular: false,
-      color: "border-gray-200"
+      id: 1,
+      name: "Sarah Johnson",
+      subject: "Piano & Music Theory",
+      rating: 4.9,
+      reviews: 127,
+      price: 25,
+      experience: "8 years",
+      location: "New York, NY",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face",
+      specialties: ["Classical", "Jazz", "Pop"],
+      verified: true,
+      responseTime: "< 1 hour",
+      languages: ["English", "French"]
     },
     {
-      name: "Pro",
-      price: "$19",
-      period: "month",
-      features: [
-        "Unlimited lessons & practice",
-        "AI feedback & analysis",
-        "Live class booking",
-        "Personalized assignments",
-        "Progress analytics",
-        "Teacher messaging"
-      ],
-      popular: true,
-      color: "border-purple-500 ring-2 ring-purple-200"
+      id: 2,
+      name: "Michael Chen",
+      subject: "Guitar & Music Production",
+      rating: 4.8,
+      reviews: 94,
+      price: 30,
+      experience: "12 years",
+      location: "Los Angeles, CA",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      specialties: ["Rock", "Blues", "Electronic"],
+      verified: true,
+      responseTime: "< 2 hours",
+      languages: ["English", "Mandarin"]
     },
     {
-      name: "Premium",
-      price: "$39",
-      period: "month",
-      features: [
-        "Everything in Pro",
-        "1:1 monthly sessions",
-        "Custom learning paths",
-        "Sheet music generator",
-        "Priority support",
-        "Certification access"
-      ],
-      popular: false,
-      color: "border-gray-200"
+      id: 3,
+      name: "Emily Rodriguez",
+      subject: "Vocals & Performance",
+      rating: 5.0,
+      reviews: 156,
+      price: 35,
+      experience: "10 years",
+      location: "Miami, FL",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+      specialties: ["Pop", "R&B", "Musical Theatre"],
+      verified: true,
+      responseTime: "< 30 min",
+      languages: ["English", "Spanish"]
+    },
+    {
+      id: 4,
+      name: "David Kim",
+      subject: "Violin & Chamber Music",
+      rating: 4.9,
+      reviews: 78,
+      price: 40,
+      experience: "15 years",
+      location: "Boston, MA",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      specialties: ["Classical", "Contemporary", "Film Score"],
+      verified: true,
+      responseTime: "< 1 hour",
+      languages: ["English", "Korean"]
     }
   ];
 
-  const featuresForStudents = [
-    { icon: Music, title: "Interactive Lessons", desc: "Gamified modules for all instruments and vocals" },
-    { icon: Brain, title: "AI Feedback", desc: "Real-time pitch, rhythm, and tempo analysis" },
-    { icon: Play, title: "Live Classes", desc: "Attend live sessions or access recordings" },
-    { icon: Award, title: "Practice Challenges", desc: "Daily challenges to improve your skills" }
-  ];
-
-  const featuresForTeachers = [
-    { icon: Users, title: "Student Dashboard", desc: "Track progress and provide feedback" },
-    { icon: Calendar, title: "Smart Scheduling", desc: "Book 1:1 or group sessions easily" },
-    { icon: Music, title: "Custom Assignments", desc: "Upload sheet music and set goals" }
-  ];
-
-  const roadmapSteps = [
-    {
-      level: "Beginner",
-      title: "Foundation Certificate",
-      duration: "3-6 months",
-      icon: BookOpen,
-      skills: ["Basic music theory", "Rhythm fundamentals", "Note reading", "Basic scales"],
-      examType: "Online Assessment",
-      badge: "Foundation"
-    },
-    {
-      level: "Elementary",
-      title: "Grade 1-3 Certification",
-      duration: "6-12 months",
-      icon: Target,
-      skills: ["Intermediate theory", "Simple pieces", "Basic harmony", "Performance skills"],
-      examType: "Practical + Theory",
-      badge: "Elementary"
-    },
-    {
-      level: "Intermediate",
-      title: "Grade 4-6 Certification",
-      duration: "12-18 months",
-      icon: Star,
-      skills: ["Advanced techniques", "Complex pieces", "Improvisation", "Music analysis"],
-      examType: "Performance + Viva",
-      badge: "Intermediate"
-    },
-    {
-      level: "Advanced",
-      title: "Grade 7-8 Certification",
-      duration: "18-24 months",
-      icon: Trophy,
-      skills: ["Master techniques", "Concert pieces", "Teaching basics", "Composition"],
-      examType: "Recital + Portfolio",
-      badge: "Advanced"
-    },
-    {
-      level: "Professional",
-      title: "Diploma & Teaching",
-      duration: "2+ years",
-      icon: Award,
-      skills: ["Professional performance", "Teaching methodology", "Music research", "Mentorship"],
-      examType: "Thesis + Recital",
-      badge: "Professional"
-    }
+  const stats = [
+    { label: "Music Teachers", value: "12,000+" },
+    { label: "Happy Students", value: "50,000+" },
+    { label: "Lessons Completed", value: "200,000+" },
+    { label: "Countries", value: "15+" }
   ];
 
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-3xl"></div>
-          <div className="relative container mx-auto px-6 py-20 text-center">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-8 animate-fade-in">
-              <Music className="h-4 w-4 text-purple-300" />
-              <span className="text-purple-100 text-sm">AI-Powered Music Learning</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in">
-              Learn Music with
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent block">
-                MuseSync
-              </span>
-            </h1>
-            
-            <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in">
-              Experience personalized music education with AI-powered feedback, live classes, 
-              and practice sessions tailored for vocal and instrumental learners.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                Start Learning Today
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10 px-8 py-3 rounded-xl backdrop-blur-sm">
-                Watch Demo
-                <Play className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="py-20 bg-white/5 backdrop-blur-sm">
+      <div className="min-h-screen bg-white">
+        {/* Hero Section with Search */}
+        <section className="bg-gradient-to-br from-blue-50 to-indigo-100 pt-20 pb-16">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4 animate-fade-in">
-                Features for Everyone
-              </h2>
-              <p className="text-gray-300 text-lg max-w-2xl mx-auto animate-fade-in">
-                Whether you're a student, teacher, or parent, MuseSync has the tools you need
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                Find your perfect
+                <span className="text-blue-600 block">music teacher</span>
+              </h1>
+              <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                Learn from expert musicians and music teachers. Over 12,000 qualified teachers available for online and in-person lessons.
               </p>
-            </div>
 
-            {/* Feature Tabs */}
-            <div className="flex justify-center mb-12">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/20 animate-scale-in">
-                <Button
-                  variant={activeTab === "students" ? "default" : "ghost"}
-                  onClick={() => setActiveTab("students")}
-                  className={`px-6 py-2 rounded-lg transition-all duration-300 ${
-                    activeTab === "students" 
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg" 
-                      : "text-gray-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  <Users className="h-4 w-4 mr-2" />
-                  Students
-                </Button>
-                <Button
-                  variant={activeTab === "teachers" ? "default" : "ghost"}
-                  onClick={() => setActiveTab("teachers")}
-                  className={`px-6 py-2 rounded-lg transition-all duration-300 ${
-                    activeTab === "teachers" 
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg" 
-                      : "text-gray-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  <Award className="h-4 w-4 mr-2" />
-                  Teachers
-                </Button>
+              {/* Search Bar */}
+              <div className="bg-white rounded-xl shadow-lg p-2 max-w-3xl mx-auto mb-8">
+                <div className="flex flex-col md:flex-row gap-2">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <Input
+                      placeholder="What do you want to learn? (e.g., Piano, Guitar, Vocals)"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-12 h-14 text-lg border-0 focus:ring-0"
+                    />
+                  </div>
+                  <div className="flex-1 relative">
+                    <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <Input
+                      placeholder="Where? (Online or City)"
+                      className="pl-12 h-14 text-lg border-0 focus:ring-0"
+                    />
+                  </div>
+                  <Button size="lg" className="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                    Search
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Feature Cards */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {(activeTab === "students" ? featuresForStudents : featuresForTeachers).map((feature, index) => (
-                <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105 hover:shadow-xl animate-fade-in hover-scale" style={{ animationDelay: `${index * 100}ms` }}>
-                  <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                      <feature.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <CardTitle className="text-white text-lg">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-gray-300 text-center">
-                      {feature.desc}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Roadmap Section */}
-        <section className="py-20 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 backdrop-blur-sm">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4 animate-fade-in">
-                Your Musical Journey Roadmap
-              </h2>
-              <p className="text-gray-300 text-lg max-w-3xl mx-auto animate-fade-in">
-                Follow our structured certification path from beginner to professional musician. 
-                Each level builds upon the previous, ensuring comprehensive musical education.
-              </p>
-            </div>
-
-            <div className="relative">
-              {/* Animated Roadmap Line */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full hidden lg:block animate-fade-in" style={{ animationDelay: '300ms' }}></div>
-              
-              <div className="space-y-12">
-                {roadmapSteps.map((step, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex items-center gap-8 transition-all duration-700 transform ${
-                      visibleSteps.includes(index) 
-                        ? 'opacity-100 translate-y-0' 
-                        : 'opacity-0 translate-y-8'
-                    } ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}
-                  >
-                    {/* Content Card */}
-                    <div className="flex-1 lg:max-w-md">
-                      <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl">
-                        <CardHeader>
-                          <div className="flex items-center justify-between mb-4">
-                            <Badge className={`${step.level === 'Beginner' ? 'bg-green-500' : 
-                              step.level === 'Elementary' ? 'bg-blue-500' :
-                              step.level === 'Intermediate' ? 'bg-yellow-500' :
-                              step.level === 'Advanced' ? 'bg-orange-500' : 'bg-red-500'} text-white animate-pulse`}>
-                              {step.badge}
-                            </Badge>
-                            <div className="flex items-center gap-2 text-gray-300">
-                              <Clock className="h-4 w-4" />
-                              <span className="text-sm">{step.duration}</span>
-                            </div>
-                          </div>
-                          <CardTitle className="text-white text-xl">{step.title}</CardTitle>
-                          <CardDescription className="text-gray-300">
-                            {step.examType}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-3">
-                            <h4 className="text-white font-medium">Key Skills:</h4>
-                            <div className="grid grid-cols-2 gap-2">
-                              {step.skills.map((skill, skillIndex) => (
-                                <div key={skillIndex} className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: `${(index * 200) + (skillIndex * 100)}ms` }}>
-                                  <Check className="h-3 w-3 text-green-400 flex-shrink-0" />
-                                  <span className="text-gray-300 text-sm">{skill}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    {/* Animated Icon Circle */}
-                    <div className="relative flex-shrink-0">
-                      <div className={`w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg border-4 border-white/20 transition-all duration-500 transform ${
-                        visibleSteps.includes(index) ? 'scale-100 rotate-0' : 'scale-0 rotate-180'
-                      }`}>
-                        <step.icon className="h-8 w-8 text-white" />
-                      </div>
-                      {index < roadmapSteps.length - 1 && (
-                        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-1 h-12 bg-gradient-to-b from-purple-400 to-pink-400 lg:hidden animate-fade-in" style={{ animationDelay: `${index * 200 + 300}ms` }}></div>
-                      )}
-                    </div>
-
-                    {/* Spacer for alternating layout */}
-                    <div className="flex-1 lg:max-w-md hidden lg:block"></div>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
+                {stats.map((stat, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-blue-600">{stat.value}</div>
+                    <div className="text-gray-600">{stat.label}</div>
                   </div>
                 ))}
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="text-center mt-16">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-fade-in">
-                Start Your Certification Journey
+        {/* Popular Subjects */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Popular Music Subjects</h2>
+              <p className="text-gray-600 text-lg">Choose from a wide range of musical instruments and subjects</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {musicSubjects.map((subject, index) => (
+                <Card 
+                  key={index} 
+                  className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-blue-200"
+                  onClick={() => setSelectedSubject(subject.name)}
+                >
+                  <CardContent className="p-6 text-center">
+                    <div className={`w-12 h-12 ${subject.color} rounded-full flex items-center justify-center mx-auto mb-3`}>
+                      <subject.icon className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">{subject.name}</h3>
+                    <p className="text-sm text-gray-500">{subject.students} students</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Teachers */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Music Teachers</h2>
+              <p className="text-gray-600 text-lg">Meet some of our top-rated music instructors</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredTeachers.map((teacher) => (
+                <Card key={teacher.id} className="hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-0">
+                    {/* Teacher Image */}
+                    <div className="relative">
+                      <img
+                        src={teacher.image}
+                        alt={teacher.name}
+                        className="w-full h-48 object-cover rounded-t-lg"
+                      />
+                      {teacher.verified && (
+                        <Badge className="absolute top-3 right-3 bg-green-500 text-white">
+                          <Shield className="h-3 w-3 mr-1" />
+                          Verified
+                        </Badge>
+                      )}
+                      <div className="absolute bottom-3 left-3 right-3 flex gap-2">
+                        {teacher.specialties.slice(0, 2).map((specialty, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs bg-white/90 text-gray-700">
+                            {specialty}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Teacher Info */}
+                    <div className="p-5">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+                          {teacher.name}
+                        </h3>
+                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
+                          <Heart className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <p className="text-blue-600 font-medium mb-3">{teacher.subject}</p>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-1 mb-3">
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`h-4 w-4 ${i < Math.floor(teacher.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                          ))}
+                        </div>
+                        <span className="font-semibold text-sm">{teacher.rating}</span>
+                        <span className="text-gray-500 text-sm">({teacher.reviews} reviews)</span>
+                      </div>
+
+                      {/* Details */}
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <MapPin className="h-4 w-4" />
+                          {teacher.location}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Clock className="h-4 w-4" />
+                          Responds in {teacher.responseTime}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Award className="h-4 w-4" />
+                          {teacher.experience} of experience
+                        </div>
+                      </div>
+
+                      {/* Languages */}
+                      <div className="flex gap-1 mb-4">
+                        {teacher.languages.map((lang, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {lang}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      {/* Price and CTA */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-2xl font-bold text-gray-900">${teacher.price}</span>
+                          <span className="text-gray-500">/hour</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                            <MessageCircle className="h-4 w-4 mr-1" />
+                            Message
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-10">
+              <Button size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                View All Teachers
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section className="py-20">
+        {/* How It Works */}
+        <section className="py-16 bg-white">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">
-                Choose Your Learning Journey
-              </h2>
-              <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-                Start free and upgrade as you grow. All plans include our core learning features.
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">How MuseSync Works</h2>
+              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                Getting started with music lessons has never been easier
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {pricingPlans.map((plan, index) => (
-                <Card key={index} className={`relative bg-white/10 backdrop-blur-md ${plan.color} hover:shadow-2xl transition-all duration-300 transform hover:scale-105`}>
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1">
-                        Most Popular
-                      </Badge>
-                    </div>
-                  )}
-                  <CardHeader className="text-center pb-8">
-                    <CardTitle className="text-white text-2xl mb-2">{plan.name}</CardTitle>
-                    <div className="text-white">
-                      <span className="text-4xl font-bold">{plan.price}</span>
-                      <span className="text-gray-300">/{plan.period}</span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {plan.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center gap-3">
-                        <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
-                        <span className="text-gray-300">{feature}</span>
-                      </div>
-                    ))}
-                    <Button 
-                      className={`w-full mt-8 ${
-                        plan.popular 
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" 
-                          : "bg-white/20 hover:bg-white/30 border border-white/30"
-                      } text-white rounded-xl py-3 transition-all duration-300`}
-                    >
-                      Get Started
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">1. Find Your Teacher</h3>
+                <p className="text-gray-600">
+                  Browse through our verified music teachers and find the perfect match for your learning goals.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageCircle className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">2. Book Your Lesson</h3>
+                <p className="text-gray-600">
+                  Contact your teacher and schedule your first lesson. Choose between online or in-person options.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Music className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">3. Start Learning</h3>
+                <p className="text-gray-600">
+                  Begin your musical journey with personalized lessons tailored to your skill level and goals.
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-sm">
+        <section className="py-16 bg-blue-600">
           <div className="container mx-auto px-6 text-center">
-            <h2 className="text-4xl font-bold text-white mb-6">
-              Ready to Transform Your Musical Journey?
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Ready to Start Your Musical Journey?
             </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of students and teachers already using MuseSync to achieve their musical goals.
+            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              Join thousands of students learning music with expert teachers on MuseSync
             </p>
-            <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-10 py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              Start Your Free Trial
-              <ArrowRight className="ml-2 h-6 w-6" />
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3">
+                Find a Teacher
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-3">
+                Become a Teacher
+              </Button>
+            </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="py-12 border-t border-white/10">
+        <footer className="py-12 bg-gray-900">
           <div className="container mx-auto px-6">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="flex items-center gap-2 mb-4 md:mb-0">
-                <Music className="h-8 w-8 text-purple-400" />
-                <span className="text-2xl font-bold text-white">MuseSync</span>
+            <div className="grid md:grid-cols-4 gap-8">
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Music className="h-8 w-8 text-blue-400" />
+                  <span className="text-2xl font-bold text-white">MuseSync</span>
+                </div>
+                <p className="text-gray-400">
+                  Connecting music students with expert teachers worldwide.
+                </p>
               </div>
-              <div className="flex gap-6 text-gray-300">
-                <a href="#" className="hover:text-white transition-colors">About</a>
-                <a href="#" className="hover:text-white transition-colors">Features</a>
-                <a href="#" className="hover:text-white transition-colors">Pricing</a>
-                <a href="#" className="hover:text-white transition-colors">Contact</a>
+              
+              <div>
+                <h3 className="font-semibold text-white mb-4">For Students</h3>
+                <div className="space-y-2">
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Find Teachers</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">How it Works</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Pricing</a>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-white mb-4">For Teachers</h3>
+                <div className="space-y-2">
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Become a Teacher</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Teacher Dashboard</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Resources</a>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-white mb-4">Support</h3>
+                <div className="space-y-2">
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Help Center</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Contact Us</a>
+                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+                </div>
               </div>
             </div>
-            <div className="mt-8 pt-8 border-t border-white/10 text-center text-gray-400">
+            
+            <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
               <p>&copy; 2024 MuseSync. All rights reserved. Empowering musicians worldwide.</p>
             </div>
           </div>
