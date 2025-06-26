@@ -9,7 +9,144 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      music_subjects: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          student_count: number
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          icon: string
+          id?: string
+          name: string
+          student_count?: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          student_count?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_stats: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          label: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          label: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          label?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      teachers: {
+        Row: {
+          created_at: string
+          experience: string
+          id: string
+          image_url: string | null
+          languages: string[]
+          location: string
+          name: string
+          price: number
+          rating: number
+          response_time: string
+          reviews: number
+          specialties: string[]
+          subject: string
+          updated_at: string
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          experience: string
+          id?: string
+          image_url?: string | null
+          languages?: string[]
+          location: string
+          name: string
+          price: number
+          rating?: number
+          response_time?: string
+          reviews?: number
+          specialties?: string[]
+          subject: string
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          experience?: string
+          id?: string
+          image_url?: string | null
+          languages?: string[]
+          location?: string
+          name?: string
+          price?: number
+          rating?: number
+          response_time?: string
+          reviews?: number
+          specialties?: string[]
+          subject?: string
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
