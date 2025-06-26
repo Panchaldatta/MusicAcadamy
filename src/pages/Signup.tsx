@@ -186,25 +186,6 @@ const Signup = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Benefits Section */}
-            <div className="mt-8 p-6 bg-white/50 backdrop-blur-sm rounded-lg border border-orange-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Join Our Musical Community</h3>
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                  <span>Learn from master gurus across India</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                  <span>Personalized learning experience</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                  <span>Practice tools and resources included</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
