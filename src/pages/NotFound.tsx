@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Music, Home, ArrowLeft } from "lucide-react";
+import { Music, Home, ArrowLeft, Search, BookOpen, Users, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 
@@ -22,7 +22,7 @@ const NotFound = () => {
               Let's get you back to making beautiful music!
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Link to="/">
                 <Button size="lg" className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white">
                   <Home className="mr-2 h-5 w-5" />
@@ -40,19 +40,23 @@ const NotFound = () => {
               </Button>
             </div>
 
-            <div className="mt-12 p-6 bg-white/50 backdrop-blur-sm rounded-lg border border-orange-200">
+            <div className="p-6 bg-white/50 backdrop-blur-sm rounded-lg border border-orange-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Popular Pages</h3>
               <div className="grid grid-cols-2 gap-4">
-                <Link to="/browse-classrooms" className="text-orange-600 hover:text-orange-700 hover:underline">
+                <Link to="/browse-classrooms" className="flex items-center text-orange-600 hover:text-orange-700 hover:underline">
+                  <Users className="mr-2 h-4 w-4" />
                   Browse Teachers
                 </Link>
-                <Link to="/about" className="text-orange-600 hover:text-orange-700 hover:underline">
+                <Link to="/about" className="flex items-center text-orange-600 hover:text-orange-700 hover:underline">
+                  <Music className="mr-2 h-4 w-4" />
                   About Us
                 </Link>
-                <Link to="/contact" className="text-orange-600 hover:text-orange-700 hover:underline">
+                <Link to="/contact" className="flex items-center text-orange-600 hover:text-orange-700 hover:underline">
+                  <Phone className="mr-2 h-4 w-4" />
                   Contact
                 </Link>
-                <Link to="/courses" className="text-orange-600 hover:text-orange-700 hover:underline">
+                <Link to="/courses" className="flex items-center text-orange-600 hover:text-orange-700 hover:underline">
+                  <BookOpen className="mr-2 h-4 w-4" />
                   Courses
                 </Link>
               </div>

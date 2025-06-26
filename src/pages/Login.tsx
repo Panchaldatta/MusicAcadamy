@@ -133,6 +133,25 @@ const Login = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Additional Features */}
+            <div className="mt-8 p-6 bg-white/50 backdrop-blur-sm rounded-lg border border-orange-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Why Choose MuseSync?</h3>
+              <div className="space-y-3 text-sm text-gray-600">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                  <span>Access to 15,000+ verified music gurus</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                  <span>Learn authentic Indian classical music</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                  <span>Flexible online and offline lessons</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
