@@ -1,22 +1,68 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Music, Search, Star, MapPin, Clock, Users, Award, Play, ArrowRight, Check, Trophy, BookOpen, Target, Guitar, Mic, Piano, Drum, Music2, MessageCircle, Heart, Shield } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import TeacherCard from "@/components/TeacherCard";
 import MusicSubjectCard from "@/components/MusicSubjectCard";
 import { useTeachers } from "@/hooks/useTeachers";
 import { useMusicSubjects } from "@/hooks/useMusicSubjects";
 import { useSiteStats } from "@/hooks/useSiteStats";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
+  const [locationQuery, setLocationQuery] = useState("");
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { data: teachers = [], isLoading: teachersLoading } = useTeachers();
   const { data: musicSubjects = [], isLoading: subjectsLoading } = useMusicSubjects();
   const { data: stats = [], isLoading: statsLoading } = useSiteStats();
+
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      toast({
+        title: "Search Query Required",
+        description: "Please enter what you want to learn",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Navigate to browse page with search parameters
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
+    if (locationQuery) params.set('location', locationQuery);
+    
+    navigate(`/browse-classrooms?${params.toString()}`);
+    
+    toast({
+      title: "Search Started",
+      description: `Searching for ${searchQuery} teachers...`
+    });
+  };
+
+  const handleSubjectSelect = (subjectName: string) => {
+    setSelectedSubject(subjectName);
+    navigate(`/browse-classrooms?subject=${encodeURIComponent(subjectName)}`);
+  };
+
+  const handleFindGuru = () => {
+    navigate('/browse-classrooms');
+  };
+
+  const handleBecomeTeacher = () => {
+    navigate('/teacher-dashboard');
+  };
+
+  const handleViewAllGurus = () => {
+    navigate('/browse-classrooms');
+  };
 
   return (
     <>
@@ -34,7 +80,7 @@ const Index = () => {
                 Master classical Indian music with expert teachers. Over 15,000 qualified gurus available for online and in-person lessons.
               </p>
 
-              {/* Search Bar */}
+              {/* Enhanced Search Bar */}
               <div className="bg-white rounded-xl shadow-lg p-2 max-w-3xl mx-auto mb-8">
                 <div className="flex flex-col md:flex-row gap-2">
                   <div className="flex-1 relative">
@@ -44,16 +90,24 @@ const Index = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-12 h-14 text-lg border-0 focus:ring-0"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
                   </div>
                   <div className="flex-1 relative">
                     <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <Input
                       placeholder="Where? (Online or City)"
+                      value={locationQuery}
+                      onChange={(e) => setLocationQuery(e.target.value)}
                       className="pl-12 h-14 text-lg border-0 focus:ring-0"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
                   </div>
-                  <Button size="lg" className="h-14 px-8 bg-orange-600 hover:bg-orange-700 text-white font-semibold">
+                  <Button 
+                    size="lg" 
+                    className="h-14 px-8 bg-orange-600 hover:bg-orange-700 text-white font-semibold"
+                    onClick={handleSearch}
+                  >
                     Search
                   </Button>
                 </div>
@@ -105,7 +159,7 @@ const Index = () => {
                     key={subject.id}
                     subject={subject}
                     isSelected={selectedSubject === subject.name}
-                    onClick={() => setSelectedSubject(subject.name)}
+                    onClick={() => handleSubjectSelect(subject.name)}
                   />
                 ))}
               </div>
@@ -138,7 +192,12 @@ const Index = () => {
             )}
 
             <div className="text-center mt-10">
-              <Button size="lg" variant="outline" className="border-orange-600 text-orange-600 hover:bg-orange-50">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                onClick={handleViewAllGurus}
+              >
                 View All Gurus
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -200,11 +259,20 @@ const Index = () => {
               Join thousands of students learning Indian classical music with expert gurus on MuseSync
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 px-8 py-3">
+              <Button 
+                size="lg" 
+                className="bg-white text-orange-600 hover:bg-gray-100 px-8 py-3"
+                onClick={handleFindGuru}
+              >
                 Find a Guru
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-3">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white text-white hover:bg-white/10 px-8 py-3"
+                onClick={handleBecomeTeacher}
+              >
                 Become a Teacher
               </Button>
             </div>
@@ -228,27 +296,27 @@ const Index = () => {
               <div>
                 <h3 className="font-semibold text-white mb-4">For Students</h3>
                 <div className="space-y-2">
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Find Teachers</a>
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">How it Works</a>
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Pricing</a>
+                  <button onClick={() => navigate('/browse-classrooms')} className="block text-gray-400 hover:text-white transition-colors text-left">Find Teachers</button>
+                  <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">How it Works</button>
+                  <button onClick={() => navigate('/contact')} className="block text-gray-400 hover:text-white transition-colors text-left">Pricing</button>
                 </div>
               </div>
               
               <div>
                 <h3 className="font-semibold text-white mb-4">For Teachers</h3>
                 <div className="space-y-2">
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Become a Teacher</a>
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Teacher Dashboard</a>
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Resources</a>
+                  <button onClick={() => navigate('/teacher-dashboard')} className="block text-gray-400 hover:text-white transition-colors text-left">Become a Teacher</button>
+                  <button onClick={() => navigate('/teacher-dashboard')} className="block text-gray-400 hover:text-white transition-colors text-left">Teacher Dashboard</button>
+                  <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">Resources</button>
                 </div>
               </div>
               
               <div>
                 <h3 className="font-semibold text-white mb-4">Support</h3>
                 <div className="space-y-2">
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Help Center</a>
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Contact Us</a>
-                  <a href="#" className="block text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+                  <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">Help Center</button>
+                  <button onClick={() => navigate('/contact')} className="block text-gray-400 hover:text-white transition-colors text-left">Contact Us</button>
+                  <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">Terms of Service</button>
                 </div>
               </div>
             </div>
