@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import BrowseClassrooms from "./pages/BrowseClassrooms";
+import BrowseTeachers from "./pages/BrowseTeachers";
 import PracticeRoom from "./components/PracticeRoom";
 import CourseCatalog from "./components/CourseCatalog";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/signup" element={<Signup />} />
           <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/browse-classrooms" element={<BrowseClassrooms />} />
+          <Route path="/browse-teachers" element={<BrowseTeachers />} />
           <Route path="/practice" element={<PracticeRoom />} />
           <Route path="/courses" element={<CourseCatalog />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

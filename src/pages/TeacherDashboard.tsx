@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import ClassroomCard from "@/components/ClassroomCard";
 import CreateClassroomDialog from "@/components/CreateClassroomDialog";
 import TeacherAnalytics from "@/components/TeacherAnalytics";
 import UpcomingClasses from "@/components/UpcomingClasses";
+import Footer from "@/components/Footer";
 
 interface Classroom {
   id: string;
@@ -295,6 +295,7 @@ const TeacherDashboard = () => {
           onCreateClassroom={handleCreateClassroom}
         />
       </div>
+      <Footer />
     </>
   );
 };
