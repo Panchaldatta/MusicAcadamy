@@ -6,6 +6,7 @@ import { Music, Search, Star, MapPin, Clock, Users, Award, Play, ArrowRight, Che
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import TeacherCard from "@/components/TeacherCard";
 import MusicSubjectCard from "@/components/MusicSubjectCard";
 import { useTeachers } from "@/hooks/useTeachers";
@@ -278,55 +279,9 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* Footer */}
-        <footer className="py-12 bg-gray-900">
-          <div className="container mx-auto px-6">
-            <div className="grid md:grid-cols-4 gap-8">
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Music className="h-8 w-8 text-orange-400" />
-                  <span className="text-2xl font-bold text-white">MuseSync</span>
-                </div>
-                <p className="text-gray-400">
-                  Connecting music students with expert Indian classical music teachers worldwide.
-                </p>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold text-white mb-4">For Students</h3>
-                <div className="space-y-2">
-                  <button onClick={() => navigate('/browse-classrooms')} className="block text-gray-400 hover:text-white transition-colors text-left">Find Teachers</button>
-                  <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">How it Works</button>
-                  <button onClick={() => navigate('/contact')} className="block text-gray-400 hover:text-white transition-colors text-left">Pricing</button>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold text-white mb-4">For Teachers</h3>
-                <div className="space-y-2">
-                  <button onClick={() => navigate('/teacher-dashboard')} className="block text-gray-400 hover:text-white transition-colors text-left">Become a Teacher</button>
-                  <button onClick={() => navigate('/teacher-dashboard')} className="block text-gray-400 hover:text-white transition-colors text-left">Teacher Dashboard</button>
-                  <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">Resources</button>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold text-white mb-4">Support</h3>
-                <div className="space-y-2">
-                  <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">Help Center</button>
-                  <button onClick={() => navigate('/contact')} className="block text-gray-400 hover:text-white transition-colors text-left">Contact Us</button>
-                  <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">Terms of Service</button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
-              <p>&copy; 2024 MuseSync. All rights reserved. Preserving and teaching Indian classical music traditions.</p>
-            </div>
-          </div>
-        </footer>
       </div>
+      
+      <Footer />
     </>
   );
 };
