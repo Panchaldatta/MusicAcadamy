@@ -1,7 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Music, Search, Star, MapPin, Clock, Users, Award, Play, ArrowRight, Check, Trophy, BookOpen, Target, Guitar, Mic, Piano, Drum, Music2, MessageCircle, Heart, Shield } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -168,7 +168,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Featured Teachers */}
+        {/* Featured Teachers Slider */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
@@ -185,10 +185,26 @@ const Index = () => {
                 ))}
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {teachers.slice(0, 4).map((teacher) => (
-                  <TeacherCard key={teacher.id} teacher={teacher} />
-                ))}
+              <div className="relative">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  className="w-full"
+                >
+                  <CarouselContent className="-ml-2 md:-ml-4">
+                    {teachers.map((teacher) => (
+                      <CarouselItem key={teacher.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                        <div className="h-full">
+                          <TeacherCard teacher={teacher} />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="hidden md:flex -left-4 lg:-left-6" />
+                  <CarouselNext className="hidden md:flex -right-4 lg:-right-6" />
+                </Carousel>
               </div>
             )}
 
