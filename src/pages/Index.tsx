@@ -27,6 +27,7 @@ const Index = () => {
   const { toast } = useToast();
 
   const [currentTeacherIndex, setCurrentTeacherIndex] = useState(0);
+  const [showSwipeMode, setShowSwipeMode] = useState(false);
 
   const { data: teachers = [], isLoading: teachersLoading } = useTeachers();
   const { data: musicSubjects = [], isLoading: subjectsLoading } = useMusicSubjects();
@@ -98,6 +99,14 @@ const Index = () => {
     navigate('/browse-classrooms');
   };
 
+  const handleStartSwiping = () => {
+    setShowSwipeMode(true);
+  };
+
+  const handleExitSwipeMode = () => {
+    setShowSwipeMode(false);
+  };
+
   const handleTeacherSwipeLeft = useCallback(() => {
     toast({
       title: "Teacher Passed",
@@ -124,6 +133,183 @@ const Index = () => {
 
   // Get current teacher
   const currentTeacher = teachers[currentTeacherIndex];
+
+  // Full-page swipe mode
+  if (showSwipeMode) {
+    return (
+      <div className="fixed inset-0 bg-gradient-to-br from-orange-50 to-red-100 z-50 overflow-hidden">
+        {/* Header */}
+        <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200">
+          <div className="flex items-center justify-between px-6 py-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleExitSwipeMode}
+              className="text-gray-700 hover:text-gray-900"
+            >
+              ← Back
+            </Button>
+            <div className="text-center">
+              <h2 className="text-lg font-semibold text-gray-900">Discover Teachers</h2>
+              <span className="text-sm text-gray-600">
+                {currentTeacherIndex + 1} of {teachers.length}
+              </span>
+            </div>
+            <div className="w-16"></div>
+          </div>
+        </div>
+
+        {/* Swipe Instructions */}
+        <div className="absolute top-24 left-0 right-0 z-10 px-6">
+          <div className="flex items-center justify-center gap-8 bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 mx-auto w-fit shadow-lg">
+            <div className="flex items-center gap-2 text-red-500">
+              <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+              <span className="text-sm font-medium">Swipe Left to Pass</span>
+            </div>
+            <div className="w-px h-6 bg-gray-300"></div>
+            <div className="flex items-center gap-2 text-green-500">
+              <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+              <span className="text-sm font-medium">Swipe Right to Like</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex items-center justify-center min-h-screen pt-32 pb-8 px-6">
+          {currentTeacher ? (
+            <SwipeableCard
+              key={`${currentTeacher.id}-${currentTeacherIndex}`}
+              onSwipeLeft={handleTeacherSwipeLeft}
+              onSwipeRight={handleTeacherSwipeRight}
+              className="w-full max-w-sm"
+            >
+              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                {/* Teacher Image */}
+                <div className="relative">
+                  <img
+                    src={currentTeacher.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"}
+                    alt={currentTeacher.name}
+                    className="w-full h-80 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                  
+                  {/* Floating Elements */}
+                  {currentTeacher.verified && (
+                    <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 shadow-lg">
+                      <Shield className="h-3 w-3" />
+                      Verified
+                    </div>
+                  )}
+                  
+                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-orange-600 px-3 py-1 rounded-full text-sm font-bold">
+                    ₹{currentTeacher.price}/hr
+                  </div>
+
+                  {/* Name and Subject at bottom */}
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-white text-2xl font-bold mb-1">{currentTeacher.name}</h3>
+                    <p className="text-orange-200 font-semibold text-lg">{currentTeacher.subject}</p>
+                  </div>
+                </div>
+
+                {/* Card Details */}
+                <div className="p-6 space-y-4">
+                  {/* Rating */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`h-4 w-4 ${i < Math.floor(currentTeacher.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                      ))}
+                    </div>
+                    <span className="font-bold text-sm bg-gray-100 px-2 py-1 rounded-full">{currentTeacher.rating}</span>
+                    <span className="text-gray-500 text-sm">({currentTeacher.reviews} reviews)</span>
+                  </div>
+
+                  {/* Details */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                        <MapPin className="h-3 w-3 text-blue-600" />
+                      </div>
+                      {currentTeacher.location}
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                        <Clock className="h-3 w-3 text-green-600" />
+                      </div>
+                      Responds in {currentTeacher.response_time}
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
+                        <Award className="h-3 w-3 text-purple-600" />
+                      </div>
+                      {currentTeacher.experience} experience
+                    </div>
+                  </div>
+
+                  {/* Specialties */}
+                  <div className="flex flex-wrap gap-2">
+                    {currentTeacher.specialties.slice(0, 3).map((specialty, idx) => (
+                      <span key={idx} className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {specialty}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Languages */}
+                  <div className="flex flex-wrap gap-1">
+                    {currentTeacher.languages.map((lang, idx) => (
+                      <span key={idx} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs font-medium">
+                        {lang}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                      onClick={handleTeacherSwipeLeft}
+                    >
+                      Pass
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+                      onClick={handleTeacherSwipeRight}
+                    >
+                      <Heart className="h-4 w-4 mr-2" />
+                      Like
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </SwipeableCard>
+          ) : (
+            <div className="text-center py-16 bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full">
+              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="h-10 w-10 text-gray-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">No more teachers!</h3>
+              <p className="text-gray-600 mb-6">You've seen all our featured teachers.</p>
+              <Button 
+                size="lg" 
+                className="bg-orange-600 hover:bg-orange-700 text-white w-full"
+                onClick={() => {
+                  handleExitSwipeMode();
+                  handleViewAllGurus();
+                }}
+              >
+                Browse All Teachers
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -228,173 +414,57 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Enhanced Featured Teachers with Single Card Swipe */}
-        <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+        {/* Featured Teachers Preview */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
                 Featured Music Gurus
               </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                Swipe right to like a teacher, swipe left to pass. Find your perfect music guru!
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8">
+                Discover amazing teachers with our swipe feature. Find your perfect music guru!
               </p>
+              
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={handleStartSwiping}
+              >
+                Start Swiping
+                <Heart className="ml-2 h-5 w-5" />
+              </Button>
             </div>
 
-            {teachersLoading ? (
-              <div className="flex justify-center">
-                <div className="animate-pulse">
-                  <div className="bg-gray-200 rounded-2xl h-[550px] w-[350px]"></div>
-                </div>
-              </div>
-            ) : (
-              <div className="relative max-w-7xl mx-auto">
-                {/* Swipe Instructions */}
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center gap-4 bg-white rounded-full px-6 py-3 shadow-lg">
-                    <div className="flex items-center gap-2 text-red-500">
-                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span className="text-sm font-medium">Swipe Left to Pass</span>
-                    </div>
-                    <div className="w-px h-4 bg-gray-300"></div>
-                    <div className="flex items-center gap-2 text-green-500">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm font-medium">Swipe Right to Like</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Teacher Counter */}
-                <div className="text-center mb-8">
-                  <span className="text-gray-600 text-lg">
-                    {currentTeacherIndex + 1} of {teachers.length}
-                  </span>
-                </div>
-
-                {currentTeacher ? (
-                  <div className="relative h-[600px] flex items-center justify-center">
-                    <SwipeableCard
-                      key={currentTeacher.id}
-                      onSwipeLeft={handleTeacherSwipeLeft}
-                      onSwipeRight={handleTeacherSwipeRight}
-                      className="z-30"
-                    >
-                      <div className="w-[350px] h-[550px]">
-                        <div className="relative group h-full">
-                          {/* Enhanced Teacher Card with Modern Design */}
-                          <div className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden h-full flex flex-col">
-                            {/* Teacher Image with Overlay */}
-                            <div className="relative overflow-hidden flex-shrink-0">
-                              <img
-                                src={currentTeacher.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=350&h=280&fit=crop&crop=face"}
-                                alt={currentTeacher.name}
-                                className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-110"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                              
-                              {/* Floating Elements */}
-                              {currentTeacher.verified && (
-                                <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 shadow-lg">
-                                  <Shield className="h-3 w-3" />
-                                  Verified
-                                </div>
-                              )}
-                              
-                              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-orange-600 px-3 py-1 rounded-full text-sm font-bold">
-                                ₹{currentTeacher.price}/hr
-                              </div>
-
-                              {/* Specialties at bottom */}
-                              <div className="absolute bottom-4 left-4 right-4 flex gap-2">
-                                {currentTeacher.specialties.slice(0, 2).map((specialty, idx) => (
-                                  <span key={idx} className="bg-white/95 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
-                                    {specialty}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Card Content */}
-                            <div className="p-6 flex-1 flex flex-col">
-                              <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
-                                  {currentTeacher.name}
-                                </h3>
-                                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                  <Heart className="h-4 w-4" />
-                                </Button>
-                              </div>
-
-                              <p className="text-orange-600 font-semibold mb-4 text-lg">{currentTeacher.subject}</p>
-
-                              {/* Enhanced Rating */}
-                              <div className="flex items-center gap-2 mb-4">
-                                <div className="flex items-center gap-1">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className={`h-4 w-4 ${i < Math.floor(currentTeacher.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
-                                  ))}
-                                </div>
-                                <span className="font-bold text-sm bg-gray-100 px-2 py-1 rounded-full">{currentTeacher.rating}</span>
-                                <span className="text-gray-500 text-sm">({currentTeacher.reviews})</span>
-                              </div>
-
-                              {/* Enhanced Details */}
-                              <div className="space-y-3 mb-5 flex-1">
-                                <div className="flex items-center gap-3 text-sm text-gray-600">
-                                  <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <MapPin className="h-3 w-3 text-blue-600" />
-                                  </div>
-                                  {currentTeacher.location}
-                                </div>
-                                <div className="flex items-center gap-3 text-sm text-gray-600">
-                                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                                    <Clock className="h-3 w-3 text-green-600" />
-                                  </div>
-                                  Responds in {currentTeacher.response_time}
-                                </div>
-                                <div className="flex items-center gap-3 text-sm text-gray-600">
-                                  <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
-                                    <Award className="h-3 w-3 text-purple-600" />
-                                  </div>
-                                  {currentTeacher.experience} experience
-                                </div>
-                              </div>
-
-                              {/* Languages */}
-                              <div className="flex flex-wrap gap-1 mb-5">
-                                {currentTeacher.languages.map((lang, idx) => (
-                                  <span key={idx} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs font-medium">
-                                    {lang}
-                                  </span>
-                                ))}
-                              </div>
-
-                              {/* CTA Button */}
-                              <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 mt-auto">
-                                <MessageCircle className="h-4 w-4 mr-2" />
-                                Start Learning
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
+            {/* Teacher Preview Cards */}
+            {!teachersLoading && teachers.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                {teachers.slice(0, 3).map((teacher) => (
+                  <div key={teacher.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div className="relative">
+                      <img
+                        src={teacher.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop&crop=face"}
+                        alt={teacher.name}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-orange-600 px-2 py-1 rounded-full text-sm font-bold">
+                        ₹{teacher.price}/hr
                       </div>
-                    </SwipeableCard>
-                  </div>
-                ) : (
-                  <div className="text-center py-16">
-                    <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Heart className="h-10 w-10 text-gray-400" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No more teachers!</h3>
-                    <p className="text-gray-600 mb-6">You've seen all our featured teachers. Check out more in our browse section.</p>
-                    <Button 
-                      size="lg" 
-                      className="bg-orange-600 hover:bg-orange-700 text-white"
-                      onClick={handleViewAllGurus}
-                    >
-                      Browse All Teachers
-                    </Button>
+                    <div className="p-4">
+                      <h3 className="font-bold text-lg text-gray-900 mb-1">{teacher.name}</h3>
+                      <p className="text-orange-600 font-semibold mb-2">{teacher.subject}</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`h-3 w-3 ${i < Math.floor(teacher.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">({teacher.reviews})</span>
+                      </div>
+                      <p className="text-sm text-gray-600">{teacher.location}</p>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
             )}
           </div>

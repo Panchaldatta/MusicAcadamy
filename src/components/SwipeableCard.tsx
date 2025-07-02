@@ -18,6 +18,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
   style = {}
 }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   
   // Motion values for tracking drag
@@ -39,27 +40,25 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
       // Animate card off screen
       const exitX = direction === 'right' ? 1000 : -1000;
       
-      // Hide card and trigger callback
-      setIsVisible(false);
-      
-      if (direction === 'left' && onSwipeLeft) {
-        setTimeout(() => onSwipeLeft(), 200);
-      } else if (direction === 'right' && onSwipeRight) {
-        setTimeout(() => onSwipeRight(), 200);
-      }
-      
-      // Animate card exit
+      // Set exiting state and animate
+      setIsExiting(true);
       x.set(exitX);
+      
+      // Trigger callbacks after animation
+      setTimeout(() => {
+        if (direction === 'left' && onSwipeLeft) {
+          onSwipeLeft();
+        } else if (direction === 'right' && onSwipeRight) {
+          onSwipeRight();
+        }
+        setIsVisible(false);
+      }, 300);
     } else {
       // Snap back to center
       x.set(0);
       y.set(0);
     }
   }, [x, y, onSwipeLeft, onSwipeRight]);
-
-  if (!isVisible) {
-    return null;
-  }
 
   return (
     <motion.div
@@ -69,7 +68,8 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
         x,
         y,
         rotate,
-        opacity,
+        opacity: isVisible ? opacity : 0,
+        scale: isVisible ? 1 : 0,
         ...style
       }}
       drag
@@ -77,7 +77,10 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
       dragElastic={0.2}
       onDragEnd={handleDragEnd}
       whileTap={{ scale: 1.05 }}
-      animate={{ scale: isVisible ? 1 : 0 }}
+      animate={{ 
+        scale: isVisible && !isExiting ? 1 : 0,
+        opacity: isVisible && !isExiting ? 1 : 0
+      }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       {children}
