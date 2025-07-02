@@ -7,13 +7,15 @@ interface SwipeableCardProps {
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const SwipeableCard: React.FC<SwipeableCardProps> = ({
   children,
   onSwipeLeft,
   onSwipeRight,
-  className = ""
+  className = "",
+  style = {}
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -67,7 +69,8 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
         x,
         y,
         rotate,
-        opacity
+        opacity,
+        ...style
       }}
       drag
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}

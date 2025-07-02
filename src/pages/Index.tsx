@@ -26,7 +26,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [swipedTeachers, setSwipedTeachers] = useState<string[]>([]);
+  const [currentTeacherIndex, setCurrentTeacherIndex] = useState(0);
 
   const { data: teachers = [], isLoading: teachersLoading } = useTeachers();
   const { data: musicSubjects = [], isLoading: subjectsLoading } = useMusicSubjects();
@@ -98,24 +98,32 @@ const Index = () => {
     navigate('/browse-classrooms');
   };
 
-  const handleTeacherSwipeLeft = useCallback((teacherId: string) => {
-    setSwipedTeachers(prev => [...prev, teacherId]);
+  const handleTeacherSwipeLeft = useCallback(() => {
     toast({
       title: "Teacher Passed",
       description: "You can find them again in browse section",
     });
-  }, [toast]);
+    
+    // Move to next teacher
+    if (currentTeacherIndex < teachers.length - 1) {
+      setCurrentTeacherIndex(prev => prev + 1);
+    }
+  }, [toast, currentTeacherIndex, teachers.length]);
 
-  const handleTeacherSwipeRight = useCallback((teacherId: string) => {
-    setSwipedTeachers(prev => [...prev, teacherId]);
+  const handleTeacherSwipeRight = useCallback(() => {
     toast({
       title: "Teacher Liked!",
       description: "Contact them to start learning",
     });
-  }, [toast]);
+    
+    // Move to next teacher
+    if (currentTeacherIndex < teachers.length - 1) {
+      setCurrentTeacherIndex(prev => prev + 1);
+    }
+  }, [toast, currentTeacherIndex, teachers.length]);
 
-  // Filter out swiped teachers
-  const availableTeachers = teachers.filter(teacher => !swipedTeachers.includes(teacher.id));
+  // Get current teacher
+  const currentTeacher = teachers[currentTeacherIndex];
 
   return (
     <>
@@ -220,7 +228,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Enhanced Featured Teachers Slider with Tinder-like Swipe */}
+        {/* Enhanced Featured Teachers with Single Card Swipe */}
         <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
@@ -233,12 +241,10 @@ const Index = () => {
             </div>
 
             {teachersLoading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {[...Array(4)].map((_, index) => (
-                  <div key={index} className="animate-pulse">
-                    <div className="bg-gray-200 rounded-2xl h-[420px]"></div>
-                  </div>
-                ))}
+              <div className="flex justify-center">
+                <div className="animate-pulse">
+                  <div className="bg-gray-200 rounded-2xl h-[550px] w-[350px]"></div>
+                </div>
               </div>
             ) : (
               <div className="relative max-w-7xl mx-auto">
@@ -257,124 +263,121 @@ const Index = () => {
                   </div>
                 </div>
 
-                {availableTeachers.length > 0 ? (
-                  <div className="relative h-[600px] flex items-center justify-center">
-                    {/* Stack of cards - showing top 3 */}
-                    {availableTeachers.slice(0, 3).map((teacher, index) => (
-                      <SwipeableCard
-                        key={teacher.id}
-                        onSwipeLeft={() => handleTeacherSwipeLeft(teacher.id)}
-                        onSwipeRight={() => handleTeacherSwipeRight(teacher.id)}
-                        className={`absolute transition-all duration-300 ${
-                          index === 0 ? 'z-30 scale-100' : 
-                          index === 1 ? 'z-20 scale-95 opacity-70' : 
-                          'z-10 scale-90 opacity-40'
-                        }`}
-                        style={{
-                          transform: `translateY(${index * 8}px) translateX(${index * 4}px)`
-                        }}
-                      >
-                        <div className="w-[350px] h-[550px] transform transition-all duration-500">
-                          <div className="relative group h-full">
-                            {/* Enhanced Teacher Card with Modern Design */}
-                            <div className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden h-full flex flex-col">
-                              {/* Teacher Image with Overlay */}
-                              <div className="relative overflow-hidden flex-shrink-0">
-                                <img
-                                  src={teacher.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=350&h=280&fit=crop&crop=face"}
-                                  alt={teacher.name}
-                                  className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                
-                                {/* Floating Elements */}
-                                {teacher.verified && (
-                                  <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 shadow-lg">
-                                    <Shield className="h-3 w-3" />
-                                    Verified
-                                  </div>
-                                )}
-                                
-                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-orange-600 px-3 py-1 rounded-full text-sm font-bold">
-                                  ₹{teacher.price}/hr
-                                </div>
+                {/* Teacher Counter */}
+                <div className="text-center mb-8">
+                  <span className="text-gray-600 text-lg">
+                    {currentTeacherIndex + 1} of {teachers.length}
+                  </span>
+                </div>
 
-                                {/* Specialties at bottom */}
-                                <div className="absolute bottom-4 left-4 right-4 flex gap-2">
-                                  {teacher.specialties.slice(0, 2).map((specialty, idx) => (
-                                    <span key={idx} className="bg-white/95 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
-                                      {specialty}
-                                    </span>
-                                  ))}
+                {currentTeacher ? (
+                  <div className="relative h-[600px] flex items-center justify-center">
+                    <SwipeableCard
+                      key={currentTeacher.id}
+                      onSwipeLeft={handleTeacherSwipeLeft}
+                      onSwipeRight={handleTeacherSwipeRight}
+                      className="z-30"
+                    >
+                      <div className="w-[350px] h-[550px]">
+                        <div className="relative group h-full">
+                          {/* Enhanced Teacher Card with Modern Design */}
+                          <div className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden h-full flex flex-col">
+                            {/* Teacher Image with Overlay */}
+                            <div className="relative overflow-hidden flex-shrink-0">
+                              <img
+                                src={currentTeacher.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=350&h=280&fit=crop&crop=face"}
+                                alt={currentTeacher.name}
+                                className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-110"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              
+                              {/* Floating Elements */}
+                              {currentTeacher.verified && (
+                                <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 shadow-lg">
+                                  <Shield className="h-3 w-3" />
+                                  Verified
                                 </div>
+                              )}
+                              
+                              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-orange-600 px-3 py-1 rounded-full text-sm font-bold">
+                                ₹{currentTeacher.price}/hr
                               </div>
 
-                              {/* Card Content */}
-                              <div className="p-6 flex-1 flex flex-col">
-                                <div className="flex justify-between items-start mb-3">
-                                  <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
-                                    {teacher.name}
-                                  </h3>
-                                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                    <Heart className="h-4 w-4" />
-                                  </Button>
-                                </div>
+                              {/* Specialties at bottom */}
+                              <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+                                {currentTeacher.specialties.slice(0, 2).map((specialty, idx) => (
+                                  <span key={idx} className="bg-white/95 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
+                                    {specialty}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
 
-                                <p className="text-orange-600 font-semibold mb-4 text-lg">{teacher.subject}</p>
-
-                                {/* Enhanced Rating */}
-                                <div className="flex items-center gap-2 mb-4">
-                                  <div className="flex items-center gap-1">
-                                    {[...Array(5)].map((_, i) => (
-                                      <Star key={i} className={`h-4 w-4 ${i < Math.floor(teacher.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
-                                    ))}
-                                  </div>
-                                  <span className="font-bold text-sm bg-gray-100 px-2 py-1 rounded-full">{teacher.rating}</span>
-                                  <span className="text-gray-500 text-sm">({teacher.reviews})</span>
-                                </div>
-
-                                {/* Enhanced Details */}
-                                <div className="space-y-3 mb-5 flex-1">
-                                  <div className="flex items-center gap-3 text-sm text-gray-600">
-                                    <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
-                                      <MapPin className="h-3 w-3 text-blue-600" />
-                                    </div>
-                                    {teacher.location}
-                                  </div>
-                                  <div className="flex items-center gap-3 text-sm text-gray-600">
-                                    <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                                      <Clock className="h-3 w-3 text-green-600" />
-                                    </div>
-                                    Responds in {teacher.response_time}
-                                  </div>
-                                  <div className="flex items-center gap-3 text-sm text-gray-600">
-                                    <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
-                                      <Award className="h-3 w-3 text-purple-600" />
-                                    </div>
-                                    {teacher.experience} experience
-                                  </div>
-                                </div>
-
-                                {/* Languages */}
-                                <div className="flex flex-wrap gap-1 mb-5">
-                                  {teacher.languages.map((lang, idx) => (
-                                    <span key={idx} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs font-medium">
-                                      {lang}
-                                    </span>
-                                  ))}
-                                </div>
-
-                                {/* CTA Button */}
-                                <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 mt-auto">
-                                  <MessageCircle className="h-4 w-4 mr-2" />
-                                  Start Learning
+                            {/* Card Content */}
+                            <div className="p-6 flex-1 flex flex-col">
+                              <div className="flex justify-between items-start mb-3">
+                                <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
+                                  {currentTeacher.name}
+                                </h3>
+                                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                  <Heart className="h-4 w-4" />
                                 </Button>
                               </div>
+
+                              <p className="text-orange-600 font-semibold mb-4 text-lg">{currentTeacher.subject}</p>
+
+                              {/* Enhanced Rating */}
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="flex items-center gap-1">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className={`h-4 w-4 ${i < Math.floor(currentTeacher.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                                  ))}
+                                </div>
+                                <span className="font-bold text-sm bg-gray-100 px-2 py-1 rounded-full">{currentTeacher.rating}</span>
+                                <span className="text-gray-500 text-sm">({currentTeacher.reviews})</span>
+                              </div>
+
+                              {/* Enhanced Details */}
+                              <div className="space-y-3 mb-5 flex-1">
+                                <div className="flex items-center gap-3 text-sm text-gray-600">
+                                  <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <MapPin className="h-3 w-3 text-blue-600" />
+                                  </div>
+                                  {currentTeacher.location}
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-gray-600">
+                                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                                    <Clock className="h-3 w-3 text-green-600" />
+                                  </div>
+                                  Responds in {currentTeacher.response_time}
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-gray-600">
+                                  <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <Award className="h-3 w-3 text-purple-600" />
+                                  </div>
+                                  {currentTeacher.experience} experience
+                                </div>
+                              </div>
+
+                              {/* Languages */}
+                              <div className="flex flex-wrap gap-1 mb-5">
+                                {currentTeacher.languages.map((lang, idx) => (
+                                  <span key={idx} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs font-medium">
+                                    {lang}
+                                  </span>
+                                ))}
+                              </div>
+
+                              {/* CTA Button */}
+                              <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 mt-auto">
+                                <MessageCircle className="h-4 w-4 mr-2" />
+                                Start Learning
+                              </Button>
                             </div>
                           </div>
                         </div>
-                      </SwipeableCard>
-                    ))}
+                      </div>
+                    </SwipeableCard>
                   </div>
                 ) : (
                   <div className="text-center py-16">
