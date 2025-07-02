@@ -14,6 +14,7 @@ import { useMusicSubjects } from "@/hooks/useMusicSubjects";
 import { useSiteStats } from "@/hooks/useSiteStats";
 import { useToast } from "@/hooks/use-toast";
 import { type CarouselApi } from "@/components/ui/carousel";
+import SwipeableCard from "@/components/SwipeableCard";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,6 +25,8 @@ const Index = () => {
   const [canScrollNext, setCanScrollNext] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const [swipedTeachers, setSwipedTeachers] = useState<string[]>([]);
 
   const { data: teachers = [], isLoading: teachersLoading } = useTeachers();
   const { data: musicSubjects = [], isLoading: subjectsLoading } = useMusicSubjects();
@@ -94,6 +97,25 @@ const Index = () => {
   const handleViewAllGurus = () => {
     navigate('/browse-classrooms');
   };
+
+  const handleTeacherSwipeLeft = useCallback((teacherId: string) => {
+    setSwipedTeachers(prev => [...prev, teacherId]);
+    toast({
+      title: "Teacher Passed",
+      description: "You can find them again in browse section",
+    });
+  }, [toast]);
+
+  const handleTeacherSwipeRight = useCallback((teacherId: string) => {
+    setSwipedTeachers(prev => [...prev, teacherId]);
+    toast({
+      title: "Teacher Liked!",
+      description: "Contact them to start learning",
+    });
+  }, [toast]);
+
+  // Filter out swiped teachers
+  const availableTeachers = teachers.filter(teacher => !swipedTeachers.includes(teacher.id));
 
   return (
     <>
@@ -198,7 +220,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Enhanced Featured Teachers Slider */}
+        {/* Enhanced Featured Teachers Slider with Tinder-like Swipe */}
         <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
@@ -206,7 +228,7 @@ const Index = () => {
                 Featured Music Gurus
               </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                Learn from master musicians and acclaimed teachers who have shaped the world of Indian classical music
+                Swipe right to like a teacher, swipe left to pass. Find your perfect music guru!
               </p>
             </div>
 
@@ -220,70 +242,44 @@ const Index = () => {
               </div>
             ) : (
               <div className="relative max-w-7xl mx-auto">
-                {/* Enhanced Navigation Controls */}
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex gap-3">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={handlePrevious}
-                      disabled={!canScrollPrev}
-                      className={`
-                        h-12 w-12 rounded-full border-2 shadow-lg transition-all duration-300 transform hover:scale-110
-                        ${!canScrollPrev 
-                          ? 'border-gray-200 text-gray-400 cursor-not-allowed' 
-                          : 'border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-400 hover:shadow-xl'
-                        }
-                      `}
-                    >
-                      <ChevronLeft className="h-6 w-6" />
-                      <span className="sr-only">Previous teachers</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={handleNext}
-                      disabled={!canScrollNext}
-                      className={`
-                        h-12 w-12 rounded-full border-2 shadow-lg transition-all duration-300 transform hover:scale-110
-                        ${!canScrollNext 
-                          ? 'border-gray-200 text-gray-400 cursor-not-allowed' 
-                          : 'border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-400 hover:shadow-xl'
-                        }
-                      `}
-                    >
-                      <ChevronRight className="h-6 w-6" />
-                      <span className="sr-only">Next teachers</span>
-                    </Button>
-                  </div>
-                  
-                  <div className="hidden md:block text-sm text-gray-500">
-                    Swipe or use arrows to navigate
+                {/* Swipe Instructions */}
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center gap-4 bg-white rounded-full px-6 py-3 shadow-lg">
+                    <div className="flex items-center gap-2 text-red-500">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span className="text-sm font-medium">Swipe Left to Pass</span>
+                    </div>
+                    <div className="w-px h-4 bg-gray-300"></div>
+                    <div className="flex items-center gap-2 text-green-500">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium">Swipe Right to Like</span>
+                    </div>
                   </div>
                 </div>
 
-                <Carousel
-                  setApi={setCarouselApi}
-                  opts={{
-                    align: "center",
-                    loop: true,
-                    skipSnaps: false,
-                    dragFree: true,
-                  }}
-                  className="w-full"
-                >
-                  <CarouselContent className="-ml-4 md:-ml-6">
-                    {teachers.map((teacher, index) => (
-                      <CarouselItem 
-                        key={teacher.id} 
-                        className="pl-4 md:pl-6 basis-[280px] md:basis-[320px] lg:basis-[350px]"
+                {availableTeachers.length > 0 ? (
+                  <div className="relative h-[600px] flex items-center justify-center">
+                    {/* Stack of cards - showing top 3 */}
+                    {availableTeachers.slice(0, 3).map((teacher, index) => (
+                      <SwipeableCard
+                        key={teacher.id}
+                        onSwipeLeft={() => handleTeacherSwipeLeft(teacher.id)}
+                        onSwipeRight={() => handleTeacherSwipeRight(teacher.id)}
+                        className={`absolute transition-all duration-300 ${
+                          index === 0 ? 'z-30 scale-100' : 
+                          index === 1 ? 'z-20 scale-95 opacity-70' : 
+                          'z-10 scale-90 opacity-40'
+                        }`}
+                        style={{
+                          transform: `translateY(${index * 8}px) translateX(${index * 4}px)`
+                        }}
                       >
-                        <div className="h-full transform transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2">
-                          <div className="relative group">
+                        <div className="w-[350px] h-[550px] transform transition-all duration-500">
+                          <div className="relative group h-full">
                             {/* Enhanced Teacher Card with Modern Design */}
-                            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden">
+                            <div className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden h-full flex flex-col">
                               {/* Teacher Image with Overlay */}
-                              <div className="relative overflow-hidden">
+                              <div className="relative overflow-hidden flex-shrink-0">
                                 <img
                                   src={teacher.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=350&h=280&fit=crop&crop=face"}
                                   alt={teacher.name}
@@ -314,7 +310,7 @@ const Index = () => {
                               </div>
 
                               {/* Card Content */}
-                              <div className="p-6">
+                              <div className="p-6 flex-1 flex flex-col">
                                 <div className="flex justify-between items-start mb-3">
                                   <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
                                     {teacher.name}
@@ -338,7 +334,7 @@ const Index = () => {
                                 </div>
 
                                 {/* Enhanced Details */}
-                                <div className="space-y-3 mb-5">
+                                <div className="space-y-3 mb-5 flex-1">
                                   <div className="flex items-center gap-3 text-sm text-gray-600">
                                     <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
                                       <MapPin className="h-3 w-3 text-blue-600" />
@@ -369,7 +365,7 @@ const Index = () => {
                                 </div>
 
                                 {/* CTA Button */}
-                                <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                                <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 mt-auto">
                                   <MessageCircle className="h-4 w-4 mr-2" />
                                   Start Learning
                                 </Button>
@@ -377,32 +373,27 @@ const Index = () => {
                             </div>
                           </div>
                         </div>
-                      </CarouselItem>
+                      </SwipeableCard>
                     ))}
-                  </CarouselContent>
-                  
-                  {/* Hidden default navigation - we use custom ones above */}
-                  <CarouselPrevious className="hidden" />
-                  <CarouselNext className="hidden" />
-                </Carousel>
-
-                {/* Decorative Elements */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20 blur-3xl"></div>
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full opacity-20 blur-3xl"></div>
+                  </div>
+                ) : (
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Heart className="h-10 w-10 text-gray-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No more teachers!</h3>
+                    <p className="text-gray-600 mb-6">You've seen all our featured teachers. Check out more in our browse section.</p>
+                    <Button 
+                      size="lg" 
+                      className="bg-orange-600 hover:bg-orange-700 text-white"
+                      onClick={handleViewAllGurus}
+                    >
+                      Browse All Teachers
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
-
-            <div className="text-center mt-12">
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 hover:border-orange-600 px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
-                onClick={handleViewAllGurus}
-              >
-                View All Gurus
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
           </div>
         </section>
 
