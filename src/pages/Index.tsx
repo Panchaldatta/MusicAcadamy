@@ -1,9 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Music, Search, Star, MapPin, Clock, Users, Award, Play, ArrowRight, Check, Trophy, BookOpen, Target, Guitar, Mic, Piano, Drum, Music2, MessageCircle, Heart, Shield } from "lucide-react";
-import { useState } from "react";
+import { Music, Search, Star, MapPin, Clock, Users, Award, Play, ArrowRight, Check, Trophy, BookOpen, Target, Guitar, Mic, Piano, Drum, Music2, MessageCircle, Heart, Shield, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -13,17 +14,47 @@ import { useTeachers } from "@/hooks/useTeachers";
 import { useMusicSubjects } from "@/hooks/useMusicSubjects";
 import { useSiteStats } from "@/hooks/useSiteStats";
 import { useToast } from "@/hooks/use-toast";
+import { type CarouselApi } from "@/components/ui/carousel";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const { data: teachers = [], isLoading: teachersLoading } = useTeachers();
   const { data: musicSubjects = [], isLoading: subjectsLoading } = useMusicSubjects();
   const { data: stats = [], isLoading: statsLoading } = useSiteStats();
+
+  // Carousel navigation handlers
+  const handlePrevious = useCallback(() => {
+    carouselApi?.scrollPrev();
+  }, [carouselApi]);
+
+  const handleNext = useCallback(() => {
+    carouselApi?.scrollNext();
+  }, [carouselApi]);
+
+  // Update scroll state when carousel API changes
+  React.useEffect(() => {
+    if (!carouselApi) return;
+
+    const onSelect = () => {
+      setCanScrollPrev(carouselApi.canScrollPrev());
+      setCanScrollNext(carouselApi.canScrollNext());
+    };
+
+    carouselApi.on("select", onSelect);
+    onSelect(); // Set initial state
+
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
@@ -168,7 +199,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Featured Teachers Modern Slider */}
+        {/* Enhanced Featured Teachers Slider */}
         <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
@@ -190,7 +221,50 @@ const Index = () => {
               </div>
             ) : (
               <div className="relative max-w-7xl mx-auto">
+                {/* Enhanced Navigation Controls */}
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={handlePrevious}
+                      disabled={!canScrollPrev}
+                      className={`
+                        h-12 w-12 rounded-full border-2 shadow-lg transition-all duration-300 transform hover:scale-110
+                        ${!canScrollPrev 
+                          ? 'border-gray-200 text-gray-400 cursor-not-allowed' 
+                          : 'border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-400 hover:shadow-xl'
+                        }
+                      `}
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                      <span className="sr-only">Previous teachers</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={handleNext}
+                      disabled={!canScrollNext}
+                      className={`
+                        h-12 w-12 rounded-full border-2 shadow-lg transition-all duration-300 transform hover:scale-110
+                        ${!canScrollNext 
+                          ? 'border-gray-200 text-gray-400 cursor-not-allowed' 
+                          : 'border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-400 hover:shadow-xl'
+                        }
+                      `}
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                      <span className="sr-only">Next teachers</span>
+                    </Button>
+                  </div>
+                  
+                  <div className="hidden md:block text-sm text-gray-500">
+                    Swipe or use arrows to navigate
+                  </div>
+                </div>
+
                 <Carousel
+                  setApi={setCarouselApi}
                   opts={{
                     align: "center",
                     loop: true,
@@ -308,9 +382,9 @@ const Index = () => {
                     ))}
                   </CarouselContent>
                   
-                  {/* Custom Navigation Buttons */}
-                  <CarouselPrevious className="hidden lg:flex -left-8 w-12 h-12 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-600 shadow-lg hover:shadow-xl transition-all duration-300" />
-                  <CarouselNext className="hidden lg:flex -right-8 w-12 h-12 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-600 shadow-lg hover:shadow-xl transition-all duration-300" />
+                  {/* Hidden default navigation - we use custom ones above */}
+                  <CarouselPrevious className="hidden" />
+                  <CarouselNext className="hidden" />
                 </Carousel>
 
                 {/* Decorative Elements */}
