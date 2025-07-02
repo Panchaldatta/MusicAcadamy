@@ -168,51 +168,162 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Featured Teachers Slider */}
-        <section className="py-16 bg-gray-50">
+        {/* Featured Teachers Modern Slider */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Music Gurus</h2>
-              <p className="text-gray-600 text-lg">Learn from master musicians and acclaimed teachers</p>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+                Featured Music Gurus
+              </h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Learn from master musicians and acclaimed teachers who have shaped the world of Indian classical music
+              </p>
             </div>
 
             {teachersLoading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {[...Array(4)].map((_, index) => (
                   <div key={index} className="animate-pulse">
-                    <div className="bg-gray-200 rounded-lg h-96"></div>
+                    <div className="bg-gray-200 rounded-2xl h-[420px]"></div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="relative">
+              <div className="relative max-w-7xl mx-auto">
                 <Carousel
                   opts={{
-                    align: "start",
+                    align: "center",
                     loop: true,
+                    skipSnaps: false,
+                    dragFree: true,
                   }}
                   className="w-full"
                 >
-                  <CarouselContent className="-ml-2 md:-ml-4">
-                    {teachers.map((teacher) => (
-                      <CarouselItem key={teacher.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                        <div className="h-full">
-                          <TeacherCard teacher={teacher} />
+                  <CarouselContent className="-ml-4 md:-ml-6">
+                    {teachers.map((teacher, index) => (
+                      <CarouselItem 
+                        key={teacher.id} 
+                        className="pl-4 md:pl-6 basis-[280px] md:basis-[320px] lg:basis-[350px]"
+                      >
+                        <div className="h-full transform transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2">
+                          <div className="relative group">
+                            {/* Enhanced Teacher Card with Modern Design */}
+                            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden">
+                              {/* Teacher Image with Overlay */}
+                              <div className="relative overflow-hidden">
+                                <img
+                                  src={teacher.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=350&h=280&fit=crop&crop=face"}
+                                  alt={teacher.name}
+                                  className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                
+                                {/* Floating Elements */}
+                                {teacher.verified && (
+                                  <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 shadow-lg">
+                                    <Shield className="h-3 w-3" />
+                                    Verified
+                                  </div>
+                                )}
+                                
+                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-orange-600 px-3 py-1 rounded-full text-sm font-bold">
+                                  ₹{teacher.price}/hr
+                                </div>
+
+                                {/* Specialties at bottom */}
+                                <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+                                  {teacher.specialties.slice(0, 2).map((specialty, idx) => (
+                                    <span key={idx} className="bg-white/95 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
+                                      {specialty}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Card Content */}
+                              <div className="p-6">
+                                <div className="flex justify-between items-start mb-3">
+                                  <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
+                                    {teacher.name}
+                                  </h3>
+                                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                    <Heart className="h-4 w-4" />
+                                  </Button>
+                                </div>
+
+                                <p className="text-orange-600 font-semibold mb-4 text-lg">{teacher.subject}</p>
+
+                                {/* Enhanced Rating */}
+                                <div className="flex items-center gap-2 mb-4">
+                                  <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star key={i} className={`h-4 w-4 ${i < Math.floor(teacher.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                                    ))}
+                                  </div>
+                                  <span className="font-bold text-sm bg-gray-100 px-2 py-1 rounded-full">{teacher.rating}</span>
+                                  <span className="text-gray-500 text-sm">({teacher.reviews})</span>
+                                </div>
+
+                                {/* Enhanced Details */}
+                                <div className="space-y-3 mb-5">
+                                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                                    <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                                      <MapPin className="h-3 w-3 text-blue-600" />
+                                    </div>
+                                    {teacher.location}
+                                  </div>
+                                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                                    <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                                      <Clock className="h-3 w-3 text-green-600" />
+                                    </div>
+                                    Responds in {teacher.response_time}
+                                  </div>
+                                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                                    <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
+                                      <Award className="h-3 w-3 text-purple-600" />
+                                    </div>
+                                    {teacher.experience} experience
+                                  </div>
+                                </div>
+
+                                {/* Languages */}
+                                <div className="flex flex-wrap gap-1 mb-5">
+                                  {teacher.languages.map((lang, idx) => (
+                                    <span key={idx} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs font-medium">
+                                      {lang}
+                                    </span>
+                                  ))}
+                                </div>
+
+                                {/* CTA Button */}
+                                <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                                  <MessageCircle className="h-4 w-4 mr-2" />
+                                  Start Learning
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex -left-4 lg:-left-6" />
-                  <CarouselNext className="hidden md:flex -right-4 lg:-right-6" />
+                  
+                  {/* Custom Navigation Buttons */}
+                  <CarouselPrevious className="hidden lg:flex -left-8 w-12 h-12 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-600 shadow-lg hover:shadow-xl transition-all duration-300" />
+                  <CarouselNext className="hidden lg:flex -right-8 w-12 h-12 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-600 shadow-lg hover:shadow-xl transition-all duration-300" />
                 </Carousel>
+
+                {/* Decorative Elements */}
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20 blur-3xl"></div>
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full opacity-20 blur-3xl"></div>
               </div>
             )}
 
-            <div className="text-center mt-10">
+            <div className="text-center mt-12">
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 hover:border-orange-600 px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
                 onClick={handleViewAllGurus}
               >
                 View All Gurus
