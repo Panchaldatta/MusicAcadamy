@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +16,7 @@ import { useCreateSwipe } from "@/hooks/useUserSwipes";
 import { useToast } from "@/hooks/use-toast";
 import { type CarouselApi } from "@/components/ui/carousel";
 import SwipeableCard from "@/components/SwipeableCard";
+import InfiniteSlider from "@/components/InfiniteSlider";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -459,6 +459,9 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Infinite Slider */}
+        <InfiniteSlider />
 
         {/* Popular Subjects */}
         <section className="py-16 bg-white">

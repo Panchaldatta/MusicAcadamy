@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -83,6 +84,14 @@ export default {
 					},
 					to: {
 						height: '0'
+					}
+				},
+				'slide': {
+					'0%': {
+						transform: 'translateX(0)'
+					},
+					'100%': {
+						transform: 'translateX(calc(-320px * 6))'
 					}
 				}
 			},
