@@ -12,6 +12,7 @@ import MusicSubjectCard from "@/components/MusicSubjectCard";
 import { useTeachers } from "@/hooks/useTeachers";
 import { useMusicSubjects } from "@/hooks/useMusicSubjects";
 import { useSiteStats } from "@/hooks/useSiteStats";
+import { useCreateSwipe } from "@/hooks/useUserSwipes";
 import { useToast } from "@/hooks/use-toast";
 import { type CarouselApi } from "@/components/ui/carousel";
 import SwipeableCard from "@/components/SwipeableCard";
@@ -32,6 +33,7 @@ const Index = () => {
   const { data: teachers = [], isLoading: teachersLoading } = useTeachers();
   const { data: musicSubjects = [], isLoading: subjectsLoading } = useMusicSubjects();
   const { data: stats = [], isLoading: statsLoading } = useSiteStats();
+  const createSwipeMutation = useCreateSwipe();
 
   // Carousel navigation handlers
   const handlePrevious = useCallback(() => {
@@ -108,6 +110,16 @@ const Index = () => {
   };
 
   const handleTeacherSwipeLeft = useCallback(() => {
+    const currentTeacher = teachers[currentTeacherIndex];
+    
+    if (currentTeacher) {
+      // Store the swipe in the database
+      createSwipeMutation.mutate({
+        teacher_id: currentTeacher.id,
+        swipe_direction: 'left'
+      });
+    }
+    
     toast({
       title: "Teacher Passed",
       description: "You can find them again in browse section",
@@ -117,9 +129,19 @@ const Index = () => {
     if (currentTeacherIndex < teachers.length - 1) {
       setCurrentTeacherIndex(prev => prev + 1);
     }
-  }, [toast, currentTeacherIndex, teachers.length]);
+  }, [currentTeacherIndex, teachers, createSwipeMutation, toast]);
 
   const handleTeacherSwipeRight = useCallback(() => {
+    const currentTeacher = teachers[currentTeacherIndex];
+    
+    if (currentTeacher) {
+      // Store the swipe in the database
+      createSwipeMutation.mutate({
+        teacher_id: currentTeacher.id,
+        swipe_direction: 'right'
+      });
+    }
+    
     toast({
       title: "Teacher Liked!",
       description: "Contact them to start learning",
@@ -129,7 +151,7 @@ const Index = () => {
     if (currentTeacherIndex < teachers.length - 1) {
       setCurrentTeacherIndex(prev => prev + 1);
     }
-  }, [toast, currentTeacherIndex, teachers.length]);
+  }, [currentTeacherIndex, teachers, createSwipeMutation, toast]);
 
   // Get current teacher
   const currentTeacher = teachers[currentTeacherIndex];
@@ -155,7 +177,14 @@ const Index = () => {
                 {currentTeacherIndex + 1} of {teachers.length}
               </span>
             </div>
-            <div className="w-16"></div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/swipe-history')}
+              className="text-gray-700 hover:text-gray-900"
+            >
+              History
+            </Button>
           </div>
         </div>
 
