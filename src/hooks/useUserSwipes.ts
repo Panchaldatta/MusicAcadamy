@@ -8,12 +8,28 @@ export interface UserSwipe {
   teacher_id: string;
   swipe_direction: 'left' | 'right';
   created_at: string;
+  teachers?: {
+    id: string;
+    name: string;
+    subject: string;
+    rating: number;
+    reviews: number;
+    price: number;
+    experience: string;
+    location: string;
+    image_url?: string;
+    specialties: string[];
+    verified: boolean;
+    response_time: string;
+    languages: string[];
+  };
 }
 
 export const useUserSwipes = () => {
   return useQuery({
     queryKey: ['user-swipes'],
     queryFn: async () => {
+      console.log('Fetching user swipes...');
       const { data, error } = await supabase
         .from('user_swipes')
         .select('*')
@@ -24,6 +40,7 @@ export const useUserSwipes = () => {
         throw error;
       }
       
+      console.log('User swipes fetched:', data);
       return data as UserSwipe[];
     },
   });
@@ -34,11 +51,16 @@ export const useCreateSwipe = () => {
   
   return useMutation({
     mutationFn: async ({ teacher_id, swipe_direction }: { teacher_id: string; swipe_direction: 'left' | 'right' }) => {
+      console.log('Creating swipe:', { teacher_id, swipe_direction });
+      
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
+        console.error('User not authenticated');
         throw new Error('User not authenticated');
       }
+
+      console.log('User authenticated:', user.id);
 
       const { data, error } = await supabase
         .from('user_swipes')
@@ -55,11 +77,17 @@ export const useCreateSwipe = () => {
         throw error;
       }
       
+      console.log('Swipe created successfully:', data);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Swipe mutation successful, invalidating queries...');
       queryClient.invalidateQueries({ queryKey: ['user-swipes'] });
+      queryClient.invalidateQueries({ queryKey: ['swiped-teachers'] });
     },
+    onError: (error) => {
+      console.error('Swipe mutation failed:', error);
+    }
   });
 };
 
@@ -67,6 +95,8 @@ export const useSwipedTeachers = (direction?: 'left' | 'right') => {
   return useQuery({
     queryKey: ['swiped-teachers', direction],
     queryFn: async () => {
+      console.log('Fetching swiped teachers with direction:', direction);
+      
       let query = supabase
         .from('user_swipes')
         .select(`
@@ -86,7 +116,8 @@ export const useSwipedTeachers = (direction?: 'left' | 'right') => {
         throw error;
       }
       
-      return data;
+      console.log('Swiped teachers fetched:', data);
+      return data as UserSwipe[];
     },
   });
 };

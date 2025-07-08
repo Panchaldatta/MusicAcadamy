@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,11 +30,15 @@ const Index = () => {
 
   const [currentTeacherIndex, setCurrentTeacherIndex] = useState(0);
   const [showSwipeMode, setShowSwipeMode] = useState(false);
+  const [swipedTeacherIds, setSwipedTeacherIds] = useState<Set<string>>(new Set());
 
   const { data: teachers = [], isLoading: teachersLoading } = useTeachers();
   const { data: musicSubjects = [], isLoading: subjectsLoading } = useMusicSubjects();
   const { data: stats = [], isLoading: statsLoading } = useSiteStats();
   const createSwipeMutation = useCreateSwipe();
+
+  // Filter out already swiped teachers
+  const availableTeachers = teachers.filter(teacher => !swipedTeacherIds.has(teacher.id));
 
   // Carousel navigation handlers
   const handlePrevious = useCallback(() => {
@@ -103,6 +108,7 @@ const Index = () => {
 
   const handleStartSwiping = () => {
     setShowSwipeMode(true);
+    setCurrentTeacherIndex(0);
   };
 
   const handleExitSwipeMode = () => {
@@ -110,13 +116,27 @@ const Index = () => {
   };
 
   const handleTeacherSwipeLeft = useCallback(() => {
-    const currentTeacher = teachers[currentTeacherIndex];
+    const currentTeacher = availableTeachers[currentTeacherIndex];
     
     if (currentTeacher) {
+      console.log('Swiping left on teacher:', currentTeacher);
+      // Add to swiped set immediately for UI responsiveness
+      setSwipedTeacherIds(prev => new Set(prev).add(currentTeacher.id));
+      
       // Store the swipe in the database
       createSwipeMutation.mutate({
         teacher_id: currentTeacher.id,
         swipe_direction: 'left'
+      }, {
+        onError: (error) => {
+          console.error('Failed to save swipe:', error);
+          // Remove from swiped set if API call failed
+          setSwipedTeacherIds(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(currentTeacher.id);
+            return newSet;
+          });
+        }
       });
     }
     
@@ -125,20 +145,41 @@ const Index = () => {
       description: "You can find them again in browse section",
     });
     
-    // Move to next teacher
-    if (currentTeacherIndex < teachers.length - 1) {
+    // Move to next teacher or exit if no more teachers
+    if (currentTeacherIndex < availableTeachers.length - 1) {
       setCurrentTeacherIndex(prev => prev + 1);
+    } else {
+      // No more teachers available
+      setShowSwipeMode(false);
+      toast({
+        title: "No More Teachers!",
+        description: "You've seen all available teachers. Check out more in browse section.",
+      });
     }
-  }, [currentTeacherIndex, teachers, createSwipeMutation, toast]);
+  }, [currentTeacherIndex, availableTeachers, createSwipeMutation, toast]);
 
   const handleTeacherSwipeRight = useCallback(() => {
-    const currentTeacher = teachers[currentTeacherIndex];
+    const currentTeacher = availableTeachers[currentTeacherIndex];
     
     if (currentTeacher) {
+      console.log('Swiping right on teacher:', currentTeacher);
+      // Add to swiped set immediately for UI responsiveness
+      setSwipedTeacherIds(prev => new Set(prev).add(currentTeacher.id));
+      
       // Store the swipe in the database
       createSwipeMutation.mutate({
         teacher_id: currentTeacher.id,
         swipe_direction: 'right'
+      }, {
+        onError: (error) => {
+          console.error('Failed to save swipe:', error);
+          // Remove from swiped set if API call failed
+          setSwipedTeacherIds(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(currentTeacher.id);
+            return newSet;
+          });
+        }
       });
     }
     
@@ -147,14 +188,21 @@ const Index = () => {
       description: "Contact them to start learning",
     });
     
-    // Move to next teacher
-    if (currentTeacherIndex < teachers.length - 1) {
+    // Move to next teacher or exit if no more teachers
+    if (currentTeacherIndex < availableTeachers.length - 1) {
       setCurrentTeacherIndex(prev => prev + 1);
+    } else {
+      // No more teachers available
+      setShowSwipeMode(false);
+      toast({
+        title: "No More Teachers!",
+        description: "You've seen all available teachers. Check your liked teachers in swipe history!",
+      });
     }
-  }, [currentTeacherIndex, teachers, createSwipeMutation, toast]);
+  }, [currentTeacherIndex, availableTeachers, createSwipeMutation, toast]);
 
-  // Get current teacher
-  const currentTeacher = teachers[currentTeacherIndex];
+  // Get current teacher from available teachers
+  const currentTeacher = availableTeachers[currentTeacherIndex];
 
   // Full-page swipe mode
   if (showSwipeMode) {
@@ -174,7 +222,7 @@ const Index = () => {
             <div className="text-center">
               <h2 className="text-lg font-semibold text-gray-900">Discover Teachers</h2>
               <span className="text-sm text-gray-600">
-                {currentTeacherIndex + 1} of {teachers.length}
+                {currentTeacherIndex + 1} of {availableTeachers.length}
               </span>
             </div>
             <Button 
@@ -458,16 +506,28 @@ const Index = () => {
                 size="lg" 
                 className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={handleStartSwiping}
+                disabled={availableTeachers.length === 0}
               >
-                Start Swiping
+                {availableTeachers.length === 0 ? 'No New Teachers' : 'Start Swiping'}
                 <Heart className="ml-2 h-5 w-5" />
               </Button>
+              
+              {availableTeachers.length === 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  You've seen all teachers! Check your <button 
+                    onClick={() => navigate('/swipe-history')} 
+                    className="text-orange-600 hover:underline"
+                  >
+                    swipe history
+                  </button> or browse more teachers.
+                </p>
+              )}
             </div>
 
             {/* Teacher Preview Cards */}
-            {!teachersLoading && teachers.length > 0 && (
+            {!teachersLoading && availableTeachers.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                {teachers.slice(0, 3).map((teacher) => (
+                {availableTeachers.slice(0, 3).map((teacher) => (
                   <div key={teacher.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                     <div className="relative">
                       <img
