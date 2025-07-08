@@ -10,12 +10,10 @@ const SwipeHistory = () => {
   const [filter, setFilter] = useState<'all' | 'left' | 'right'>('all');
   const { data: swipedTeachers, isLoading } = useSwipedTeachers(filter === 'all' ? undefined : filter);
 
-  // Calculate filter counts correctly
-  const { data: allSwipedTeachers } = useSwipedTeachers();
   const filterCounts = {
-    all: allSwipedTeachers?.length || 0,
-    right: allSwipedTeachers?.filter(s => s.swipe_direction === 'right').length || 0,
-    left: allSwipedTeachers?.filter(s => s.swipe_direction === 'left').length || 0,
+    all: swipedTeachers?.length || 0,
+    right: swipedTeachers?.filter(s => s.swipe_direction === 'right').length || 0,
+    left: swipedTeachers?.filter(s => s.swipe_direction === 'left').length || 0,
   };
 
   if (isLoading) {
@@ -49,7 +47,7 @@ const SwipeHistory = () => {
             variant={filter === 'right' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('right')}
-            className={`flex items-center gap-2 ${filter === 'right' ? 'bg-green-600 hover:bg-green-700 text-white' : 'text-green-600 border-green-600 hover:bg-green-50'}`}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
           >
             <Heart className="h-4 w-4" />
             Liked ({filterCounts.right})
@@ -58,7 +56,7 @@ const SwipeHistory = () => {
             variant={filter === 'left' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('left')}
-            className={`flex items-center gap-2 ${filter === 'left' ? 'bg-red-600 hover:bg-red-700 text-white' : 'text-red-600 border-red-600 hover:bg-red-50'}`}
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white"
           >
             <X className="h-4 w-4" />
             Passed ({filterCounts.left})
@@ -78,119 +76,107 @@ const SwipeHistory = () => {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {swipedTeachers.map((swipe) => {
-            const teacher = swipe.teachers;
-            return (
-              <Card key={swipe.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <CardContent className="p-0">
-                  <div className="flex flex-col sm:flex-row">
-                    {/* Teacher Image */}
-                    <div className="relative w-full sm:w-48 h-48 sm:h-auto">
-                      <img
-                        src={teacher?.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"}
-                        alt={teacher?.name}
-                        className="w-full h-full object-cover"
-                      />
-                      
-                      {/* Swipe Direction Badge */}
-                      <div className="absolute top-3 right-3">
-                        {swipe.swipe_direction === 'right' ? (
-                          <Badge className="bg-green-500 text-white flex items-center gap-1">
-                            <Heart className="h-3 w-3" />
-                            Liked
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-red-500 text-white flex items-center gap-1">
-                            <X className="h-3 w-3" />
-                            Passed
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Price */}
-                      <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-orange-600 px-2 py-1 rounded-full text-sm font-bold">
-                        ₹{teacher?.price}/hr
-                      </div>
+          {swipedTeachers.map((swipe) => (
+            <Card key={swipe.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardContent className="p-0">
+                <div className="flex flex-col sm:flex-row">
+                  {/* Teacher Image */}
+                  <div className="relative w-full sm:w-48 h-48 sm:h-auto">
+                    <img
+                      src={swipe.teachers?.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"}
+                      alt={swipe.teachers?.name}
+                      className="w-full h-full object-cover"
+                    />
+                    
+                    {/* Swipe Direction Badge */}
+                    <div className="absolute top-3 right-3">
+                      {swipe.swipe_direction === 'right' ? (
+                        <Badge className="bg-green-500 text-white flex items-center gap-1">
+                          <Heart className="h-3 w-3" />
+                          Liked
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-red-500 text-white flex items-center gap-1">
+                          <X className="h-3 w-3" />
+                          Passed
+                        </Badge>
+                      )}
                     </div>
 
-                    {/* Teacher Info */}
-                    <div className="flex-1 p-6">
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4">
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-1">
-                            {teacher?.name}
-                          </h3>
-                          <p className="text-orange-600 font-semibold text-lg mb-2">
-                            {teacher?.subject}
-                          </p>
-                        </div>
-                        
-                        {teacher?.verified && (
-                          <Badge className="bg-emerald-100 text-emerald-700 mt-2 sm:mt-0">
-                            Verified
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Rating */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`h-4 w-4 ${i < Math.floor(teacher?.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
-                          ))}
-                        </div>
-                        <span className="font-bold text-sm bg-gray-100 px-2 py-1 rounded-full">
-                          {teacher?.rating}
-                        </span>
-                        <span className="text-gray-500 text-sm">
-                          ({teacher?.reviews} reviews)
-                        </span>
-                      </div>
-
-                      {/* Details */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <MapPin className="h-4 w-4 text-blue-600" />
-                          {teacher?.location}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Clock className="h-4 w-4 text-green-600" />
-                          {teacher?.response_time}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Award className="h-4 w-4 text-purple-600" />
-                          {teacher?.experience}
-                        </div>
-                      </div>
-
-                      {/* Languages */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {teacher?.languages?.map((language, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
-                            {language}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Specialties */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {teacher?.specialties?.slice(0, 3).map((specialty, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {specialty}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Swipe Date */}
-                      <div className="text-xs text-gray-500">
-                        Swiped on {new Date(swipe.created_at).toLocaleDateString()}
-                      </div>
+                    {/* Price */}
+                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-orange-600 px-2 py-1 rounded-full text-sm font-bold">
+                      ₹{swipe.teachers?.price}/hr
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+
+                  {/* Teacher Info */}
+                  <div className="flex-1 p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-1">
+                          {swipe.teachers?.name}
+                        </h3>
+                        <p className="text-orange-600 font-semibold text-lg mb-2">
+                          {swipe.teachers?.subject}
+                        </p>
+                      </div>
+                      
+                      {swipe.teachers?.verified && (
+                        <Badge className="bg-emerald-100 text-emerald-700 mt-2 sm:mt-0">
+                          Verified
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className={`h-4 w-4 ${i < Math.floor(swipe.teachers?.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                        ))}
+                      </div>
+                      <span className="font-bold text-sm bg-gray-100 px-2 py-1 rounded-full">
+                        {swipe.teachers?.rating}
+                      </span>
+                      <span className="text-gray-500 text-sm">
+                        ({swipe.teachers?.reviews} reviews)
+                      </span>
+                    </div>
+
+                    {/* Details */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="h-4 w-4 text-blue-600" />
+                        {swipe.teachers?.location}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Clock className="h-4 w-4 text-green-600" />
+                        {swipe.teachers?.response_time}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Award className="h-4 w-4 text-purple-600" />
+                        {swipe.teachers?.experience}
+                      </div>
+                    </div>
+
+                    {/* Specialties */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {swipe.teachers?.specialties?.slice(0, 3).map((specialty, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {specialty}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    {/* Swipe Date */}
+                    <div className="text-xs text-gray-500">
+                      Swiped on {new Date(swipe.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
     </div>

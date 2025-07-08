@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Music, Heart, Zap } from "lucide-react";
+import { Menu, Music, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -14,8 +14,7 @@ const Navigation = () => {
     { name: "Home", href: "/" },
     { name: "Browse Classrooms", href: "/browse-classrooms" },
     { name: "Browse Teachers", href: "/browse-teachers" },
-    { name: "Swipe Teachers", href: "/swipe-teachers", icon: Zap },
-    { name: "Swipe History", href: "/swipe-history", icon: Heart },
+    { name: "Swipe History", href: "/swipe-history" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
@@ -41,7 +40,7 @@ const Navigation = () => {
                         to={item.href}
                         className="px-3 py-2 text-gray-700 hover:text-orange-600 transition-colors font-medium flex items-center gap-2"
                       >
-                        {item.icon && <item.icon className="h-4 w-4" />}
+                        {item.name === "Swipe History" && <Heart className="h-4 w-4" />}
                         {item.name}
                       </Link>
                     </NavigationMenuLink>
@@ -78,7 +77,7 @@ const Navigation = () => {
                       onClick={() => setIsOpen(false)}
                       className="px-4 py-2 text-gray-700 hover:text-orange-600 transition-colors font-medium flex items-center gap-2"
                     >
-                      {item.icon && <item.icon className="h-4 w-4" />}
+                      {item.name === "Swipe History" && <Heart className="h-4 w-4" />}
                       {item.name}
                     </Link>
                   ))}

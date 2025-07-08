@@ -13,7 +13,6 @@ import BrowseClassrooms from "./pages/BrowseClassrooms";
 import BrowseTeachers from "./pages/BrowseTeachers";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import SwipeHistoryPage from "./pages/SwipeHistory";
-import SwipeTeachersPage from "./pages/SwipeTeachers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,7 +32,6 @@ const App = () => (
           <Route path="/browse-classrooms" element={<BrowseClassrooms />} />
           <Route path="/browse-teachers" element={<BrowseTeachers />} />
           <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-          <Route path="/swipe-teachers" element={<SwipeTeachersPage />} />
           <Route path="/swipe-history" element={<SwipeHistoryPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
