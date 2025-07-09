@@ -1,53 +1,54 @@
 
 import React from 'react';
-
-interface SlideItem {
-  id: number;
-  image: string;
-  title: string;
-  subtitle: string;
-}
-
-const slides: SlideItem[] = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    title: "Classical Vocals",
-    subtitle: "Master the art of Indian classical singing"
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    title: "Tabla Mastery",
-    subtitle: "Learn rhythm and percussion excellence"
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    title: "Sitar Lessons",
-    subtitle: "Experience the soul of Indian strings"
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    title: "Harmonium Classes",
-    subtitle: "Perfect your accompaniment skills"
-  },
-  {
-    id: 5,
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    title: "Flute Training",
-    subtitle: "Breathe life into melodious tunes"
-  },
-  {
-    id: 6,
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    title: "Violin Expertise",
-    subtitle: "Master the strings of classical music"
-  }
-];
+import { useMusicSubjects } from '@/hooks/useMusicSubjects';
 
 const InfiniteSlider = () => {
+  const { data: musicSubjects = [], isLoading } = useMusicSubjects();
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="relative py-16 bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
+        <div className="relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Explore Musical Journeys
+            </h2>
+            <p className="text-xl text-gray-300">
+              Discover the rich heritage of Indian classical music
+            </p>
+          </div>
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no subjects available
+  if (!musicSubjects || musicSubjects.length === 0) {
+    return (
+      <div className="relative py-16 bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
+        <div className="relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Explore Musical Journeys
+            </h2>
+            <p className="text-xl text-gray-300">
+              Discover the rich heritage of Indian classical music
+            </p>
+          </div>
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-lg">No musical subjects available at the moment.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative py-16 bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
       {/* Black blur overlay */}
@@ -69,23 +70,23 @@ const InfiniteSlider = () => {
           {/* Main sliding track */}
           <div className="flex animate-[slide_30s_linear_infinite] hover:[animation-play-state:paused]">
             {/* First set of slides */}
-            {slides.map((slide) => (
-              <div key={`first-${slide.id}`} className="flex-shrink-0 w-80 mx-4">
+            {musicSubjects.map((subject) => (
+              <div key={`first-${subject.id}`} className="flex-shrink-0 w-80 mx-4">
                 <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:border-orange-400/50 transition-all duration-300 hover:scale-105 hover:bg-white/15">
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={slide.image}
-                      alt={slide.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                  <div className="relative h-48 overflow-hidden" style={{ backgroundColor: `${subject.color}20` }}>
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="text-6xl" style={{ color: subject.color }}>
+                        {subject.icon}
+                      </div>
+                    </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
-                      {slide.title}
+                      {subject.name}
                     </h3>
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      {slide.subtitle}
+                      {subject.student_count} students learning this instrument
                     </p>
                   </div>
                   {/* Subtle glow effect */}
@@ -95,23 +96,23 @@ const InfiniteSlider = () => {
             ))}
             
             {/* Duplicate set for seamless loop */}
-            {slides.map((slide) => (
-              <div key={`second-${slide.id}`} className="flex-shrink-0 w-80 mx-4">
+            {musicSubjects.map((subject) => (
+              <div key={`second-${subject.id}`} className="flex-shrink-0 w-80 mx-4">
                 <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:border-orange-400/50 transition-all duration-300 hover:scale-105 hover:bg-white/15">
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={slide.image}
-                      alt={slide.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                  <div className="relative h-48 overflow-hidden" style={{ backgroundColor: `${subject.color}20` }}>
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="text-6xl" style={{ color: subject.color }}>
+                        {subject.icon}
+                      </div>
+                    </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
-                      {slide.title}
+                      {subject.name}
                     </h3>
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      {slide.subtitle}
+                      {subject.student_count} students learning this instrument
                     </p>
                   </div>
                   {/* Subtle glow effect */}

@@ -91,7 +91,7 @@ export default {
 						transform: 'translateX(0)'
 					},
 					'100%': {
-						transform: 'translateX(calc(-320px * 6))'
+						transform: 'translateX(-50%)'
 					}
 				}
 			},
