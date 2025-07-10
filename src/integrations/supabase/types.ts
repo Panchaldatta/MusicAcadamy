@@ -14,6 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
+      classroom_enrollments: {
+        Row: {
+          classroom_id: string
+          enrolled_at: string
+          id: string
+          status: string
+          student_id: string
+        }
+        Insert: {
+          classroom_id: string
+          enrolled_at?: string
+          id?: string
+          status?: string
+          student_id: string
+        }
+        Update: {
+          classroom_id?: string
+          enrolled_at?: string
+          id?: string
+          status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_enrollments_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classrooms: {
+        Row: {
+          capacity: number
+          created_at: string
+          description: string | null
+          duration_weeks: number | null
+          id: string
+          image_url: string | null
+          level: string
+          materials: string[] | null
+          name: string
+          prerequisites: string | null
+          price: number
+          schedule: string
+          session_duration_minutes: number | null
+          sessions_per_week: number | null
+          status: string
+          subject: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          description?: string | null
+          duration_weeks?: number | null
+          id?: string
+          image_url?: string | null
+          level: string
+          materials?: string[] | null
+          name: string
+          prerequisites?: string | null
+          price?: number
+          schedule: string
+          session_duration_minutes?: number | null
+          sessions_per_week?: number | null
+          status?: string
+          subject: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          description?: string | null
+          duration_weeks?: number | null
+          id?: string
+          image_url?: string | null
+          level?: string
+          materials?: string[] | null
+          name?: string
+          prerequisites?: string | null
+          price?: number
+          schedule?: string
+          session_duration_minutes?: number | null
+          sessions_per_week?: number | null
+          status?: string
+          subject?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       music_subjects: {
         Row: {
           color: string

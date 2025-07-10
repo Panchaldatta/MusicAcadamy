@@ -1,0 +1,104 @@
+
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type Classroom = Database['public']['Tables']['classrooms']['Row'];
+type ClassroomInsert = Database['public']['Tables']['classrooms']['Insert'];
+type ClassroomUpdate = Database['public']['Tables']['classrooms']['Update'];
+
+export class ClassroomService {
+  static async getTeacherClassrooms(): Promise<Classroom[]> {
+    const { data, error } = await supabase
+      .from('classrooms')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching teacher classrooms:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
+
+  static async createClassroom(classroom: Omit<ClassroomInsert, 'teacher_id'>): Promise<Classroom> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User must be authenticated to create a classroom');
+    }
+
+    const { data, error } = await supabase
+      .from('classrooms')
+      .insert({
+        ...classroom,
+        teacher_id: user.id
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating classroom:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  static async updateClassroom(id: string, updates: ClassroomUpdate): Promise<Classroom> {
+    const { data, error } = await supabase
+      .from('classrooms')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating classroom:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  static async deleteClassroom(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('classrooms')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting classroom:', error);
+      throw error;
+    }
+  }
+
+  static async getActiveClassrooms(): Promise<Classroom[]> {
+    const { data, error } = await supabase
+      .from('classrooms')
+      .select('*')
+      .eq('status', 'active')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching active classrooms:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
+
+  static async getClassroomEnrollments(classroomId: string) {
+    const { data, error } = await supabase
+      .from('classroom_enrollments')
+      .select('*')
+      .eq('classroom_id', classroomId);
+
+    if (error) {
+      console.error('Error fetching classroom enrollments:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
+}

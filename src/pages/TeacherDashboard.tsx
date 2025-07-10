@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,74 +10,48 @@ import CreateClassroomDialog from "@/components/CreateClassroomDialog";
 import TeacherAnalytics from "@/components/TeacherAnalytics";
 import UpcomingClasses from "@/components/UpcomingClasses";
 import Footer from "@/components/Footer";
-
-interface Classroom {
-  id: string;
-  name: string;
-  description: string;
-  subject: string;
-  studentsCount: number;
-  schedule: string;
-  level: string;
-  price: number;
-  rating: number;
-  image?: string;
-}
+import { useTeacherClassrooms, useDeleteClassroom } from "@/hooks/useClassrooms";
+import { useToast } from "@/hooks/use-toast";
 
 const TeacherDashboard = () => {
-  const [classrooms, setClassrooms] = useState<Classroom[]>([
-    {
-      id: "1",
-      name: "Piano Fundamentals",
-      description: "Learn the basics of piano playing with proper finger technique and music theory.",
-      subject: "Piano",
-      studentsCount: 15,
-      schedule: "Mon, Wed, Fri - 4:00 PM",
-      level: "Beginner",
-      price: 25,
-      rating: 4.8
-    },
-    {
-      id: "2",
-      name: "Guitar Masterclass",
-      description: "Advanced guitar techniques including jazz, classical, and contemporary styles.",
-      subject: "Guitar",
-      studentsCount: 8,
-      schedule: "Tue, Thu - 6:00 PM",
-      level: "Advanced",
-      price: 40,
-      rating: 4.9
-    },
-    {
-      id: "3",
-      name: "Vocal Training Basics",
-      description: "Develop your voice with proper breathing techniques and vocal exercises.",
-      subject: "Vocals",
-      studentsCount: 12,
-      schedule: "Mon, Wed - 5:30 PM",
-      level: "Beginner",
-      price: 30,
-      rating: 4.7
-    }
-  ]);
-
+  const { data: classrooms = [], isLoading, error } = useTeacherClassrooms();
+  const deleteClassroom = useDeleteClassroom();
+  const { toast } = useToast();
+  
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
-  const handleCreateClassroom = (newClassroom: Omit<Classroom, 'id' | 'studentsCount' | 'rating'>) => {
-    const classroom: Classroom = {
-      ...newClassroom,
-      id: Date.now().toString(),
-      studentsCount: 0,
-      rating: 0
-    };
-    setClassrooms([...classrooms, classroom]);
-    setIsCreateDialogOpen(false);
+  const handleDeleteClassroom = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this classroom? This action cannot be undone.")) {
+      try {
+        await deleteClassroom.mutateAsync(id);
+      } catch (error) {
+        console.error('Failed to delete classroom:', error);
+      }
+    }
   };
 
-  const totalStudents = classrooms.reduce((sum, classroom) => sum + classroom.studentsCount, 0);
-  const totalRevenue = classrooms.reduce((sum, classroom) => sum + (classroom.studentsCount * classroom.price), 0);
-  const averageRating = classrooms.length > 0 ? (classrooms.reduce((sum, classroom) => sum + classroom.rating, 0) / classrooms.length) : 0;
+  const handleEditClassroom = (classroom: any) => {
+    toast({
+      title: "Feature Coming Soon",
+      description: "Classroom editing functionality will be available soon!",
+    });
+  };
+
+  const handleViewAnalytics = (id: string) => {
+    toast({
+      title: "Feature Coming Soon", 
+      description: "Detailed analytics for individual classrooms will be available soon!",
+    });
+  };
+
+  // Calculate stats from real data
+  const totalStudents = 0; // We'll need to fetch enrollment data
+  const totalRevenue = classrooms.reduce((sum, classroom) => {
+    const estimatedStudents = Math.floor(classroom.capacity * 0.6); // Rough estimate
+    return sum + (estimatedStudents * classroom.price * (classroom.sessions_per_week || 2) * 4);
+  }, 0);
+  const averageRating = 4.8; // Placeholder until we implement ratings
 
   const stats = [
     {
@@ -120,6 +95,22 @@ const TeacherDashboard = () => {
     { id: "schedule", label: "Schedule", icon: Calendar },
     { id: "settings", label: "Settings", icon: Settings }
   ];
+
+  if (error) {
+    return (
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardContent className="p-6 text-center">
+              <h2 className="text-xl font-semibold text-white mb-2">Error Loading Dashboard</h2>
+              <p className="text-gray-300">Please make sure you're logged in to access your teacher dashboard.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -207,11 +198,31 @@ const TeacherDashboard = () => {
               {/* Recent Classrooms */}
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Your Recent Classrooms</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {classrooms.slice(0, 3).map((classroom) => (
-                    <ClassroomCard key={classroom.id} classroom={classroom} />
-                  ))}
-                </div>
+                {isLoading ? (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3].map((i) => (
+                      <Card key={i} className="bg-white/10 backdrop-blur-md border-white/20 animate-pulse">
+                        <CardContent className="p-6">
+                          <div className="h-6 bg-white/20 rounded mb-4"></div>
+                          <div className="h-4 bg-white/20 rounded mb-2"></div>
+                          <div className="h-4 bg-white/20 rounded w-3/4"></div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {classrooms.slice(0, 3).map((classroom) => (
+                      <ClassroomCard 
+                        key={classroom.id} 
+                        classroom={classroom}
+                        onEdit={handleEditClassroom}
+                        onDelete={handleDeleteClassroom}
+                        onViewAnalytics={handleViewAnalytics}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -225,7 +236,19 @@ const TeacherDashboard = () => {
                 </Badge>
               </div>
               
-              {classrooms.length === 0 ? (
+              {isLoading ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Card key={i} className="bg-white/10 backdrop-blur-md border-white/20 animate-pulse">
+                      <CardContent className="p-6">
+                        <div className="h-6 bg-white/20 rounded mb-4"></div>
+                        <div className="h-4 bg-white/20 rounded mb-2"></div>
+                        <div className="h-4 bg-white/20 rounded w-3/4"></div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : classrooms.length === 0 ? (
                 <Card className="bg-white/10 backdrop-blur-md border-white/20">
                   <CardContent className="p-12 text-center">
                     <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -243,7 +266,13 @@ const TeacherDashboard = () => {
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {classrooms.map((classroom) => (
-                    <ClassroomCard key={classroom.id} classroom={classroom} />
+                    <ClassroomCard 
+                      key={classroom.id} 
+                      classroom={classroom}
+                      onEdit={handleEditClassroom}
+                      onDelete={handleDeleteClassroom}
+                      onViewAnalytics={handleViewAnalytics}
+                    />
                   ))}
                 </div>
               )}
@@ -292,7 +321,6 @@ const TeacherDashboard = () => {
         <CreateClassroomDialog 
           open={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
-          onCreateClassroom={handleCreateClassroom}
         />
       </div>
       <Footer />

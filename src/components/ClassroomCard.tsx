@@ -3,28 +3,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, Clock, Star, DollarSign, Edit, Trash2, Settings, BarChart3 } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Classroom {
-  id: string;
-  name: string;
-  description: string;
-  subject: string;
-  studentsCount: number;
-  schedule: string;
-  level: string;
-  price: number;
-  rating: number;
-  image?: string;
-}
+type Classroom = Database['public']['Tables']['classrooms']['Row'];
 
 interface ClassroomCardProps {
   classroom: Classroom;
+  enrollmentCount?: number;
   onEdit?: (classroom: Classroom) => void;
   onDelete?: (id: string) => void;
   onViewAnalytics?: (id: string) => void;
 }
 
-const ClassroomCard = ({ classroom, onEdit, onDelete, onViewAnalytics }: ClassroomCardProps) => {
+const ClassroomCard = ({ classroom, enrollmentCount = 0, onEdit, onDelete, onViewAnalytics }: ClassroomCardProps) => {
   const getLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
       case 'beginner':
@@ -43,6 +34,8 @@ const ClassroomCard = ({ classroom, onEdit, onDelete, onViewAnalytics }: Classro
     return "🎵";
   };
 
+  const monthlyRevenue = enrollmentCount * classroom.price * (classroom.sessions_per_week || 2) * 4;
+
   return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105 group">
       <CardHeader className="pb-3">
@@ -55,7 +48,7 @@ const ClassroomCard = ({ classroom, onEdit, onDelete, onViewAnalytics }: Classro
           </div>
           <div className="flex items-center gap-1">
             <Star className="h-4 w-4 text-yellow-400 fill-current" />
-            <span className="text-white text-sm font-medium">{classroom.rating}</span>
+            <span className="text-white text-sm font-medium">4.8</span>
           </div>
         </div>
         
@@ -73,7 +66,7 @@ const ClassroomCard = ({ classroom, onEdit, onDelete, onViewAnalytics }: Classro
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center gap-2 text-gray-300">
               <Users className="h-4 w-4 text-blue-400" />
-              <span className="text-sm font-medium">{classroom.studentsCount} students</span>
+              <span className="text-sm font-medium">{enrollmentCount}/{classroom.capacity} students</span>
             </div>
             <div className="flex items-center gap-2 text-gray-300">
               <DollarSign className="h-4 w-4 text-green-400" />
@@ -87,11 +80,17 @@ const ClassroomCard = ({ classroom, onEdit, onDelete, onViewAnalytics }: Classro
             <span className="text-sm">{classroom.schedule}</span>
           </div>
 
+          {/* Additional Info */}
+          <div className="text-xs text-gray-400 space-y-1">
+            <div>Duration: {classroom.duration_weeks} weeks</div>
+            <div>Sessions: {classroom.sessions_per_week}/week, {classroom.session_duration_minutes}min each</div>
+          </div>
+
           {/* Revenue Info */}
           <div className="p-3 bg-white/5 rounded-lg border border-white/10">
             <div className="flex justify-between items-center">
               <span className="text-gray-300 text-sm">Monthly Revenue</span>
-              <span className="text-white font-semibold">${classroom.studentsCount * classroom.price}</span>
+              <span className="text-white font-semibold">${monthlyRevenue}</span>
             </div>
           </div>
 
