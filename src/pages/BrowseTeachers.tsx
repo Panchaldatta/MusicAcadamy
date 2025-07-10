@@ -1,32 +1,31 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useTeachers } from "@/hooks/useTeachers";
+import { useTeacherFilters } from "@/hooks/useTeacherFilters";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FilterBar from "@/components/FilterBar";
 import TeacherGrid from "@/components/TeacherGrid";
+import LoadingState from "@/components/common/LoadingState";
+import ErrorState from "@/components/common/ErrorState";
 
 const BrowseTeachers = () => {
   const [searchParams] = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || "");
-  const [selectedSubject, setSelectedSubject] = useState(searchParams.get('subject') || "all");
-  const [selectedLocation, setSelectedLocation] = useState("all");
-  const [priceRange, setPriceRange] = useState("all");
-  const [sortBy, setSortBy] = useState("rating");
   const { toast } = useToast();
   const { data: teachers = [], isLoading, error } = useTeachers();
+  const { filters, filteredAndSortedTeachers, updateFilter, clearFilters } = useTeacherFilters(teachers);
 
-  // Initialize search term from URL params
+  // Initialize search from URL params
   useEffect(() => {
     const searchParam = searchParams.get('search');
     const subjectParam = searchParams.get('subject');
     const locationParam = searchParams.get('location');
     
-    if (searchParam) setSearchTerm(searchParam);
-    if (subjectParam) setSelectedSubject(subjectParam);
-    if (locationParam) setSelectedLocation(locationParam);
+    if (searchParam) updateFilter('searchTerm', searchParam);
+    if (subjectParam) updateFilter('selectedSubject', subjectParam);
+    if (locationParam) updateFilter('selectedLocation', locationParam);
     
     if (searchParam || subjectParam || locationParam) {
       toast({
@@ -34,52 +33,10 @@ const BrowseTeachers = () => {
         description: `Showing results for your search criteria`,
       });
     }
-  }, [searchParams, toast]);
-
-  const filteredTeachers = teachers.filter(teacher => {
-    const matchesSearch = searchTerm === "" || 
-                         teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         teacher.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         teacher.specialties.some(specialty => 
-                           specialty.toLowerCase().includes(searchTerm.toLowerCase())
-                         );
-    
-    const matchesSubject = selectedSubject === "all" || teacher.subject === selectedSubject;
-    const matchesLocation = selectedLocation === "all" || teacher.location === selectedLocation;
-    
-    const matchesPrice = priceRange === "all" || (() => {
-      const [min, max] = priceRange.split('-').map(p => p.replace('+', ''));
-      if (priceRange.includes('+')) {
-        return teacher.price >= parseInt(min);
-      }
-      return teacher.price >= parseInt(min) && teacher.price <= parseInt(max);
-    })();
-    
-    return matchesSearch && matchesSubject && matchesLocation && matchesPrice;
-  });
-
-  // Sort teachers
-  const sortedTeachers = [...filteredTeachers].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.price - b.price;
-      case 'price-high':
-        return b.price - a.price;
-      case 'rating':
-        return b.rating - a.rating;
-      case 'experience':
-        return b.experience.localeCompare(a.experience);
-      default:
-        return b.rating - a.rating;
-    }
-  });
+  }, [searchParams, toast, updateFilter]);
 
   const handleClearFilters = () => {
-    setSearchTerm("");
-    setSelectedSubject("all");
-    setSelectedLocation("all");
-    setPriceRange("all");
-    setSortBy("rating");
+    clearFilters();
     toast({
       title: "Filters Cleared",
       description: "All search filters have been reset",
@@ -90,13 +47,7 @@ const BrowseTeachers = () => {
     return (
       <>
         <Navigation />
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-20 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-600 mx-auto mb-6"></div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Loading Teachers...</h3>
-            <p className="text-gray-600">Finding the best music gurus for you</p>
-          </div>
-        </div>
+        <LoadingState message="Finding the best music gurus for you" />
         <Footer />
       </>
     );
@@ -106,21 +57,11 @@ const BrowseTeachers = () => {
     return (
       <>
         <Navigation />
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-20 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-red-600 text-4xl">⚠️</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Teachers</h3>
-            <p className="text-red-600 mb-6">Failed to load teachers. Please try again later.</p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-6 py-3 rounded-lg"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
+        <ErrorState 
+          title="Error Loading Teachers"
+          message="Failed to load teachers. Please try again later."
+          onRetry={() => window.location.reload()}
+        />
         <Footer />
       </>
     );
@@ -141,23 +82,23 @@ const BrowseTeachers = () => {
 
           {/* Filters */}
           <FilterBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedSubject={selectedSubject}
-            onSubjectChange={setSelectedSubject}
-            selectedLocation={selectedLocation}
-            onLocationChange={setSelectedLocation}
-            priceRange={priceRange}
-            onPriceRangeChange={setPriceRange}
-            sortBy={sortBy}
-            onSortByChange={setSortBy}
+            searchTerm={filters.searchTerm}
+            onSearchChange={(value) => updateFilter('searchTerm', value)}
+            selectedSubject={filters.selectedSubject}
+            onSubjectChange={(value) => updateFilter('selectedSubject', value)}
+            selectedLocation={filters.selectedLocation}
+            onLocationChange={(value) => updateFilter('selectedLocation', value)}
+            priceRange={filters.priceRange}
+            onPriceRangeChange={(value) => updateFilter('priceRange', value)}
+            sortBy={filters.sortBy}
+            onSortByChange={(value) => updateFilter('sortBy', value)}
             onClearFilters={handleClearFilters}
-            resultCount={sortedTeachers.length}
+            resultCount={filteredAndSortedTeachers.length}
             showLocation={true}
           />
 
           {/* Teachers Grid */}
-          <TeacherGrid teachers={sortedTeachers} />
+          <TeacherGrid teachers={filteredAndSortedTeachers} />
         </div>
       </div>
       <Footer />

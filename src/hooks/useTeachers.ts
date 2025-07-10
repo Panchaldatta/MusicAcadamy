@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { TeacherService } from '@/services/teacherService';
 
 export interface Teacher {
   id: string;
@@ -21,18 +21,22 @@ export interface Teacher {
 export const useTeachers = () => {
   return useQuery({
     queryKey: ['teachers'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('teachers')
-        .select('*')
-        .order('rating', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching teachers:', error);
-        throw error;
-      }
-      
-      return data as Teacher[];
-    },
+    queryFn: TeacherService.getAllTeachers,
+  });
+};
+
+export const useTeachersBySubject = (subject: string) => {
+  return useQuery({
+    queryKey: ['teachers', 'subject', subject],
+    queryFn: () => TeacherService.getTeachersBySubject(subject),
+    enabled: !!subject,
+  });
+};
+
+export const useSearchTeachers = (searchTerm: string) => {
+  return useQuery({
+    queryKey: ['teachers', 'search', searchTerm],
+    queryFn: () => TeacherService.searchTeachers(searchTerm),
+    enabled: !!searchTerm,
   });
 };

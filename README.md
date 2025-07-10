@@ -1,73 +1,325 @@
-# Welcome to your Lovable project
 
-## Project info
+# SangamGuru - Indian Classical Music Learning Platform
 
-**URL**: https://lovable.dev/projects/57aea331-dd1b-4811-8aae-f277eff7dfa5
+A modern web application connecting music students with expert Indian classical music teachers (gurus). Built with React, TypeScript, Tailwind CSS, and Supabase.
 
-## How can I edit this code?
+## 🎯 Overview
 
-There are several ways of editing your application.
+SangamGuru is a comprehensive platform that enables students to discover, connect with, and learn from verified Indian classical music teachers. The application features a Tinder-like swipe interface for teacher discovery, detailed teacher profiles, and a robust filtering system.
 
-**Use Lovable**
+## 🚀 Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/57aea331-dd1b-4811-8aae-f277eff7dfa5) and start prompting.
+### Core Features
+- **Teacher Discovery**: Browse and search through verified music teachers
+- **Swipe Interface**: Tinder-like experience for discovering teachers
+- **Advanced Filtering**: Filter by subject, location, price range, and more
+- **Teacher Profiles**: Detailed profiles with ratings, reviews, and specialties
+- **Responsive Design**: Fully responsive across all devices
+- **Real-time Data**: Live updates using Supabase real-time subscriptions
 
-Changes made via Lovable will be committed automatically to this repo.
+### Music Subjects Supported
+- Tabla & Percussion
+- Classical Vocals & Hindustani
+- Sitar & String Instruments
+- Harmonium & Devotional Music
+- Flute, Violin, Veena, Santoor
 
-**Use your preferred IDE**
+## 🛠️ Technology Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Frontend
+- **React 18** - Modern React with hooks and functional components
+- **TypeScript** - Type-safe development
+- **Vite** - Fast build tool and development server
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Modern UI component library
+- **Framer Motion** - Smooth animations and transitions
+- **React Router** - Client-side routing
+- **React Query (TanStack Query)** - Data fetching and state management
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Backend & Database
+- **Supabase** - Backend-as-a-Service
+  - PostgreSQL database
+  - Real-time subscriptions
+  - Row Level Security (RLS)
+  - Authentication
+  - Edge Functions
 
-Follow these steps:
+### Additional Libraries
+- **Lucide React** - Modern icon library
+- **React Hook Form** - Form validation and handling
+- **Sonner** - Toast notifications
+- **Recharts** - Data visualization
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📁 Project Structure
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+├── components/           # Reusable UI components
+│   ├── common/          # Common components (LoadingState, ErrorState)
+│   ├── ui/              # shadcn/ui components
+│   └── ...              # Feature-specific components
+├── hooks/               # Custom React hooks
+├── pages/               # Page components (routes)
+├── services/            # Backend service layer
+├── utils/               # Utility functions
+├── types/               # TypeScript type definitions
+├── constants/           # Application constants
+├── integrations/        # Third-party integrations
+│   └── supabase/        # Supabase configuration
+└── lib/                 # Utility libraries
 ```
 
-**Edit a file directly in GitHub**
+## 🔧 Architecture & Design Patterns
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Clean Architecture
+The application follows clean architecture principles:
 
-**Use GitHub Codespaces**
+1. **Service Layer** (`src/services/`): Handles all backend communication
+2. **Custom Hooks** (`src/hooks/`): Business logic and state management
+3. **Components** (`src/components/`): Pure UI components
+4. **Utils** (`src/utils/`): Pure functions for data transformation
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Key Design Patterns
+- **Repository Pattern**: Service classes abstract database operations
+- **Custom Hooks Pattern**: Encapsulate business logic and state
+- **Component Composition**: Reusable, focused components
+- **Separation of Concerns**: Clear boundaries between layers
 
-## What technologies are used for this project?
+## 🚀 Getting Started
 
-This project is built with:
+### Prerequisites
+- **Node.js** (v18 or higher)
+- **npm** or **yarn**
+- **Supabase Account**
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Installation
 
-## How can I deploy this project?
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd sangamguru
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/57aea331-dd1b-4811-8aae-f277eff7dfa5) and click on Share -> Publish.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-## Can I connect a custom domain to my Lovable project?
+3. **Environment Setup**
+   - The Supabase configuration is already set up in `src/integrations/supabase/client.ts`
+   - No additional environment variables needed for development
 
-Yes, you can!
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+5. **Access the application**
+   - Open [http://localhost:5173](http://localhost:5173) in your browser
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 🗄️ Database Schema
+
+### Core Tables
+
+#### `teachers`
+- Teacher profiles with ratings, reviews, and specialties
+- Columns: id, name, subject, rating, reviews, price, experience, location, etc.
+
+#### `music_subjects`
+- Available music subjects/instruments
+- Columns: id, name, icon, color, student_count
+
+#### `user_swipes`
+- User swipe history for teacher recommendations
+- Columns: id, user_id, teacher_id, swipe_direction
+
+#### `profiles`
+- Extended user profiles
+- Columns: id, first_name, last_name, email, role
+
+#### `site_stats`
+- Homepage statistics
+- Columns: id, label, value, display_order
+
+### Row Level Security (RLS)
+All tables implement Row Level Security policies to ensure data access control:
+- Users can only access their own data
+- Public data (teachers, subjects) is readable by all
+- Admin-only operations for managing content
+
+## 🔐 Authentication
+
+- **Provider**: Supabase Auth
+- **Methods**: Email/Password
+- **Features**: 
+  - User registration and login
+  - Profile management
+  - Role-based access control
+
+## 📱 API Integration
+
+### Service Layer Architecture
+All backend operations are abstracted through service classes:
+
+```typescript
+// Example: TeacherService
+export class TeacherService {
+  static async getAllTeachers(): Promise<Teacher[]>
+  static async getTeachersBySubject(subject: string): Promise<Teacher[]>
+  static async searchTeachers(searchTerm: string): Promise<Teacher[]>
+}
+```
+
+### Custom Hooks
+Business logic is encapsulated in custom hooks:
+
+```typescript
+// Example: useTeacherFilters
+export const useTeacherFilters = (teachers: Teacher[]) => {
+  // Filter and sort logic
+  return { filters, filteredTeachers, updateFilter, clearFilters }
+}
+```
+
+## 🎨 UI/UX Features
+
+### Design System
+- **Color Scheme**: Orange and red gradients with Indian-inspired themes
+- **Typography**: Modern, readable fonts with proper hierarchy
+- **Components**: Consistent, reusable UI components
+- **Responsive**: Mobile-first design approach
+
+### Key UI Components
+- **Swipeable Cards**: Tinder-like interface for teacher discovery
+- **Filter Bar**: Advanced filtering with multiple criteria
+- **Teacher Grid**: Responsive grid layout for teacher listings
+- **Loading States**: Consistent loading indicators
+- **Error States**: User-friendly error handling
+
+## 🔍 Search & Filtering
+
+### Advanced Filtering System
+- **Subject-based filtering**: Filter by music instruments/subjects
+- **Location filtering**: Find teachers in specific cities
+- **Price range filtering**: Budget-based teacher selection
+- **Rating & experience sorting**: Sort by quality metrics
+
+### Search Functionality
+- **Full-text search**: Search across teacher names, subjects, and specialties
+- **URL-based search**: Shareable search URLs with parameters
+- **Real-time filtering**: Instant results as users type
+
+## 📊 Performance Optimizations
+
+### React Query Integration
+- **Caching**: Intelligent data caching for better performance
+- **Background Updates**: Keep data fresh without blocking UI
+- **Error Handling**: Robust error handling with retry mechanisms
+
+### Code Splitting
+- **Lazy Loading**: Components loaded on demand
+- **Route-based Splitting**: Separate bundles for different pages
+
+## 🚀 Deployment
+
+### Build for Production
+```bash
+npm run build
+```
+
+### Deployment Options
+1. **Lovable Platform**: Direct deployment from the Lovable interface
+2. **Vercel/Netlify**: Static site deployment
+3. **Custom Hosting**: Deploy build files to any static hosting
+
+### Environment Configuration
+- **Supabase**: Pre-configured with project credentials
+- **Domain Setup**: Custom domain configuration available
+- **SSL**: Automatic HTTPS setup
+
+## 🧪 Testing
+
+### Testing Strategy
+- **Component Testing**: Individual component functionality
+- **Integration Testing**: Service layer and API integration
+- **E2E Testing**: Full user workflow testing
+
+### Running Tests
+```bash
+npm run test        # Run unit tests
+npm run test:e2e    # Run end-to-end tests
+```
+
+## 🔧 Development Guidelines
+
+### Code Standards
+- **TypeScript**: Strict type checking enabled
+- **ESLint**: Code quality and consistency
+- **Prettier**: Code formatting
+- **Conventional Commits**: Structured commit messages
+
+### Component Guidelines
+- **Single Responsibility**: Each component has one clear purpose
+- **Composition over Inheritance**: Favor component composition
+- **Props Interface**: Always define TypeScript interfaces for props
+- **Error Boundaries**: Implement error handling at appropriate levels
+
+### State Management
+- **React Query**: Server state management
+- **useState/useReducer**: Local component state
+- **Custom Hooks**: Shared business logic
+
+## 📈 Monitoring & Analytics
+
+### Error Tracking
+- **Console Logging**: Comprehensive error logging
+- **Error Boundaries**: Graceful error handling
+- **User Feedback**: Error reporting mechanisms
+
+### Performance Monitoring
+- **Core Web Vitals**: Track loading performance
+- **User Experience**: Monitor user interactions
+- **Database Performance**: Query optimization
+
+## 🤝 Contributing
+
+### Development Process
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit changes**: `git commit -m 'Add amazing feature'`
+4. **Push to branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
+
+### Code Review Process
+- **Automated Checks**: ESLint, TypeScript, and build checks
+- **Manual Review**: Code quality and architecture review
+- **Testing**: Ensure all tests pass
+
+## 📞 Support & Contact
+
+### Getting Help
+- **Documentation**: Comprehensive docs in `/docs` folder
+- **Issues**: Report bugs via GitHub issues
+- **Discussions**: Community discussions for feature requests
+
+### Maintenance
+- **Regular Updates**: Keep dependencies updated
+- **Security Patches**: Apply security updates promptly
+- **Performance Monitoring**: Regular performance audits
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Supabase**: For the excellent backend-as-a-service platform
+- **shadcn/ui**: For the beautiful and accessible UI components
+- **Tailwind CSS**: For the utility-first CSS framework
+- **React Community**: For the amazing ecosystem and tools
+
+---
+
+**Built with ❤️ for the Indian classical music community**
+
+For more information, visit our [website](https://sangamguru.lovable.app) or contact our team.

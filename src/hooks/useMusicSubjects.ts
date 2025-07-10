@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { MusicSubjectService } from '@/services/musicSubjectService';
 
 export interface MusicSubject {
   id: string;
@@ -13,18 +13,14 @@ export interface MusicSubject {
 export const useMusicSubjects = () => {
   return useQuery({
     queryKey: ['music_subjects'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('music_subjects')
-        .select('*')
-        .order('student_count', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching music subjects:', error);
-        throw error;
-      }
-      
-      return data as MusicSubject[];
-    },
+    queryFn: MusicSubjectService.getAllMusicSubjects,
+  });
+};
+
+export const useMusicSubject = (id: string) => {
+  return useQuery({
+    queryKey: ['music_subjects', id],
+    queryFn: () => MusicSubjectService.getMusicSubjectById(id),
+    enabled: !!id,
   });
 };
