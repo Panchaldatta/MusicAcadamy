@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateClassroom } from "@/hooks/useClassrooms";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CreateClassroomDialogProps {
   open: boolean;
@@ -71,6 +72,20 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Starting classroom creation...');
+
+    // Check authentication first
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to create a classroom. Please log in and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('User authenticated:', user.id);
 
     if (!validateForm()) {
       toast({
@@ -82,6 +97,7 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
     }
     
     try {
+      console.log('Submitting classroom data:', formData);
       await createClassroom.mutateAsync({
         name: formData.name,
         description: formData.description,
@@ -96,13 +112,14 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
         session_duration_minutes: formData.session_duration_minutes
       });
 
+      console.log('Classroom created successfully');
       resetForm();
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to create classroom:', error);
       toast({
         title: "Error",
-        description: "Failed to create classroom. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create classroom. Please try again.",
         variant: "destructive",
       });
     }

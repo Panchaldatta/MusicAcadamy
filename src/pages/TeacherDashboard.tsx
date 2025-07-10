@@ -10,6 +10,7 @@ import CreateClassroomDialog from "@/components/CreateClassroomDialog";
 import TeacherAnalytics from "@/components/TeacherAnalytics";
 import UpcomingClasses from "@/components/UpcomingClasses";
 import Footer from "@/components/Footer";
+import AuthCheck from "@/components/AuthCheck";
 import { useTeacherClassrooms, useDeleteClassroom } from "@/hooks/useClassrooms";
 import { useToast } from "@/hooks/use-toast";
 
@@ -96,24 +97,8 @@ const TeacherDashboard = () => {
     { id: "settings", label: "Settings", icon: Settings }
   ];
 
-  if (error) {
-    return (
-      <>
-        <Navigation />
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardContent className="p-6 text-center">
-              <h2 className="text-xl font-semibold text-white mb-2">Error Loading Dashboard</h2>
-              <p className="text-gray-300">Please make sure you're logged in to access your teacher dashboard.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
   return (
-    <>
+    <AuthCheck>
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <div className="container mx-auto px-6 py-8">
@@ -324,7 +309,7 @@ const TeacherDashboard = () => {
         />
       </div>
       <Footer />
-    </>
+    </AuthCheck>
   );
 };
 
