@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateClassroom } from "@/hooks/useClassrooms";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface CreateClassroomDialogProps {
   open: boolean;
@@ -21,11 +20,16 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
 
   const [formData, setFormData] = useState({
     name: "",
+    description: "",
     subject: "",
-    level: "",
     schedule: "",
+    level: "",
     price: 25,
-    capacity: 20
+    capacity: 20,
+    prerequisites: "",
+    duration_weeks: 12,
+    sessions_per_week: 2,
+    session_duration_minutes: 60
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -34,11 +38,15 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) newErrors.name = "Classroom name is required";
+    if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.subject) newErrors.subject = "Subject is required";
     if (!formData.schedule.trim()) newErrors.schedule = "Schedule is required";
     if (!formData.level) newErrors.level = "Level is required";
     if (formData.price < 0) newErrors.price = "Price must be positive";
     if (formData.capacity < 1) newErrors.capacity = "Capacity must be at least 1";
+    if (formData.duration_weeks < 1) newErrors.duration_weeks = "Duration must be at least 1 week";
+    if (formData.sessions_per_week < 1) newErrors.sessions_per_week = "Must have at least 1 session per week";
+    if (formData.session_duration_minutes < 15) newErrors.session_duration_minutes = "Session must be at least 15 minutes";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -47,31 +55,22 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
   const resetForm = () => {
     setFormData({
       name: "",
+      description: "",
       subject: "",
-      level: "",
       schedule: "",
+      level: "",
       price: 25,
-      capacity: 20
+      capacity: 20,
+      prerequisites: "",
+      duration_weeks: 12,
+      sessions_per_week: 2,
+      session_duration_minutes: 60
     });
     setErrors({});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Starting classroom creation...');
-
-    // Check authentication first
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "You must be logged in to create a classroom. Please log in and try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    console.log('User authenticated:', user.id);
 
     if (!validateForm()) {
       toast({
@@ -83,25 +82,27 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
     }
     
     try {
-      console.log('Submitting classroom data:', formData);
       await createClassroom.mutateAsync({
         name: formData.name,
-        description: `Learn ${formData.subject} at ${formData.level} level`,
+        description: formData.description,
         subject: formData.subject,
         schedule: formData.schedule,
         level: formData.level,
         price: formData.price,
-        capacity: formData.capacity
+        capacity: formData.capacity,
+        prerequisites: formData.prerequisites || null,
+        duration_weeks: formData.duration_weeks,
+        sessions_per_week: formData.sessions_per_week,
+        session_duration_minutes: formData.session_duration_minutes
       });
 
-      console.log('Classroom created successfully');
       resetForm();
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to create classroom:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create classroom. Please try again.",
+        description: "Failed to create classroom. Please try again.",
         variant: "destructive",
       });
     }
@@ -128,18 +129,23 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-900 border-white/20 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-slate-900 border-white/20 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Create Classroom
+            Create New Classroom
           </DialogTitle>
           <DialogDescription className="text-gray-300">
-            Set up a new classroom quickly with just the essentials.
+            Set up a new classroom to start teaching students online.
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information */}
           <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-purple-300 border-b border-white/10 pb-2">
+              Basic Information
+            </h3>
+            
             <div>
               <Label htmlFor="name" className="text-white">
                 Classroom Name <span className="text-red-400">*</span>
@@ -154,6 +160,23 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
                 }`}
               />
               {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
+            </div>
+
+            <div>
+              <Label htmlFor="description" className="text-white">
+                Description <span className="text-red-400">*</span>
+              </Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Describe what students will learn in this classroom..."
+                className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 ${
+                  errors.description ? 'border-red-500' : ''
+                }`}
+                rows={3}
+              />
+              {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -215,6 +238,13 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
               />
               {errors.schedule && <p className="text-red-400 text-sm mt-1">{errors.schedule}</p>}
             </div>
+          </div>
+
+          {/* Pricing & Capacity */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-purple-300 border-b border-white/10 pb-2">
+              Pricing & Capacity
+            </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -237,7 +267,7 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
 
               <div>
                 <Label htmlFor="capacity" className="text-white">
-                  Max Students <span className="text-red-400">*</span>
+                  Maximum Students <span className="text-red-400">*</span>
                 </Label>
                 <Input
                   id="capacity"
@@ -253,6 +283,92 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
                 />
                 {errors.capacity && <p className="text-red-400 text-sm mt-1">{errors.capacity}</p>}
               </div>
+            </div>
+          </div>
+
+          {/* Schedule Details */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-purple-300 border-b border-white/10 pb-2">
+              Schedule Details
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="duration_weeks" className="text-white">
+                  Duration (weeks) <span className="text-red-400">*</span>
+                </Label>
+                <Input
+                  id="duration_weeks"
+                  type="number"
+                  value={formData.duration_weeks}
+                  onChange={(e) => setFormData({ ...formData, duration_weeks: parseInt(e.target.value) || 12 })}
+                  placeholder="12"
+                  className={`bg-white/10 border-white/20 text-white ${
+                    errors.duration_weeks ? 'border-red-500' : ''
+                  }`}
+                  min="1"
+                />
+                {errors.duration_weeks && <p className="text-red-400 text-sm mt-1">{errors.duration_weeks}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="sessions_per_week" className="text-white">
+                  Sessions per Week <span className="text-red-400">*</span>
+                </Label>
+                <Input
+                  id="sessions_per_week"
+                  type="number"
+                  value={formData.sessions_per_week}
+                  onChange={(e) => setFormData({ ...formData, sessions_per_week: parseInt(e.target.value) || 2 })}
+                  placeholder="2"
+                  className={`bg-white/10 border-white/20 text-white ${
+                    errors.sessions_per_week ? 'border-red-500' : ''
+                  }`}
+                  min="1"
+                  max="7"
+                />
+                {errors.sessions_per_week && <p className="text-red-400 text-sm mt-1">{errors.sessions_per_week}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="session_duration_minutes" className="text-white">
+                  Session Duration (minutes) <span className="text-red-400">*</span>
+                </Label>
+                <Input
+                  id="session_duration_minutes"
+                  type="number"
+                  value={formData.session_duration_minutes}
+                  onChange={(e) => setFormData({ ...formData, session_duration_minutes: parseInt(e.target.value) || 60 })}
+                  placeholder="60"
+                  className={`bg-white/10 border-white/20 text-white ${
+                    errors.session_duration_minutes ? 'border-red-500' : ''
+                  }`}
+                  min="15"
+                  max="180"
+                />
+                {errors.session_duration_minutes && <p className="text-red-400 text-sm mt-1">{errors.session_duration_minutes}</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-purple-300 border-b border-white/10 pb-2">
+              Additional Information
+            </h3>
+            
+            <div>
+              <Label htmlFor="prerequisites" className="text-white">
+                Prerequisites (optional)
+              </Label>
+              <Textarea
+                id="prerequisites"
+                value={formData.prerequisites}
+                onChange={(e) => setFormData({ ...formData, prerequisites: e.target.value })}
+                placeholder="Any requirements or prior knowledge needed..."
+                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                rows={2}
+              />
             </div>
           </div>
 

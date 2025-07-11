@@ -138,47 +138,29 @@ export type Database = {
       }
       profiles: {
         Row: {
-          avatar_url: string | null
-          bio: string | null
           created_at: string
-          date_of_birth: string | null
           email: string | null
-          email_verified: boolean | null
           first_name: string | null
           id: string
-          is_active: boolean | null
           last_name: string | null
-          phone: string | null
           role: string | null
           updated_at: string
         }
         Insert: {
-          avatar_url?: string | null
-          bio?: string | null
           created_at?: string
-          date_of_birth?: string | null
           email?: string | null
-          email_verified?: boolean | null
           first_name?: string | null
           id: string
-          is_active?: boolean | null
           last_name?: string | null
-          phone?: string | null
           role?: string | null
           updated_at?: string
         }
         Update: {
-          avatar_url?: string | null
-          bio?: string | null
           created_at?: string
-          date_of_birth?: string | null
           email?: string | null
-          email_verified?: boolean | null
           first_name?: string | null
           id?: string
-          is_active?: boolean | null
           last_name?: string | null
-          phone?: string | null
           role?: string | null
           updated_at?: string
         }
@@ -302,18 +284,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_role: {
-        Args: { user_id?: string }
-        Returns: string
-      }
-      is_student: {
-        Args: { user_id?: string }
-        Returns: boolean
-      }
-      is_teacher: {
-        Args: { user_id?: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
