@@ -22,6 +22,7 @@ export class ClassroomService {
     const { data, error } = await supabase
       .from('classrooms')
       .select('*')
+      .eq('teacher_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
