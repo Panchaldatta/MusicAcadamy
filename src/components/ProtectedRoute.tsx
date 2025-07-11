@@ -1,13 +1,12 @@
-
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 
-interface AuthCheckProps {
+interface ProtectedRouteProps {
   children: React.ReactNode;
   requireRole?: 'teacher' | 'student';
 }
 
-const AuthCheck = ({ children, requireRole }: AuthCheckProps) => {
+const ProtectedRoute = ({ children, requireRole }: ProtectedRouteProps) => {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
 
@@ -33,4 +32,4 @@ const AuthCheck = ({ children, requireRole }: AuthCheckProps) => {
   return <>{children}</>;
 };
 
-export default AuthCheck;
+export default ProtectedRoute;
