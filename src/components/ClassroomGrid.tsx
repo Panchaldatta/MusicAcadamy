@@ -5,20 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Clock, Users, Star, DollarSign, Heart, Calendar, Play } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Classroom {
-  id: string;
-  name: string;
-  description: string;
-  subject: string;
-  teacher: string;
-  studentsCount: number;
-  schedule: string;
-  level: string;
-  price: number;
-  rating: number;
-  image?: string;
-}
+type Classroom = Database['public']['Tables']['classrooms']['Row'];
 
 interface ClassroomGridProps {
   classrooms: Classroom[];
@@ -39,6 +28,21 @@ const ClassroomGrid = ({ classrooms }: ClassroomGridProps) => {
       default:
         return 'bg-gray-500 hover:bg-gray-600';
     }
+  };
+
+  const getSubjectIcon = (subject: string) => {
+    const icons: Record<string, string> = {
+      'Sitar': '🎸',
+      'Tabla': '🥁', 
+      'Vocals': '🎤',
+      'Flute': '🎵',
+      'Harmonium': '🎹',
+      'Violin': '🎻',
+      'Guitar': '🎸',
+      'Piano': '🎹',
+      'Drums': '🥁'
+    };
+    return icons[subject] || '🎵';
   };
 
   const handleJoinClassroom = (classroomId: string, classroomName: string) => {
@@ -83,9 +87,12 @@ const ClassroomGrid = ({ classrooms }: ClassroomGridProps) => {
         <Card key={classroom.id} className="group bg-white border-orange-200 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 rounded-xl overflow-hidden">
           <CardHeader className="pb-4">
             <div className="flex justify-between items-start mb-3">
-              <Badge className={`${getLevelColor(classroom.level)} text-white transition-colors`}>
-                {classroom.level}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{getSubjectIcon(classroom.subject)}</span>
+                <Badge className={`${getLevelColor(classroom.level)} text-white transition-colors`}>
+                  {classroom.level}
+                </Badge>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => toggleFavorite(classroom.id)}
@@ -99,7 +106,7 @@ const ClassroomGrid = ({ classrooms }: ClassroomGridProps) => {
                 </button>
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                  <span className="text-gray-900 text-sm font-medium">{classroom.rating}</span>
+                  <span className="text-gray-900 text-sm font-medium">4.8</span>
                 </div>
               </div>
             </div>
@@ -108,28 +115,33 @@ const ClassroomGrid = ({ classrooms }: ClassroomGridProps) => {
               {classroom.name}
             </CardTitle>
             <CardDescription className="text-orange-600 font-medium text-lg">
-              by {classroom.teacher}
+              {classroom.subject} Class
             </CardDescription>
           </CardHeader>
           
           <CardContent>
-            <p className="text-gray-600 text-sm mb-6 line-clamp-3">{classroom.description}</p>
+            <p className="text-gray-600 text-sm mb-6 line-clamp-3">{classroom.description || `Learn ${classroom.subject} with expert guidance and structured curriculum.`}</p>
             
             <div className="space-y-3 mb-6">
               <div className="flex items-center justify-between text-gray-600 text-sm">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-blue-500" />
-                  <span>{classroom.studentsCount} students enrolled</span>
+                  <span>{classroom.capacity} max students</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-green-500" />
-                  <span className="font-semibold">₹{classroom.price}/month</span>
+                  <span className="font-semibold">₹{classroom.price}/session</span>
                 </div>
               </div>
               
               <div className="flex items-center gap-2 text-gray-600 text-sm">
                 <Clock className="h-4 w-4 text-purple-500" />
                 <span>{classroom.schedule}</span>
+              </div>
+
+              <div className="text-xs text-gray-500 space-y-1">
+                <div>Duration: {classroom.duration_weeks} weeks</div>
+                <div>Sessions: {classroom.sessions_per_week}/week, {classroom.session_duration_minutes}min each</div>
               </div>
             </div>
 

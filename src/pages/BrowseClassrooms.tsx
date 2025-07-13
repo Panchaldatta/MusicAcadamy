@@ -6,20 +6,9 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FilterBar from "@/components/FilterBar";
 import ClassroomGrid from "@/components/ClassroomGrid";
-
-interface Classroom {
-  id: string;
-  name: string;
-  description: string;
-  subject: string;
-  teacher: string;
-  studentsCount: number;
-  schedule: string;
-  level: string;
-  price: number;
-  rating: number;
-  image?: string;
-}
+import { useActiveClassrooms } from "@/hooks/useClassrooms";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 const BrowseClassrooms = () => {
   const [searchParams] = useSearchParams();
@@ -29,81 +18,8 @@ const BrowseClassrooms = () => {
   const [priceRange, setPriceRange] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
   const { toast } = useToast();
-
-  const classrooms: Classroom[] = [
-    {
-      id: "1",
-      name: "Sitar Basics for Beginners",
-      description: "Learn the fundamentals of sitar playing with traditional Indian ragas and proper finger techniques. Master the art of string manipulation and understand the cultural significance of this beautiful instrument.",
-      subject: "Sitar",
-      teacher: "Pandit Ravi Sharma",
-      studentsCount: 15,
-      schedule: "Mon, Wed, Fri - 4:00 PM IST",
-      level: "Beginner",
-      price: 1500,
-      rating: 4.8
-    },
-    {
-      id: "2",
-      name: "Tabla Advanced Rhythms",
-      description: "Master complex tabla compositions and traditional Indian percussion techniques. Dive deep into classical talas and learn to accompany various musical forms.",
-      subject: "Tabla",
-      teacher: "Ustad Zakir Khan",
-      studentsCount: 8,
-      schedule: "Tue, Thu - 6:00 PM IST",
-      level: "Advanced",
-      price: 2500,
-      rating: 4.9
-    },
-    {
-      id: "3",
-      name: "Classical Vocals - Hindustani",
-      description: "Develop your voice with classical Indian vocal techniques, breathing exercises, and ragas. Learn traditional compositions and improvisation skills.",
-      subject: "Vocals",
-      teacher: "Vidushi Parveen Sultana",
-      studentsCount: 12,
-      schedule: "Mon, Wed - 5:30 PM IST",
-      level: "Beginner",
-      price: 1800,
-      rating: 4.7
-    },
-    {
-      id: "4",
-      name: "Flute Intermediate Techniques",
-      description: "Explore melodic patterns and advanced breathing techniques for Indian classical flute. Focus on ornamentation and emotional expression through music.",
-      subject: "Flute",
-      teacher: "Pandit Hariprasad Chaurasia Jr.",
-      studentsCount: 6,
-      schedule: "Sat - 2:00 PM IST",
-      level: "Intermediate",
-      price: 2000,
-      rating: 4.9
-    },
-    {
-      id: "5",
-      name: "Harmonium Basics",
-      description: "Learn to play harmonium with basic chord progressions and classical accompaniment. Perfect for beginners wanting to understand Indian classical music.",
-      subject: "Harmonium",
-      teacher: "Shri Vinod Prasad",
-      studentsCount: 20,
-      schedule: "Daily - 7:00 PM IST",
-      level: "Beginner",
-      price: 1200,
-      rating: 4.6
-    },
-    {
-      id: "6",
-      name: "Violin - Carnatic Style",
-      description: "Master South Indian classical violin techniques with traditional compositions. Learn the unique bowing styles and melodic approaches of Carnatic music.",
-      subject: "Violin",
-      teacher: "Vidwan Lalgudi Jayaraman",
-      studentsCount: 10,
-      schedule: "Tue, Fri - 3:00 PM IST",
-      level: "Intermediate",
-      price: 2200,
-      rating: 4.8
-    }
-  ];
+  
+  const { data: classrooms = [], isLoading, error } = useActiveClassrooms();
 
   // Initialize search term from URL params
   useEffect(() => {
@@ -124,8 +40,7 @@ const BrowseClassrooms = () => {
   const filteredClassrooms = classrooms.filter(classroom => {
     const matchesSearch = searchTerm === "" || 
                          classroom.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         classroom.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         classroom.teacher.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         classroom.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          classroom.subject.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesSubject = selectedSubject === "all" || classroom.subject === selectedSubject;
@@ -150,11 +65,11 @@ const BrowseClassrooms = () => {
       case 'price-high':
         return b.price - a.price;
       case 'rating':
-        return b.rating - a.rating;
+        return 4.8 - 4.8; // Default rating until we implement ratings
       case 'students':
-        return b.studentsCount - a.studentsCount;
+        return b.capacity - a.capacity; // Sort by capacity as proxy for popularity
       default:
-        return b.rating - a.rating;
+        return b.capacity - a.capacity;
     }
   });
 
@@ -170,6 +85,25 @@ const BrowseClassrooms = () => {
     });
   };
 
+  if (error) {
+    return (
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-20">
+          <div className="container mx-auto px-6 py-8">
+            <Card className="bg-red-50 border-red-200">
+              <CardContent className="p-6 text-center">
+                <h2 className="text-xl font-semibold text-red-800 mb-2">Error Loading Classrooms</h2>
+                <p className="text-red-600">There was an issue loading the classrooms. Please try again later.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Navigation />
@@ -183,25 +117,35 @@ const BrowseClassrooms = () => {
             </p>
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+              <span className="ml-2 text-gray-600">Loading classrooms...</span>
+            </div>
+          )}
+
           {/* Filters */}
-          <FilterBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedSubject={selectedSubject}
-            onSubjectChange={setSelectedSubject}
-            selectedLevel={selectedLevel}
-            onLevelChange={setSelectedLevel}
-            priceRange={priceRange}
-            onPriceRangeChange={setPriceRange}
-            sortBy={sortBy}
-            onSortByChange={setSortBy}
-            onClearFilters={handleClearFilters}
-            resultCount={sortedClassrooms.length}
-            showLevel={true}
-          />
+          {!isLoading && (
+            <FilterBar
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              selectedSubject={selectedSubject}
+              onSubjectChange={setSelectedSubject}
+              selectedLevel={selectedLevel}
+              onLevelChange={setSelectedLevel}
+              priceRange={priceRange}
+              onPriceRangeChange={setPriceRange}
+              sortBy={sortBy}
+              onSortByChange={setSortBy}
+              onClearFilters={handleClearFilters}
+              resultCount={sortedClassrooms.length}
+              showLevel={true}
+            />
+          )}
 
           {/* Classrooms Grid */}
-          <ClassroomGrid classrooms={sortedClassrooms} />
+          {!isLoading && <ClassroomGrid classrooms={sortedClassrooms} />}
         </div>
       </div>
       <Footer />
