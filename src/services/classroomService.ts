@@ -63,8 +63,8 @@ export class ClassroomService {
 
   static async deleteClassroom(id: string): Promise<void> {
     const { error } = await supabase
-      .delete()
       .from('classrooms')
+      .delete()
       .eq('id', id);
 
     if (error) {
