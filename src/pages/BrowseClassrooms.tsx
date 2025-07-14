@@ -6,8 +6,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SwipeableClassroomView from "@/components/SwipeableClassroomView";
 import { useActiveClassrooms } from "@/hooks/useClassrooms";
-import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 
 const BrowseClassrooms = () => {
   const [searchParams] = useSearchParams();
@@ -17,7 +16,6 @@ const BrowseClassrooms = () => {
   
   const { data: classrooms = [], isLoading, error } = useActiveClassrooms();
 
-  // Initialize search term from URL params
   useEffect(() => {
     const searchParam = searchParams.get('search');
     const subjectParam = searchParams.get('subject');
@@ -37,13 +35,13 @@ const BrowseClassrooms = () => {
     return (
       <>
         <Navigation />
-        <div className="min-h-screen bg-white pt-20 flex items-center justify-center">
+        <div className="min-h-screen bg-background pt-20 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-6">
-            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">😕</span>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
-            <p className="text-gray-600">We couldn't load the classrooms. Please try refreshing the page.</p>
+            <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
+            <p className="text-muted-foreground">We couldn't load the classrooms. Please try refreshing the page.</p>
           </div>
         </div>
         <Footer />
@@ -54,39 +52,33 @@ const BrowseClassrooms = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-white">
-        {/* Simple Header */}
+      <div className="min-h-screen bg-background">
+        {/* Hero Section */}
         <div className="pt-20 pb-8">
           <div className="text-center px-6">
-            <div className="inline-flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-full mb-6">
-              <Sparkles className="h-4 w-4 text-orange-600" />
-              <span className="text-sm font-medium text-orange-700">Find Your Perfect Class</span>
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-2 rounded-full mb-6">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Find Your Perfect Class</span>
             </div>
             
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
               Swipe to Discover
             </h1>
-            <p className="text-gray-600 text-lg max-w-md mx-auto">
+            <p className="text-muted-foreground text-lg max-w-md mx-auto">
               Swipe right to like, left to pass. Find your ideal music class in seconds.
             </p>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="pb-16">
-          {/* Loading State */}
-          {isLoading && (
+        <div className="pb-16 px-6">
+          {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-12 h-12 border-4 border-orange-100 border-t-orange-600 rounded-full animate-spin mb-4"></div>
-              <p className="text-gray-600 font-medium">Loading classes...</p>
+              <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground font-medium">Loading classes...</p>
             </div>
-          )}
-
-          {/* Swipe View */}
-          {!isLoading && (
-            <div className="px-6">
-              <SwipeableClassroomView classrooms={classrooms} />
-            </div>
+          ) : (
+            <SwipeableClassroomView classrooms={classrooms} />
           )}
         </div>
       </div>
