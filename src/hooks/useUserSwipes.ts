@@ -8,7 +8,7 @@ export interface UserSwipe {
   teacher_id: string;
   swipe_direction: 'left' | 'right';
   created_at: string;
-  teacher?: {
+  teachers?: {
     id: string;
     name: string;
     subject: string;
@@ -30,17 +30,9 @@ export const useUserSwipes = () => {
     queryKey: ['user-swipes'],
     queryFn: async () => {
       console.log('Fetching user swipes...');
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        console.log('No authenticated user');
-        return [];
-      }
-
       const { data, error } = await supabase
         .from('user_swipes')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -105,57 +97,27 @@ export const useSwipedTeachers = (direction?: 'left' | 'right') => {
     queryFn: async () => {
       console.log('Fetching swiped teachers with direction:', direction);
       
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        console.log('No authenticated user');
-        return [];
-      }
-
-      // First get the swipes
-      let swipesQuery = supabase
+      let query = supabase
         .from('user_swipes')
-        .select('*')
-        .eq('user_id', user.id)
+        .select(`
+          *,
+          teachers (*)
+        `)
         .order('created_at', { ascending: false });
       
       if (direction) {
-        swipesQuery = swipesQuery.eq('swipe_direction', direction);
+        query = query.eq('swipe_direction', direction);
       }
       
-      const { data: swipes, error: swipesError } = await swipesQuery;
+      const { data, error } = await query;
       
-      if (swipesError) {
-        console.error('Error fetching swiped teachers:', swipesError);
-        throw swipesError;
+      if (error) {
+        console.error('Error fetching swiped teachers:', error);
+        throw error;
       }
-
-      if (!swipes || swipes.length === 0) {
-        console.log('No swipes found');
-        return [];
-      }
-
-      // Then get the teacher data for each swipe
-      const teacherIds = swipes.map(swipe => swipe.teacher_id);
       
-      const { data: teachers, error: teachersError } = await supabase
-        .from('teachers')
-        .select('*')
-        .in('id', teacherIds);
-      
-      if (teachersError) {
-        console.error('Error fetching teachers:', teachersError);
-        throw teachersError;
-      }
-
-      // Combine swipes with teacher data
-      const swipedTeachers = swipes.map(swipe => ({
-        ...swipe,
-        teacher: teachers?.find(teacher => teacher.id === swipe.teacher_id)
-      }));
-      
-      console.log('Swiped teachers fetched:', swipedTeachers);
-      return swipedTeachers as UserSwipe[];
+      console.log('Swiped teachers fetched:', data);
+      return data as UserSwipe[];
     },
   });
 };
