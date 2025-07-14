@@ -1,10 +1,11 @@
+
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/common/LoadingState';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireRole?: 'teacher' | 'student';
+  requireRole?: 'teacher' | 'student' | 'admin';
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireRole }) => {
