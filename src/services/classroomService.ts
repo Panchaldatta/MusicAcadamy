@@ -5,6 +5,8 @@ import type { Database } from "@/integrations/supabase/types";
 type Classroom = Database['public']['Tables']['classrooms']['Row'];
 type ClassroomInsert = Database['public']['Tables']['classrooms']['Insert'];
 type ClassroomUpdate = Database['public']['Tables']['classrooms']['Update'];
+type ClassroomSwipe = Database['public']['Tables']['classroom_swipes']['Row'];
+type ClassroomSwipeInsert = Database['public']['Tables']['classroom_swipes']['Insert'];
 
 export class ClassroomService {
   static async getTeacherClassrooms(): Promise<Classroom[]> {
@@ -100,5 +102,61 @@ export class ClassroomService {
     }
 
     return data || [];
+  }
+
+  // New swipe functionality
+  static async recordSwipe(classroomId: string, direction: 'left' | 'right'): Promise<ClassroomSwipe> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User must be authenticated to record swipes');
+    }
+
+    const { data, error } = await supabase
+      .from('classroom_swipes')
+      .insert({
+        user_id: user.id,
+        classroom_id: classroomId,
+        swipe_direction: direction
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error recording swipe:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  static async getUserSwipes(userId?: string): Promise<ClassroomSwipe[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    const targetUserId = userId || user?.id;
+    
+    if (!targetUserId) {
+      throw new Error('User ID required to fetch swipes');
+    }
+
+    const { data, error } = await supabase
+      .from('classroom_swipes')
+      .select(`
+        *,
+        classrooms (*)
+      `)
+      .eq('user_id', targetUserId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching user swipes:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
+
+  static async getUserSwipedClassroomIds(userId?: string): Promise<string[]> {
+    const swipes = await this.getUserSwipes(userId);
+    return swipes.map(swipe => swipe.classroom_id);
   }
 }

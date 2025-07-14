@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClassroomSwipes } from '@/hooks/useClassroomSwipes';
+import { ClassroomService } from '@/services/classroomService';
 import { filterClassroomsByKeywords, CLASSROOM_KEYWORDS } from '@/utils/classroomKeywords';
 import SearchFilters from './classroom/SearchFilters';
 import CompactClassroomCard from './classroom/CompactClassroomCard';
@@ -63,26 +64,77 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
   const popularKeywords = Object.keys(CLASSROOM_KEYWORDS).slice(0, 6);
   const hasActiveFilters = searchKeywords.length > 0 || priceFilter !== 'all' || levelFilter !== 'all';
 
-  const handleSwipeLeftAction = (classroom: Classroom) => {
-    handleSwipeLeft(classroom);
-    moveToNext();
+  const handleSwipeLeftAction = async (classroom: Classroom) => {
+    try {
+      // Record swipe in database
+      await ClassroomService.recordSwipe(classroom.id, 'left');
+      
+      // Update local state
+      handleSwipeLeft(classroom);
+      moveToNext();
+      
+      toast({
+        title: "Passed",
+        description: `You passed on "${classroom.name}"`,
+      });
+    } catch (error) {
+      console.error('Error recording swipe:', error);
+      toast({
+        title: "Error",
+        description: "Failed to record your swipe. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleSwipeRightAction = (classroom: Classroom) => {
-    handleSwipeRight(classroom);
-    moveToNext();
+  const handleSwipeRightAction = async (classroom: Classroom) => {
+    try {
+      // Record swipe in database
+      await ClassroomService.recordSwipe(classroom.id, 'right');
+      
+      // Update local state
+      handleSwipeRight(classroom);
+      moveToNext();
+      
+      toast({
+        title: "Liked!",
+        description: `You liked "${classroom.name}"`,
+      });
+    } catch (error) {
+      console.error('Error recording swipe:', error);
+      toast({
+        title: "Error",
+        description: "Failed to record your swipe. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const moveToNext = () => {
     setCurrentIndex(prev => Math.min(prev + 1, filteredClassrooms.length - 1));
   };
 
-  const handleJoinClassroom = (classroom: Classroom) => {
-    toast({
-      title: "Amazing choice!",
-      description: `Welcome to "${classroom.name}". Check your email for next steps.`,
-    });
-    handleSwipeRightAction(classroom);
+  const handleJoinClassroom = async (classroom: Classroom) => {
+    try {
+      // Record swipe in database
+      await ClassroomService.recordSwipe(classroom.id, 'right');
+      
+      toast({
+        title: "Amazing choice!",
+        description: `Welcome to "${classroom.name}". Check your email for next steps.`,
+      });
+      
+      // Update local state
+      handleSwipeRight(classroom);
+      moveToNext();
+    } catch (error) {
+      console.error('Error joining classroom:', error);
+      toast({
+        title: "Error",
+        description: "Failed to join classroom. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const addKeyword = (keyword: string) => {

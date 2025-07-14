@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_stats: {
+        Row: {
+          created_at: string
+          id: string
+          metric_category: string
+          metric_name: string
+          metric_value: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metric_category: string
+          metric_name: string
+          metric_value?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metric_category?: string
+          metric_name?: string
+          metric_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       classroom_enrollments: {
         Row: {
           classroom_id: string
@@ -39,6 +66,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "classroom_enrollments_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classroom_swipes: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          id: string
+          swipe_direction: string
+          user_id: string
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          id?: string
+          swipe_direction: string
+          user_id: string
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          id?: string
+          swipe_direction?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_swipes_classroom_id_fkey"
             columns: ["classroom_id"]
             isOneToOne: false
             referencedRelation: "classrooms"
