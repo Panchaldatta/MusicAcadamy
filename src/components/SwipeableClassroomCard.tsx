@@ -4,7 +4,7 @@ import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from '
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Users, Star, DollarSign, Heart, X, Play, Calendar, BookOpen, Award } from "lucide-react";
+import { Clock, Users, Star, DollarSign, Heart, X, Play, Calendar, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -40,13 +40,13 @@ const SwipeableClassroomCard: React.FC<SwipeableClassroomCardProps> = ({
   const getLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
       case 'beginner':
-        return 'bg-gradient-to-r from-green-500 to-emerald-600 text-white';
+        return 'bg-green-500 text-white';
       case 'intermediate':
-        return 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white';
+        return 'bg-yellow-500 text-white';
       case 'advanced':
-        return 'bg-gradient-to-r from-red-500 to-pink-600 text-white';
+        return 'bg-red-500 text-white';
       default:
-        return 'bg-gradient-to-r from-gray-500 to-gray-600 text-white';
+        return 'bg-gray-500 text-white';
     }
   };
 
@@ -156,115 +156,108 @@ const SwipeableClassroomCard: React.FC<SwipeableClassroomCardProps> = ({
         opacity: { duration: 0.2 }
       }}
     >
-      <Card className="bg-white border-2 border-gray-200 shadow-2xl rounded-2xl overflow-hidden h-[650px] relative">
-        {/* Gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5 pointer-events-none z-10" />
-        
-        <CardHeader className="pb-4 relative z-20">
+      <Card className="bg-white border border-gray-200 shadow-lg rounded-2xl overflow-hidden h-[600px] relative">
+        <CardHeader className="pb-4">
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-3">
-              <div className="text-3xl bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm">
+              <div className="text-2xl bg-gray-50 rounded-full p-2">
                 {getSubjectIcon(classroom.subject)}
               </div>
-              <Badge className={`${getLevelColor(classroom.level)} px-3 py-1 text-sm font-medium shadow-sm`}>
+              <Badge className={`${getLevelColor(classroom.level)} px-2 py-1 text-xs font-medium`}>
                 {classroom.level}
               </Badge>
             </div>
-            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 shadow-sm">
-              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="text-gray-900 text-sm font-bold">4.8</span>
+            <div className="flex items-center gap-1 bg-gray-50 rounded-full px-2 py-1">
+              <Star className="h-3 w-3 text-yellow-500 fill-current" />
+              <span className="text-gray-900 text-xs font-bold">4.8</span>
             </div>
           </div>
           
-          <CardTitle className="text-gray-900 text-xl font-bold line-clamp-2 leading-tight">
+          <CardTitle className="text-gray-900 text-lg font-bold line-clamp-2 leading-tight mb-1">
             {classroom.name}
           </CardTitle>
-          <p className="text-orange-600 font-semibold text-lg">
+          <p className="text-orange-600 font-semibold text-sm">
             {classroom.subject} Class
           </p>
         </CardHeader>
         
-        <CardContent className="flex flex-col justify-between h-full pb-6 relative z-20">
-          <div className="space-y-5">
+        <CardContent className="flex flex-col justify-between h-full pb-6">
+          <div className="space-y-4">
             <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
-              {classroom.description || `Master ${classroom.subject} with expert guidance, structured curriculum, and personalized attention in a supportive learning environment.`}
+              {classroom.description || `Master ${classroom.subject} with expert guidance and personalized attention.`}
             </p>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-blue-50 p-3 rounded-xl border border-blue-200">
-                <div className="flex items-center gap-2 text-blue-700 mb-1">
-                  <Users className="h-4 w-4" />
-                  <span className="text-xs font-medium">Capacity</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <div className="flex items-center gap-1 text-blue-700 mb-1">
+                  <Users className="h-3 w-3" />
+                  <span className="text-xs font-medium">Students</span>
                 </div>
-                <span className="text-sm font-bold text-blue-900">{classroom.capacity} students</span>
+                <span className="text-sm font-bold text-blue-900">{classroom.capacity}</span>
               </div>
               
-              <div className="bg-green-50 p-3 rounded-xl border border-green-200">
-                <div className="flex items-center gap-2 text-green-700 mb-1">
-                  <DollarSign className="h-4 w-4" />
+              <div className="bg-green-50 p-3 rounded-lg">
+                <div className="flex items-center gap-1 text-green-700 mb-1">
+                  <DollarSign className="h-3 w-3" />
                   <span className="text-xs font-medium">Price</span>
                 </div>
-                <span className="text-sm font-bold text-green-900">₹{classroom.price}/session</span>
+                <span className="text-sm font-bold text-green-900">₹{classroom.price}</span>
               </div>
               
-              <div className="bg-purple-50 p-3 rounded-xl border border-purple-200">
-                <div className="flex items-center gap-2 text-purple-700 mb-1">
-                  <Clock className="h-4 w-4" />
+              <div className="bg-purple-50 p-3 rounded-lg">
+                <div className="flex items-center gap-1 text-purple-700 mb-1">
+                  <Clock className="h-3 w-3" />
                   <span className="text-xs font-medium">Schedule</span>
                 </div>
                 <span className="text-xs font-medium text-purple-900">{classroom.schedule}</span>
               </div>
               
-              <div className="bg-orange-50 p-3 rounded-xl border border-orange-200">
-                <div className="flex items-center gap-2 text-orange-700 mb-1">
-                  <BookOpen className="h-4 w-4" />
+              <div className="bg-orange-50 p-3 rounded-lg">
+                <div className="flex items-center gap-1 text-orange-700 mb-1">
+                  <BookOpen className="h-3 w-3" />
                   <span className="text-xs font-medium">Duration</span>
                 </div>
-                <span className="text-xs font-medium text-orange-900">{classroom.duration_weeks} weeks</span>
+                <span className="text-xs font-medium text-orange-900">{classroom.duration_weeks}w</span>
               </div>
             </div>
 
-            <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+            <div className="bg-gray-50 p-3 rounded-lg">
               <div className="text-xs text-gray-600 space-y-1">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-3 w-3" />
-                  <span>{classroom.sessions_per_week} sessions/week</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-3 w-3" />
-                  <span>{classroom.session_duration_minutes} minutes each</span>
+                  <span>{classroom.sessions_per_week} sessions/week • {classroom.session_duration_minutes}min each</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 space-y-3">
             <Button 
-              className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white rounded-xl py-3 font-semibold text-base shadow-lg transform transition-transform active:scale-95"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-lg py-3 font-semibold"
               onClick={() => onJoin(classroom)}
             >
-              <Play className="h-5 w-5 mr-2" />
-              Join Now
+              <Play className="h-4 w-4 mr-2" />
+              Join Class
             </Button>
             
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="lg"
-                className="flex-1 border-2 border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600 rounded-xl font-medium"
+                className="flex-1 border border-red-200 hover:bg-red-50 text-red-600 rounded-lg"
                 onClick={() => handleButtonSwipe('left')}
               >
-                <X className="h-5 w-5 mr-2" />
+                <X className="h-4 w-4 mr-1" />
                 Pass
               </Button>
               
               <Button
                 variant="outline"
                 size="lg"
-                className="flex-1 border-2 border-green-200 hover:bg-green-50 hover:border-green-300 text-green-600 rounded-xl font-medium"
+                className="flex-1 border border-green-200 hover:bg-green-50 text-green-600 rounded-lg"
                 onClick={() => handleButtonSwipe('right')}
               >
-                <Heart className="h-5 w-5 mr-2" />
+                <Heart className="h-4 w-4 mr-1" />
                 Like
               </Button>
             </div>
@@ -272,7 +265,7 @@ const SwipeableClassroomCard: React.FC<SwipeableClassroomCardProps> = ({
         </CardContent>
       </Card>
 
-      {/* Enhanced Swipe Indicators */}
+      {/* Swipe Indicators */}
       <AnimatePresence>
         {dragDirection === 'right' && (
           <motion.div
@@ -281,8 +274,8 @@ const SwipeableClassroomCard: React.FC<SwipeableClassroomCardProps> = ({
             exit={{ opacity: 0, scale: 0.8 }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
           >
-            <div className="bg-green-500 text-white px-8 py-4 rounded-2xl font-bold text-2xl shadow-2xl border-4 border-white transform rotate-12">
-              <Heart className="inline h-6 w-6 mr-2 fill-current" />
+            <div className="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xl shadow-xl border-2 border-white transform rotate-12">
+              <Heart className="inline h-5 w-5 mr-2 fill-current" />
               LIKE
             </div>
           </motion.div>
@@ -295,8 +288,8 @@ const SwipeableClassroomCard: React.FC<SwipeableClassroomCardProps> = ({
             exit={{ opacity: 0, scale: 0.8 }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
           >
-            <div className="bg-red-500 text-white px-8 py-4 rounded-2xl font-bold text-2xl shadow-2xl border-4 border-white transform -rotate-12">
-              <X className="inline h-6 w-6 mr-2" />
+            <div className="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xl shadow-xl border-2 border-white transform -rotate-12">
+              <X className="inline h-5 w-5 mr-2" />
               PASS
             </div>
           </motion.div>
