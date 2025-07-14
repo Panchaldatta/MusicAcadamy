@@ -15,10 +15,10 @@ interface ClassroomGridProps {
 
 const ClassroomGrid = ({ classrooms }: ClassroomGridProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [viewMode, setViewMode<'grid' | 'swipe'>>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'swipe'>('grid');
   const { toast } = useToast();
 
-  const getLevelColor = (level: string) => {
+  function getLevelColor(level: string) {
     switch (level.toLowerCase()) {
       case 'beginner':
         return 'bg-green-500 hover:bg-green-600';
@@ -29,9 +29,9 @@ const ClassroomGrid = ({ classrooms }: ClassroomGridProps) => {
       default:
         return 'bg-gray-500 hover:bg-gray-600';
     }
-  };
+  }
 
-  const getSubjectIcon = (subject: string) => {
+  function getSubjectIcon(subject: string) {
     const icons: Record<string, string> = {
       'Sitar': '🎸',
       'Tabla': '🥁', 
@@ -44,16 +44,16 @@ const ClassroomGrid = ({ classrooms }: ClassroomGridProps) => {
       'Drums': '🥁'
     };
     return icons[subject] || '🎵';
-  };
+  }
 
-  const handleJoinClassroom = (classroomId: string, classroomName: string) => {
+  function handleJoinClassroom(classroomId: string, classroomName: string) {
     toast({
       title: "Classroom Joined!",
       description: `You've successfully joined "${classroomName}". Check your email for further instructions.`,
     });
-  };
+  }
 
-  const toggleFavorite = (classroomId: string) => {
+  function toggleFavorite(classroomId: string) {
     setFavorites(prev => {
       const newFavorites = prev.includes(classroomId) 
         ? prev.filter(id => id !== classroomId)
@@ -68,7 +68,7 @@ const ClassroomGrid = ({ classrooms }: ClassroomGridProps) => {
       
       return newFavorites;
     });
-  };
+  }
 
   return (
     <div className="space-y-6">
