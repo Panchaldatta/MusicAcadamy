@@ -1,9 +1,10 @@
+
 import React, { useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClassroomSwipes } from '@/hooks/useClassroomSwipes';
 import { filterClassroomsByKeywords, CLASSROOM_KEYWORDS } from '@/utils/classroomKeywords';
 import SearchFilters from './classroom/SearchFilters';
-import SwapCard from './classroom/SwapCard';
+import CompactClassroomCard from './classroom/CompactClassroomCard';
 import SwipeProgress from './classroom/SwipeProgress';
 import EmptyState from './classroom/EmptyState';
 import type { Database } from "@/integrations/supabase/types";
@@ -72,16 +73,16 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
     moveToNext();
   };
 
-  const handleSkipAction = (classroom: Classroom) => {
-    toast({
-      title: "Skipped",
-      description: `You skipped "${classroom.name}". No worries, there are more classes to explore!`,
-    });
-    moveToNext();
-  };
-
   const moveToNext = () => {
     setCurrentIndex(prev => Math.min(prev + 1, filteredClassrooms.length - 1));
+  };
+
+  const handleJoinClassroom = (classroom: Classroom) => {
+    toast({
+      title: "Amazing choice!",
+      description: `Welcome to "${classroom.name}". Check your email for next steps.`,
+    });
+    handleSwipeRightAction(classroom);
   };
 
   const addKeyword = (keyword: string) => {
@@ -163,11 +164,11 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
 
       {currentClassroom && (
         <div className="py-2">
-          <SwapCard
+          <CompactClassroomCard
             classroom={currentClassroom}
             onSwipeLeft={handleSwipeLeftAction}
             onSwipeRight={handleSwipeRightAction}
-            onSkip={handleSkipAction}
+            onJoin={handleJoinClassroom}
           />
         </div>
       )}
