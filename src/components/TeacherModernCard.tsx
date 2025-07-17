@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Clock, Calendar, Award, Users, Heart } from "lucide-react";
 import { Teacher } from "@/hooks/useTeachers";
-import BookingDialog from "./BookingDialog";
+import PaymentDialog from "./PaymentDialog";
 
 interface TeacherModernCardProps {
   teacher: Teacher;
@@ -13,15 +13,15 @@ interface TeacherModernCardProps {
 }
 
 const TeacherModernCard = ({ teacher, onBookLesson }: TeacherModernCardProps) => {
-  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
   const handleBookLesson = () => {
-    setIsBookingDialogOpen(true);
+    setIsPaymentDialogOpen(true);
     onBookLesson?.();
   };
 
-  const handleBookingComplete = () => {
-    console.log('Booking completed for teacher:', teacher.name);
+  const handlePaymentComplete = () => {
+    console.log('Payment completed for teacher:', teacher.name);
   };
 
   return (
@@ -133,7 +133,7 @@ const TeacherModernCard = ({ teacher, onBookLesson }: TeacherModernCardProps) =>
                   <div className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                     ₹{teacher.price}
                   </div>
-                  <div className="text-xs text-gray-500 font-medium">per lesson</div>
+                  <div className="text-xs text-gray-500 font-medium">per hour</div>
                 </div>
                 
                 <div className="flex gap-2">
@@ -149,7 +149,7 @@ const TeacherModernCard = ({ teacher, onBookLesson }: TeacherModernCardProps) =>
                     size="sm"
                     className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   >
-                    BOOK LESSON
+                    PAY & BOOK
                   </Button>
                 </div>
               </div>
@@ -158,11 +158,11 @@ const TeacherModernCard = ({ teacher, onBookLesson }: TeacherModernCardProps) =>
         </CardContent>
       </Card>
 
-      <BookingDialog
+      <PaymentDialog
         teacher={teacher}
-        isOpen={isBookingDialogOpen}
-        onClose={() => setIsBookingDialogOpen(false)}
-        onBookingComplete={handleBookingComplete}
+        isOpen={isPaymentDialogOpen}
+        onClose={() => setIsPaymentDialogOpen(false)}
+        onPaymentComplete={handlePaymentComplete}
       />
     </>
   );

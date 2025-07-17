@@ -11,7 +11,8 @@ import TeacherGrid from "@/components/TeacherGrid";
 import LoadingState from "@/components/common/LoadingState";
 import ErrorState from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
-import { ArrowUp, Sparkles, TrendingUp, Star } from "lucide-react";
+import { ArrowUp, Sparkles, TrendingUp, Star, CheckCircle, XCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const BrowseTeachers = () => {
   const [searchParams] = useSearchParams();
@@ -19,6 +20,34 @@ const BrowseTeachers = () => {
   const { toast } = useToast();
   const { data: teachers = [], isLoading, error } = useTeachers();
   const { filters, filteredAndSortedTeachers, updateFilter, clearFilters } = useTeacherFilters(teachers);
+
+  // Handle payment success/failure notifications
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment');
+    const sessionId = searchParams.get('session_id');
+
+    if (paymentStatus === 'success' && sessionId) {
+      // Verify payment and update booking status
+      supabase.functions.invoke('verify-payment', {
+        body: { sessionId }
+      }).then(({ data, error }) => {
+        if (error) {
+          console.error('Payment verification error:', error);
+        } else {
+          toast({
+            title: "🎉 Payment Successful!",
+            description: "Your lesson has been booked successfully. You'll receive a confirmation email shortly.",
+          });
+        }
+      });
+    } else if (paymentStatus === 'cancelled') {
+      toast({
+        title: "Payment Cancelled",
+        description: "Your lesson booking was cancelled. You can try again whenever you're ready.",
+        variant: "destructive",
+      });
+    }
+  }, [searchParams, toast]);
 
   // Initialize search from URL params
   useEffect(() => {

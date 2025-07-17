@@ -1,1 +1,16 @@
+
 project_id = "jzdolobncemqdqazgwoq"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://lovable.dev"]
+
+[functions.create-payment]
+verify_jwt = true
+
+[functions.verify-payment]
+verify_jwt = false
+
+[functions.send-payment-confirmation]
+verify_jwt = false
