@@ -27,14 +27,11 @@ const TeacherGrid = ({ teachers }: TeacherGridProps) => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {teachers.map((teacher) => (
         <TeacherModernCard 
           key={teacher.id} 
           teacher={teacher}
-          onBookLesson={() => {
-            console.log('Book lesson for teacher:', teacher.name);
-          }}
         />
       ))}
     </div>
