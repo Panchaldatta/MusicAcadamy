@@ -1,6 +1,6 @@
 
 import { Teacher } from "@/hooks/useTeachers";
-import CompactTeacherCard from "./CompactTeacherCard";
+import TeacherModernCard from "./TeacherModernCard";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 
@@ -27,9 +27,15 @@ const TeacherGrid = ({ teachers }: TeacherGridProps) => {
   }
 
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="space-y-8">
       {teachers.map((teacher) => (
-        <CompactTeacherCard key={teacher.id} teacher={teacher} />
+        <TeacherModernCard 
+          key={teacher.id} 
+          teacher={teacher}
+          onBookLesson={() => {
+            console.log('Book lesson for teacher:', teacher.name);
+          }}
+        />
       ))}
     </div>
   );
