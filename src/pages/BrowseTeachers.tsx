@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useTeachers } from "@/hooks/useTeachers";
@@ -10,9 +10,12 @@ import FilterBar from "@/components/FilterBar";
 import TeacherGrid from "@/components/TeacherGrid";
 import LoadingState from "@/components/common/LoadingState";
 import ErrorState from "@/components/common/ErrorState";
+import { Button } from "@/components/ui/button";
+import { ArrowUp, Sparkles, TrendingUp, Star } from "lucide-react";
 
 const BrowseTeachers = () => {
   const [searchParams] = useSearchParams();
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const { toast } = useToast();
   const { data: teachers = [], isLoading, error } = useTeachers();
   const { filters, filteredAndSortedTeachers, updateFilter, clearFilters } = useTeacherFilters(teachers);
@@ -29,16 +32,30 @@ const BrowseTeachers = () => {
     
     if (searchParam || subjectParam || locationParam) {
       toast({
-        title: "Search Applied",
+        title: "Search Applied ✨",
         description: `Showing results for your search criteria`,
       });
     }
   }, [searchParams, toast, updateFilter]);
 
+  // Scroll to top functionality
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleClearFilters = () => {
     clearFilters();
     toast({
-      title: "Filters Cleared",
+      title: "Filters Cleared 🧹",
       description: "All search filters have been reset",
     });
   };
@@ -47,7 +64,9 @@ const BrowseTeachers = () => {
     return (
       <>
         <Navigation />
-        <LoadingState message="Finding the best music gurus for you" />
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-20">
+          <LoadingState message="Finding the best music gurus for you..." />
+        </div>
         <Footer />
       </>
     );
@@ -57,11 +76,13 @@ const BrowseTeachers = () => {
     return (
       <>
         <Navigation />
-        <ErrorState 
-          title="Error Loading Teachers"
-          message="Failed to load teachers. Please try again later."
-          onRetry={() => window.location.reload()}
-        />
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-20">
+          <ErrorState 
+            title="Error Loading Teachers"
+            message="Failed to load teachers. Please try again later."
+            onRetry={() => window.location.reload()}
+          />
+        </div>
         <Footer />
       </>
     );
@@ -72,15 +93,50 @@ const BrowseTeachers = () => {
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-20">
         <div className="container mx-auto px-6 py-8">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Find Your Perfect Music Teacher</h1>
-            <p className="text-gray-600 text-xl max-w-3xl mx-auto leading-relaxed">
-              Connect with expert gurus and master Indian classical music. Our verified teachers offer personalized lessons tailored to your learning style and goals.
-            </p>
+          {/* Enhanced Header */}
+          <div className="text-center mb-16 relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-400/20 rounded-3xl blur-3xl"></div>
+            <div className="relative">
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-full">
+                  <Sparkles className="h-12 w-12 text-white" />
+                </div>
+              </div>
+              <h1 className="text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                Find Your Perfect Music Teacher
+              </h1>
+              <p className="text-gray-600 text-xl max-w-4xl mx-auto leading-relaxed mb-8">
+                Connect with expert gurus and master Indian classical music. Our verified teachers offer personalized lessons tailored to your learning style and musical goals.
+              </p>
+              
+              {/* Stats */}
+              <div className="flex justify-center gap-8 mb-8">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                    <span className="text-2xl font-bold text-gray-900">{teachers.length}+</span>
+                  </div>
+                  <p className="text-gray-600">Expert Teachers</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <TrendingUp className="h-5 w-5 text-green-500" />
+                    <span className="text-2xl font-bold text-gray-900">98%</span>
+                  </div>
+                  <p className="text-gray-600">Success Rate</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Sparkles className="h-5 w-5 text-purple-500" />
+                    <span className="text-2xl font-bold text-gray-900">5000+</span>
+                  </div>
+                  <p className="text-gray-600">Happy Students</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Filters */}
+          {/* Enhanced Filters */}
           <FilterBar
             searchTerm={filters.searchTerm}
             onSearchChange={(value) => updateFilter('searchTerm', value)}
@@ -98,8 +154,40 @@ const BrowseTeachers = () => {
           />
 
           {/* Teachers Grid */}
-          <TeacherGrid teachers={filteredAndSortedTeachers} />
+          <div className="relative">
+            <TeacherGrid teachers={filteredAndSortedTeachers} />
+          </div>
+
+          {/* No Results Enhancement */}
+          {filteredAndSortedTeachers.length === 0 && teachers.length > 0 && (
+            <div className="text-center py-16">
+              <div className="w-32 h-32 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mx-auto mb-8">
+                <Star className="h-16 w-16 text-orange-600" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">No teachers match your criteria</h3>
+              <p className="text-gray-600 text-lg mb-8 max-w-md mx-auto">
+                Try adjusting your search criteria or filters to discover amazing music teachers perfect for your learning journey.
+              </p>
+              <Button 
+                onClick={handleClearFilters}
+                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-8 py-3 rounded-xl font-semibold"
+              >
+                Clear All Filters
+              </Button>
+            </div>
+          )}
         </div>
+
+        {/* Scroll to Top Button */}
+        {showScrollTop && (
+          <Button
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+            size="lg"
+          >
+            <ArrowUp className="h-6 w-6" />
+          </Button>
+        )}
       </div>
       <Footer />
     </>
