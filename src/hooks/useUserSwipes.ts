@@ -101,7 +101,7 @@ export const useSwipedTeachers = (direction?: 'left' | 'right') => {
         .from('user_swipes')
         .select(`
           *,
-          teachers (*)
+          teachers!inner (*)
         `)
         .order('created_at', { ascending: false });
       
