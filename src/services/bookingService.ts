@@ -27,7 +27,7 @@ export class BookingService {
       throw error;
     }
 
-    return data;
+    return data as LessonBooking;
   }
 
   static async getStudentBookings(studentId: string): Promise<LessonBooking[]> {
@@ -42,7 +42,7 @@ export class BookingService {
       throw error;
     }
 
-    return data || [];
+    return (data || []) as LessonBooking[];
   }
 
   static async updateBookingStatus(bookingId: string, status: LessonBooking['status']): Promise<void> {
