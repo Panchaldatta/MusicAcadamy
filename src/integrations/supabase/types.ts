@@ -168,6 +168,53 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_bookings: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_date: string
+          lesson_duration: number
+          notes: string | null
+          price: number
+          status: string
+          student_id: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_date: string
+          lesson_duration?: number
+          notes?: string | null
+          price: number
+          status?: string
+          student_id: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_date?: string
+          lesson_duration?: number
+          notes?: string | null
+          price?: number
+          status?: string
+          student_id?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_bookings_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       music_subjects: {
         Row: {
           color: string
