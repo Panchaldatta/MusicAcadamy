@@ -17,59 +17,62 @@ const HeroSection = () => {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-red-50 overflow-hidden">
-      {/* Enhanced Background Pattern */}
+      {/* Refined Background Pattern */}
       <div className="absolute inset-0">
-        {/* Geometric shapes */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-orange-200/30 to-red-200/30 rounded-full blur-xl"></div>
-        <div className="absolute top-60 right-20 w-40 h-40 bg-gradient-to-br from-amber-200/30 to-orange-200/30 rounded-full blur-xl"></div>
-        <div className="absolute bottom-40 left-1/4 w-24 h-24 bg-gradient-to-br from-red-200/30 to-orange-200/30 rounded-full blur-lg"></div>
+        {/* Subtle geometric shapes */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-orange-100/20 to-red-100/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-amber-100/20 to-orange-100/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-gradient-to-br from-red-100/15 to-orange-100/15 rounded-full blur-2xl"></div>
         
-        {/* Musical notes pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-32 left-16 text-4xl rotate-12">🎵</div>
-          <div className="absolute top-48 right-32 text-3xl -rotate-12">🎶</div>
-          <div className="absolute bottom-60 left-32 text-5xl rotate-6">🎼</div>
-          <div className="absolute top-72 left-2/3 text-3xl -rotate-6">🎵</div>
-          <div className="absolute bottom-32 right-16 text-4xl rotate-12">🎶</div>
+        {/* Refined musical notes pattern */}
+        <div className="absolute inset-0 opacity-3">
+          <div className="absolute top-32 left-16 text-3xl rotate-12 text-orange-300">♪</div>
+          <div className="absolute top-48 right-32 text-2xl -rotate-12 text-red-300">♫</div>
+          <div className="absolute bottom-60 left-32 text-4xl rotate-6 text-amber-300">♬</div>
+          <div className="absolute top-72 left-2/3 text-2xl -rotate-6 text-orange-300">♪</div>
+          <div className="absolute bottom-32 right-16 text-3xl rotate-12 text-red-300">♫</div>
         </div>
       </div>
 
-      <div className="relative z-10 container mx-auto px-6 pt-24 pb-16">
-        <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
-          {/* Left Content */}
-          <div className="space-y-10">
-            {/* Badge */}
-            <div className="inline-flex items-center bg-gradient-to-r from-orange-100 to-red-100 backdrop-blur-sm rounded-full px-6 py-3 border border-orange-200/50 shadow-lg">
-              <Star className="h-4 w-4 text-orange-600 mr-2 fill-current" />
-              <span className="text-sm font-semibold text-orange-800">
-                Trusted by {studentCount} music enthusiasts
+      <div className="relative z-10 container mx-auto px-6 pt-32 pb-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center space-y-12">
+            {/* Refined Badge */}
+            <div className="inline-flex items-center bg-white/70 backdrop-blur-md rounded-full px-8 py-4 border border-orange-200/50 shadow-lg">
+              <Star className="h-5 w-5 text-orange-600 mr-3 fill-current" />
+              <span className="text-base font-medium text-orange-800">
+                Trusted by {studentCount} music enthusiasts worldwide
               </span>
             </div>
             
-            {/* Main Heading */}
-            <div className="space-y-6">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold leading-tight">
-                <span className="text-gray-900">Master</span>
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-red-600 to-orange-700">
-                  Indian Music
+            {/* Main Heading - Eurydice Style */}
+            <div className="space-y-8">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-light leading-[0.9] tracking-tight">
+                <span className="block text-gray-900 mb-4">Master the Art of</span>
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-red-600 to-orange-700 font-medium">
+                  Indian Classical Music
                 </span>
               </h1>
               
-              <p className="text-xl md:text-2xl text-gray-700 leading-relaxed max-w-xl font-light">
-                Connect with legendary gurus and discover the timeless beauty of Indian classical music through immersive online lessons.
-              </p>
+              <div className="max-w-3xl mx-auto space-y-6">
+                <p className="text-xl md:text-2xl text-gray-600 leading-relaxed font-light">
+                  Connect with legendary gurus and discover the timeless beauty of Indian classical music through immersive online lessons.
+                </p>
+                <p className="text-lg text-gray-500 font-light">
+                  Experience authentic teaching methods with modern convenience
+                </p>
+              </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6">
+            {/* CTA Buttons - Refined */}
+            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
               <Button 
                 asChild
                 size="lg" 
-                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-10 py-7 text-lg rounded-3xl shadow-2xl hover:shadow-orange-300/25 transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-12 py-8 text-lg font-medium rounded-full shadow-2xl hover:shadow-orange-300/25 transition-all duration-300 transform hover:scale-105 border-0"
               >
                 <Link to="/browse-teachers">
-                  Start Learning Today
+                  Start Your Journey
                   <ArrowRight className="ml-3 h-5 w-5" />
                 </Link>
               </Button>
@@ -77,92 +80,72 @@ const HeroSection = () => {
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-2 border-orange-300 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 px-10 py-7 text-lg rounded-3xl bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                className="border-2 border-gray-300 hover:bg-white/80 px-12 py-8 text-lg font-medium rounded-full bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 text-gray-700 hover:text-gray-900"
               >
                 <Play className="mr-3 h-5 w-5" />
                 Watch Preview
               </Button>
             </div>
 
-            {/* Enhanced Trust Indicators */}
-            <div className="grid grid-cols-3 gap-8 pt-8 border-t border-orange-200/50">
-              <div className="text-center group">
-                <div className="flex items-center justify-center mb-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mr-2">
-                    <Star className="h-4 w-4 text-orange-600 fill-current" />
+            {/* Refined Trust Indicators */}
+            <div className="pt-16 border-t border-orange-200/30">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
+                <div className="text-center group">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                      <Star className="h-6 w-6 text-orange-600 fill-current" />
+                    </div>
+                    <div className="text-4xl font-light text-gray-900">4.9</div>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900">4.9</div>
+                  <div className="text-sm text-gray-600 font-medium uppercase tracking-wide">Average Rating</div>
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Avg Rating</div>
-              </div>
-              <div className="text-center group">
-                <div className="flex items-center justify-center mb-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mr-2">
-                    <Users className="h-4 w-4 text-orange-600" />
+                
+                <div className="text-center group">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                      <Users className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <div className="text-4xl font-light text-gray-900">50+</div>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900">50+</div>
+                  <div className="text-sm text-gray-600 font-medium uppercase tracking-wide">Expert Gurus</div>
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Expert Gurus</div>
-              </div>
-              <div className="text-center group">
-                <div className="flex items-center justify-center mb-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mr-2">
-                    <Award className="h-4 w-4 text-orange-600" />
+                
+                <div className="text-center group">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                      <Award className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <div className="text-4xl font-light text-gray-900">24/7</div>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900">24/7</div>
-                </div>
-                <div className="text-sm text-gray-600 font-medium">Support</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Content - Enhanced Visual */}
-          <div className="relative flex items-center justify-center">
-            {/* Main central element */}
-            <div className="relative">
-              <div className="w-96 h-96 bg-gradient-to-br from-white/80 to-orange-50/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/50 p-12 flex items-center justify-center">
-                <div className="text-center space-y-6">
-                  <div className="text-9xl animate-pulse">🎼</div>
-                  <h3 className="text-3xl font-bold text-gray-900">Begin Your Journey</h3>
-                  <p className="text-gray-600 text-lg">Learn from masters</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Enhanced Floating Cards */}
-            <div className="absolute -top-8 -right-8 bg-gradient-to-br from-white to-orange-50 rounded-3xl shadow-2xl p-6 border border-orange-100 animate-bounce max-w-xs">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center">
-                  <Music className="h-6 w-6 text-orange-600" />
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900 text-lg">Live Sessions</div>
-                  <div className="text-orange-600 font-medium">Starting now</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="absolute -bottom-8 -left-8 bg-gradient-to-br from-white to-red-50 rounded-3xl shadow-2xl p-6 border border-red-100 animate-pulse max-w-xs">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center">
-                  <Award className="h-6 w-6 text-red-600" />
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900 text-lg">Certified Gurus</div>
-                  <div className="text-red-600 font-medium">Verified experts</div>
+                  <div className="text-sm text-gray-600 font-medium uppercase tracking-wide">Support</div>
                 </div>
               </div>
             </div>
 
-            <div className="absolute top-1/2 -left-16 bg-gradient-to-br from-white to-amber-50 rounded-3xl shadow-xl p-4 border border-amber-100 animate-bounce delay-1000">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center">
-                  🏆
+            {/* Elegant Feature Cards */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 pt-20 max-w-6xl mx-auto">
+              <div className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Music className="h-8 w-8 text-orange-600" />
                 </div>
-                <div>
-                  <div className="font-bold text-gray-900">Top Rated</div>
-                  <div className="text-amber-600 text-sm font-medium">Platform</div>
+                <h3 className="text-xl font-medium text-gray-900 mb-3">Live Sessions</h3>
+                <p className="text-gray-600 leading-relaxed">Interactive live classes with certified masters from the comfort of your home.</p>
+              </div>
+              
+              <div className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                <div className="w-16 h-16 bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Award className="h-8 w-8 text-red-600" />
                 </div>
+                <h3 className="text-xl font-medium text-gray-900 mb-3">Certified Gurus</h3>
+                <p className="text-gray-600 leading-relaxed">Learn from verified experts with decades of classical music experience.</p>
+              </div>
+              
+              <div className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 group md:col-span-2 lg:col-span-1">
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl">🏆</span>
+                </div>
+                <h3 className="text-xl font-medium text-gray-900 mb-3">Structured Learning</h3>
+                <p className="text-gray-600 leading-relaxed">Progressive curriculum designed to take you from beginner to advanced levels.</p>
               </div>
             </div>
           </div>
