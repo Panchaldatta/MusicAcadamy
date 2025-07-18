@@ -1,10 +1,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, List, BarChart3, Plus } from "lucide-react";
 import { useTeacherClassrooms } from "@/hooks/useClassrooms";
+import { useClassSessions, useCreateClassSession, useUpdateClassSession, useDeleteClassSession } from "@/hooks/useClassSessions";
 import { useToast } from "@/hooks/use-toast";
 import ClassScheduleCalendar from "./schedule/ClassScheduleCalendar";
 import ScheduleListView from "./schedule/ScheduleListView";
@@ -25,74 +26,18 @@ interface ClassSession {
 }
 
 const ClassScheduleManager = () => {
-  const { data: classrooms = [], isLoading } = useTeacherClassrooms();
+  const { data: classrooms = [], isLoading: classroomsLoading } = useTeacherClassrooms();
+  const { data: sessions = [], isLoading: sessionsLoading, error } = useClassSessions();
+  const createSession = useCreateClassSession();
+  const updateSession = useUpdateClassSession();
+  const deleteSession = useDeleteClassSession();
   const { toast } = useToast();
-  
-  // Mock data for demonstration - in a real app, this would come from a database
-  const [sessions, setSessions] = useState<ClassSession[]>([
-    {
-      id: '1',
-      classroomId: 'classroom-1',
-      classroomName: 'Piano Fundamentals',
-      date: new Date(2024, 0, 20), // January 20, 2024
-      startTime: '09:00',
-      endTime: '10:00',
-      students: 12,
-      location: 'Online',
-      status: 'scheduled',
-      notes: 'Focus on scales and basic technique'
-    },
-    {
-      id: '2',
-      classroomId: 'classroom-2',
-      classroomName: 'Guitar Masterclass',
-      date: new Date(2024, 0, 21), // January 21, 2024
-      startTime: '14:00',
-      endTime: '15:30',
-      students: 8,
-      location: 'Studio A',
-      status: 'scheduled',
-    },
-    {
-      id: '3',
-      classroomId: 'classroom-3',
-      classroomName: 'Vocal Training',
-      date: new Date(2024, 0, 19), // January 19, 2024
-      startTime: '16:00',
-      endTime: '17:00',
-      students: 15,
-      location: 'Online',
-      status: 'completed',
-      notes: 'Great session - students showed excellent progress'
-    },
-    {
-      id: '4',
-      classroomId: 'classroom-1',
-      classroomName: 'Piano Fundamentals',
-      date: new Date(2024, 0, 22), // January 22, 2024
-      startTime: '10:00',
-      endTime: '11:00',
-      students: 12,
-      location: 'Online',
-      status: 'scheduled',
-    },
-    {
-      id: '5',
-      classroomId: 'classroom-4',
-      classroomName: 'Music Theory 101',
-      date: new Date(2024, 0, 18), // January 18, 2024
-      startTime: '13:00',
-      endTime: '14:00',
-      students: 6,
-      location: 'Room 205',
-      status: 'cancelled',
-      notes: 'Cancelled due to technical issues'
-    }
-  ]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<ClassSession | undefined>();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+
+  const isLoading = classroomsLoading || sessionsLoading;
 
   const handleAddSession = (date: Date) => {
     setSelectedDate(date);
@@ -106,33 +51,54 @@ const ClassScheduleManager = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDeleteSession = (sessionId: string) => {
+  const handleDeleteSession = async (sessionId: string) => {
     if (window.confirm("Are you sure you want to delete this session?")) {
-      setSessions(prev => prev.filter(s => s.id !== sessionId));
-      toast({
-        title: "Session Deleted",
-        description: "The class session has been removed from your schedule.",
-      });
+      try {
+        await deleteSession.mutateAsync(sessionId);
+      } catch (error) {
+        console.error('Error deleting session:', error);
+      }
     }
   };
 
-  const handleSaveSession = (sessionData: Omit<ClassSession, 'id'>) => {
-    if (editingSession) {
-      // Update existing session
-      setSessions(prev => prev.map(s => 
-        s.id === editingSession.id 
-          ? { ...sessionData, id: editingSession.id }
-          : s
-      ));
-    } else {
-      // Create new session
-      const newSession: ClassSession = {
-        ...sessionData,
-        id: `session-${Date.now()}`
+  const handleSaveSession = async (sessionData: Omit<ClassSession, 'id'>) => {
+    try {
+      const dbSessionData = {
+        classroom_id: sessionData.classroomId,
+        session_date: sessionData.date.toISOString().split('T')[0],
+        start_time: sessionData.startTime,
+        end_time: sessionData.endTime,
+        student_count: sessionData.students,
+        location: sessionData.location,
+        status: sessionData.status,
+        notes: sessionData.notes
       };
-      setSessions(prev => [...prev, newSession]);
+
+      if (editingSession) {
+        await updateSession.mutateAsync({
+          id: editingSession.id,
+          ...dbSessionData
+        });
+      } else {
+        await createSession.mutateAsync(dbSessionData);
+      }
+
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('Error saving session:', error);
     }
   };
+
+  if (error) {
+    return (
+      <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <CardContent className="p-8 text-center">
+          <p className="text-red-400 mb-4">Error loading schedule data</p>
+          <p className="text-gray-300">Please make sure you're logged in and try again.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -161,11 +127,21 @@ const ClassScheduleManager = () => {
         <Button
           onClick={() => handleAddSession(new Date())}
           className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+          disabled={classrooms.length === 0}
         >
           <Plus className="h-4 w-4 mr-2" />
           Schedule New Class
         </Button>
       </div>
+
+      {classrooms.length === 0 && (
+        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <CardContent className="p-6 text-center">
+            <p className="text-yellow-400 mb-2">No Classrooms Available</p>
+            <p className="text-gray-300">You need to create at least one classroom before you can schedule classes.</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Overview */}
       <ScheduleStats sessions={sessions} />
@@ -206,17 +182,12 @@ const ClassScheduleManager = () => {
 
         <TabsContent value="analytics">
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Schedule Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-300">Advanced analytics coming soon!</p>
-                <p className="text-gray-400 text-sm mt-2">
-                  Track your teaching patterns, student attendance, and scheduling efficiency.
-                </p>
-              </div>
+            <CardContent className="p-8 text-center">
+              <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-300">Advanced analytics coming soon!</p>
+              <p className="text-gray-400 text-sm mt-2">
+                Track your teaching patterns, student attendance, and scheduling efficiency.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>

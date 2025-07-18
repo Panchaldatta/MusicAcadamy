@@ -41,6 +41,59 @@ export type Database = {
         }
         Relationships: []
       }
+      class_sessions: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          end_time: string
+          id: string
+          location: string
+          notes: string | null
+          session_date: string
+          start_time: string
+          status: string
+          student_count: number
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          end_time: string
+          id?: string
+          location?: string
+          notes?: string | null
+          session_date: string
+          start_time: string
+          status?: string
+          student_count?: number
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          location?: string
+          notes?: string | null
+          session_date?: string
+          start_time?: string
+          status?: string
+          student_count?: number
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_sessions_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classroom_enrollments: {
         Row: {
           classroom_id: string
