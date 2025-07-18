@@ -16,11 +16,13 @@ export const useLenis = () => {
   const scrollToElement = useCallback((selector: string, options?: any) => {
     const element = document.querySelector(selector);
     if (element) {
-      // Use the element's offsetTop to get its position
-      const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
-      scrollTo(elementTop, options);
+      // Use scrollTo with the element directly
+      const lenis = (window as any).lenis;
+      if (lenis) {
+        lenis.scrollTo(element, options);
+      }
     }
-  }, [scrollTo]);
+  }, []);
 
   return {
     scrollTo,
