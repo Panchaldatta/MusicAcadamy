@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -50,23 +49,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('🔥 Setting up auth state listener');
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('🔥 Auth state changed:', event, session?.user?.email);
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('🔥 User authenticated, fetching profile...');
           // Fetch user profile
           setTimeout(async () => {
-            const { data: profileData } = await supabase
+            const { data: profileData, error } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
               .single();
-            setProfile(profileData);
+            
+            if (error) {
+              console.error('❌ Error fetching profile:', error);
+            } else {
+              console.log('✅ Profile fetched:', profileData);
+              setProfile(profileData);
+            }
           }, 0);
         } else {
+          console.log('🔥 User signed out, clearing profile');
           setProfile(null);
         }
         
@@ -75,7 +86,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // Check for existing session
+    console.log('🔥 Checking for existing session...');
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('🔥 Existing session:', session?.user?.email || 'None');
+      
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -85,8 +99,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .select('*')
           .eq('id', session.user.id)
           .single()
-          .then(({ data: profileData }) => {
-            setProfile(profileData);
+          .then(({ data: profileData, error }) => {
+            if (error) {
+              console.error('❌ Error fetching existing profile:', error);
+            } else {
+              console.log('✅ Existing profile loaded:', profileData);
+              setProfile(profileData);
+            }
             setLoading(false);
           });
       } else {
@@ -153,7 +172,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async () => {
+    console.log('🔥 Starting Google sign in...');
     const redirectUrl = `${window.location.origin}/`;
+    console.log('🔥 Redirect URL:', redirectUrl);
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -167,11 +188,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (error) {
+      console.error('❌ Google sign in error:', error);
       toast({
         title: "Google Sign In Failed",
         description: error.message,
         variant: "destructive"
       });
+    } else {
+      console.log('✅ Google sign in initiated successfully');
     }
 
     return { error };
