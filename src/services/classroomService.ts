@@ -23,6 +23,27 @@ export class ClassroomService {
     return data || [];
   }
 
+  static async getTeacherClassroomsWithEnrollments(): Promise<(Classroom & { enrollment_count: number })[]> {
+    const { data, error } = await supabase
+      .from('classrooms')
+      .select(`
+        *,
+        classroom_enrollments(count)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching teacher classrooms with enrollments:', error);
+      throw error;
+    }
+
+    // Transform the data to include enrollment count
+    return (data || []).map(classroom => ({
+      ...classroom,
+      enrollment_count: classroom.classroom_enrollments?.[0]?.count || 0
+    }));
+  }
+
   static async createClassroom(classroom: Omit<ClassroomInsert, 'teacher_id'>): Promise<Classroom> {
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -102,6 +123,21 @@ export class ClassroomService {
     }
 
     return data || [];
+  }
+
+  static async getClassroomEnrollmentCount(classroomId: string): Promise<number> {
+    const { data, error } = await supabase
+      .from('classroom_enrollments')
+      .select('id', { count: 'exact' })
+      .eq('classroom_id', classroomId)
+      .eq('status', 'active');
+
+    if (error) {
+      console.error('Error fetching classroom enrollment count:', error);
+      return 0;
+    }
+
+    return data?.length || 0;
   }
 
   // New swipe functionality
