@@ -36,13 +36,13 @@ const CompactClassroomCard: React.FC<CompactClassroomCardProps> = ({
   const getLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
       case 'beginner':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-emerald-500/10 text-emerald-700 border-emerald-200';
       case 'intermediate':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+        return 'bg-amber-500/10 text-amber-700 border-amber-200';
       case 'advanced':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-rose-500/10 text-rose-700 border-rose-200';
       default:
-        return 'bg-muted text-muted-foreground';
+        return 'bg-gray-500/10 text-gray-700 border-gray-200';
     }
   };
 
@@ -108,7 +108,7 @@ const CompactClassroomCard: React.FC<CompactClassroomCardProps> = ({
 
   return (
     <motion.div
-      className="relative cursor-grab active:cursor-grabbing max-w-xs mx-auto"
+      className="relative cursor-grab active:cursor-grabbing max-w-sm mx-auto"
       style={{ x, y, rotate, opacity, scale }}
       drag
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
@@ -122,98 +122,108 @@ const CompactClassroomCard: React.FC<CompactClassroomCardProps> = ({
       }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
-      <Card className="bg-card border-border shadow-md overflow-hidden h-[420px] relative">
-        <CardHeader className="pb-3 px-4 pt-4">
-          <div className="flex justify-between items-start mb-2">
-            <div className="flex items-center gap-2">
-              <div className="text-xl bg-muted rounded-lg p-1.5">
+      <Card className="bg-white border-0 shadow-xl rounded-3xl overflow-hidden h-[480px] relative">
+        {/* Header Section */}
+        <CardHeader className="pb-4 px-6 pt-8 bg-gradient-to-br from-slate-50 to-white">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
                 {getSubjectIcon(classroom.subject)}
               </div>
-              <Badge className={`${getLevelColor(classroom.level)} px-2 py-0.5 text-xs font-medium border`}>
-                {classroom.level}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-1 bg-muted rounded-full px-2 py-0.5">
-              <Star className="h-3 w-3 text-yellow-500 fill-current" />
-              <span className="text-xs font-semibold">4.8</span>
+              <div className="flex flex-col gap-2">
+                <Badge className={`${getLevelColor(classroom.level)} px-3 py-1 text-sm font-semibold border rounded-full w-fit`}>
+                  {classroom.level}
+                </Badge>
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 text-amber-400 fill-current" />
+                  <span className="text-sm font-bold text-gray-700">4.8</span>
+                  <span className="text-xs text-gray-500">(124)</span>
+                </div>
+              </div>
             </div>
           </div>
           
-          <h3 className="font-bold text-base line-clamp-2 leading-tight mb-1">
-            {classroom.name}
-          </h3>
-          <p className="text-primary font-medium text-sm">
-            {classroom.subject} Class
-          </p>
+          <div className="space-y-2">
+            <h3 className="font-bold text-xl text-gray-900 line-clamp-2 leading-tight">
+              {classroom.name}
+            </h3>
+            <p className="text-primary font-semibold text-base">
+              {classroom.subject} Class
+            </p>
+          </div>
         </CardHeader>
         
-        <CardContent className="px-4 pb-4 flex flex-col justify-between h-full">
-          <div className="space-y-3">
-            <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed">
-              {classroom.description || `Master ${classroom.subject} with expert guidance.`}
+        <CardContent className="px-6 pb-6 flex flex-col justify-between h-full">
+          <div className="space-y-5">
+            <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
+              {classroom.description || `Master ${classroom.subject} with expert guidance and personalized learning.`}
             </p>
             
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-blue-50 p-2 rounded-lg border border-blue-100">
-                <div className="flex items-center gap-1 text-blue-600 mb-0.5">
-                  <Users className="h-3 w-3" />
-                  <span className="text-xs font-medium">Students</span>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-blue-50/70 p-4 rounded-2xl border border-blue-100/50">
+                <div className="flex items-center gap-2 text-blue-600 mb-2">
+                  <Users className="h-4 w-4" />
+                  <span className="text-sm font-semibold">Students</span>
                 </div>
-                <span className="text-sm font-bold text-blue-700">{classroom.capacity}</span>
+                <span className="text-lg font-bold text-blue-700">{classroom.capacity}</span>
               </div>
               
-              <div className="bg-green-50 p-2 rounded-lg border border-green-100">
-                <div className="flex items-center gap-1 text-green-600 mb-0.5">
-                  <DollarSign className="h-3 w-3" />
-                  <span className="text-xs font-medium">Price</span>
+              <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100/50">
+                <div className="flex items-center gap-2 text-emerald-600 mb-2">
+                  <DollarSign className="h-4 w-4" />
+                  <span className="text-sm font-semibold">Price</span>
                 </div>
-                <span className="text-sm font-bold text-green-700">₹{classroom.price}</span>
-              </div>
-              
-              <div className="bg-purple-50 p-2 rounded-lg border border-purple-100 col-span-2">
-                <div className="flex items-center gap-1 text-purple-600 mb-0.5">
-                  <Calendar className="h-3 w-3" />
-                  <span className="text-xs font-medium">Schedule</span>
-                </div>
-                <span className="text-xs font-medium text-purple-700">{classroom.schedule}</span>
+                <span className="text-lg font-bold text-emerald-700">₹{classroom.price}</span>
               </div>
             </div>
 
-            <div className="bg-muted/50 p-2 rounded-lg border">
-              <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <Clock className="h-3 w-3" />
-                <span>{classroom.sessions_per_week} sessions/week • {classroom.session_duration_minutes}min each</span>
+            {/* Schedule Info */}
+            <div className="bg-purple-50/70 p-4 rounded-2xl border border-purple-100/50">
+              <div className="flex items-center gap-2 text-purple-600 mb-2">
+                <Calendar className="h-4 w-4" />
+                <span className="text-sm font-semibold">Schedule</span>
+              </div>
+              <span className="text-sm font-semibold text-purple-700">{classroom.schedule}</span>
+            </div>
+
+            {/* Session Details */}
+            <div className="bg-gray-50/70 p-4 rounded-2xl border border-gray-100/50">
+              <div className="text-sm text-gray-600 flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                <span className="font-medium">{classroom.sessions_per_week} sessions/week • {classroom.session_duration_minutes}min each</span>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 space-y-2">
+          {/* Action Buttons */}
+          <div className="mt-6 space-y-3">
             <Button 
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-9 font-medium"
+              className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white h-12 font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200"
               onClick={() => onJoin(classroom)}
             >
-              <Play className="h-4 w-4 mr-2" />
+              <Play className="h-5 w-5 mr-2" />
               Join Class
             </Button>
             
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button
                 variant="outline"
-                size="sm"
-                className="flex-1 border-red-200 hover:bg-red-50 text-red-600 h-8"
+                size="lg"
+                className="flex-1 border-2 border-red-200 hover:bg-red-50 text-red-600 h-11 rounded-2xl font-semibold transition-all duration-200"
                 onClick={() => handleButtonSwipe('left')}
               >
-                <X className="h-3 w-3 mr-1" />
+                <X className="h-4 w-4 mr-1" />
                 Pass
               </Button>
               
               <Button
                 variant="outline"
-                size="sm"
-                className="flex-1 border-green-200 hover:bg-green-50 text-green-600 h-8"
+                size="lg"
+                className="flex-1 border-2 border-emerald-200 hover:bg-emerald-50 text-emerald-600 h-11 rounded-2xl font-semibold transition-all duration-200"
                 onClick={() => handleButtonSwipe('right')}
               >
-                <Heart className="h-3 w-3 mr-1" />
+                <Heart className="h-4 w-4 mr-1" />
                 Like
               </Button>
             </div>
@@ -230,8 +240,8 @@ const CompactClassroomCard: React.FC<CompactClassroomCardProps> = ({
             exit={{ opacity: 0, scale: 0.8 }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
           >
-            <div className="bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-lg shadow-xl border-2 border-white transform rotate-12">
-              <Heart className="inline h-4 w-4 mr-1 fill-current" />
+            <div className="bg-emerald-500 text-white px-6 py-3 rounded-2xl font-bold text-xl shadow-2xl border-4 border-white transform rotate-12">
+              <Heart className="inline h-5 w-5 mr-2 fill-current" />
               LIKE
             </div>
           </motion.div>
@@ -244,8 +254,8 @@ const CompactClassroomCard: React.FC<CompactClassroomCardProps> = ({
             exit={{ opacity: 0, scale: 0.8 }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
           >
-            <div className="bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-lg shadow-xl border-2 border-white transform -rotate-12">
-              <X className="inline h-4 w-4 mr-1" />
+            <div className="bg-red-500 text-white px-6 py-3 rounded-2xl font-bold text-xl shadow-2xl border-4 border-white transform -rotate-12">
+              <X className="inline h-5 w-5 mr-2" />
               PASS
             </div>
           </motion.div>
