@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useTeachers } from "@/hooks/useTeachers";
 import { useTeacherFilters } from "@/hooks/useTeacherFilters";
+import { useLenis } from "@/hooks/useLenis";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FilterBar from "@/components/FilterBar";
@@ -18,6 +19,7 @@ const BrowseTeachers = () => {
   const [searchParams] = useSearchParams();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const { toast } = useToast();
+  const { scrollToTop } = useLenis();
   const { data: teachers = [], isLoading, error } = useTeachers();
   const { filters, filteredAndSortedTeachers, updateFilter, clearFilters } = useTeacherFilters(teachers);
 
@@ -77,8 +79,8 @@ const BrowseTeachers = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleScrollToTop = () => {
+    scrollToTop({ duration: 1.5 });
   };
 
   const handleClearFilters = () => {
@@ -123,11 +125,11 @@ const BrowseTeachers = () => {
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-20">
         <div className="container mx-auto px-6 py-8">
           {/* Enhanced Header */}
-          <div className="text-center mb-16 relative">
+          <div className="text-center mb-16 relative animate-fade-in-down">
             <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-400/20 rounded-3xl blur-3xl"></div>
             <div className="relative">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-full">
+                <div className="p-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-scale-in">
                   <Sparkles className="h-12 w-12 text-white" />
                 </div>
               </div>
@@ -139,7 +141,7 @@ const BrowseTeachers = () => {
               </p>
               
               {/* Stats */}
-              <div className="flex justify-center gap-8 mb-8">
+              <div className="flex justify-center gap-8 mb-8 animate-fade-in-up">
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <Star className="h-5 w-5 text-yellow-400 fill-current" />
@@ -166,30 +168,32 @@ const BrowseTeachers = () => {
           </div>
 
           {/* Enhanced Filters */}
-          <FilterBar
-            searchTerm={filters.searchTerm}
-            onSearchChange={(value) => updateFilter('searchTerm', value)}
-            selectedSubject={filters.selectedSubject}
-            onSubjectChange={(value) => updateFilter('selectedSubject', value)}
-            selectedLocation={filters.selectedLocation}
-            onLocationChange={(value) => updateFilter('selectedLocation', value)}
-            priceRange={filters.priceRange}
-            onPriceRangeChange={(value) => updateFilter('priceRange', value)}
-            sortBy={filters.sortBy}
-            onSortByChange={(value) => updateFilter('sortBy', value)}
-            onClearFilters={handleClearFilters}
-            resultCount={filteredAndSortedTeachers.length}
-            showLocation={true}
-          />
+          <div className="animate-fade-in-up">
+            <FilterBar
+              searchTerm={filters.searchTerm}
+              onSearchChange={(value) => updateFilter('searchTerm', value)}
+              selectedSubject={filters.selectedSubject}
+              onSubjectChange={(value) => updateFilter('selectedSubject', value)}
+              selectedLocation={filters.selectedLocation}
+              onLocationChange={(value) => updateFilter('selectedLocation', value)}
+              priceRange={filters.priceRange}
+              onPriceRangeChange={(value) => updateFilter('priceRange', value)}
+              sortBy={filters.sortBy}
+              onSortByChange={(value) => updateFilter('sortBy', value)}
+              onClearFilters={handleClearFilters}
+              resultCount={filteredAndSortedTeachers.length}
+              showLocation={true}
+            />
+          </div>
 
           {/* Teachers Grid */}
-          <div className="relative">
+          <div className="relative animate-fade-in-up">
             <TeacherGrid teachers={filteredAndSortedTeachers} />
           </div>
 
           {/* No Results Enhancement */}
           {filteredAndSortedTeachers.length === 0 && teachers.length > 0 && (
-            <div className="text-center py-16">
+            <div className="text-center py-16 animate-scale-in">
               <div className="w-32 h-32 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mx-auto mb-8">
                 <Star className="h-16 w-16 text-orange-600" />
               </div>
@@ -210,7 +214,7 @@ const BrowseTeachers = () => {
         {/* Scroll to Top Button */}
         {showScrollTop && (
           <Button
-            onClick={scrollToTop}
+            onClick={handleScrollToTop}
             className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
             size="lg"
           >

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import LenisProvider from "@/components/providers/LenisProvider";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -26,38 +27,40 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/browse-teachers" element={<BrowseTeachers />} />
-              <Route path="/browse-classrooms" element={<BrowseClassrooms />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/swipe-history" element={<SwipeHistoryPage />} />
-              <Route path="/classroom-swipe-history" element={<ClassroomSwipeHistoryPage />} />
-              <Route
-                path="/teacher-dashboard"
-                element={
-                  <ProtectedRoute requireRole="teacher">
-                    <TeacherDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin-dashboard"
-                element={
-                  <ProtectedRoute requireRole="admin">
-                    <TeacherDashboardAdmin />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <LenisProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/browse-teachers" element={<BrowseTeachers />} />
+                <Route path="/browse-classrooms" element={<BrowseClassrooms />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/swipe-history" element={<SwipeHistoryPage />} />
+                <Route path="/classroom-swipe-history" element={<ClassroomSwipeHistoryPage />} />
+                <Route
+                  path="/teacher-dashboard"
+                  element={
+                    <ProtectedRoute requireRole="teacher">
+                      <TeacherDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin-dashboard"
+                  element={
+                    <ProtectedRoute requireRole="admin">
+                      <TeacherDashboardAdmin />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </LenisProvider>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
