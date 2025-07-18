@@ -13,6 +13,7 @@ import BrowseTeachers from "./pages/BrowseTeachers";
 import BrowseClassrooms from "./pages/BrowseClassrooms";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherDashboardAdmin from "./pages/TeacherDashboardAdmin";
+import StudentDashboard from "./pages/StudentDashboard";
 import ClassroomSwipeHistoryPage from "./pages/ClassroomSwipeHistoryPage";
 import SwipeHistoryPage from "./pages/SwipeHistory";
 import Auth from "./pages/Auth";
@@ -46,6 +47,14 @@ function App() {
                   element={
                     <ProtectedRoute requireRole="teacher">
                       <TeacherDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/student-dashboard"
+                  element={
+                    <ProtectedRoute requireRole="student">
+                      <StudentDashboard />
                     </ProtectedRoute>
                   }
                 />

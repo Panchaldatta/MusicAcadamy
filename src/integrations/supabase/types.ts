@@ -297,55 +297,94 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          availability: string | null
           avatar_url: string | null
           bio: string | null
+          city: string | null
+          country: string | null
           created_at: string
           date_of_birth: string | null
           email: string | null
           email_verified: boolean | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relationship: string | null
           first_name: string | null
           google_id: string | null
           id: string
           is_active: boolean | null
           last_name: string | null
+          learning_goals: string | null
+          music_experience_level: string | null
           phone: string | null
+          preferred_instruments: string[] | null
           provider: string | null
           role: string | null
+          state: string | null
+          timezone: string | null
           updated_at: string
+          zip_code: string | null
         }
         Insert: {
+          address?: string | null
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           date_of_birth?: string | null
           email?: string | null
           email_verified?: boolean | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           first_name?: string | null
           google_id?: string | null
           id: string
           is_active?: boolean | null
           last_name?: string | null
+          learning_goals?: string | null
+          music_experience_level?: string | null
           phone?: string | null
+          preferred_instruments?: string[] | null
           provider?: string | null
           role?: string | null
+          state?: string | null
+          timezone?: string | null
           updated_at?: string
+          zip_code?: string | null
         }
         Update: {
+          address?: string | null
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           date_of_birth?: string | null
           email?: string | null
           email_verified?: boolean | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           first_name?: string | null
           google_id?: string | null
           id?: string
           is_active?: boolean | null
           last_name?: string | null
+          learning_goals?: string | null
+          music_experience_level?: string | null
           phone?: string | null
+          preferred_instruments?: string[] | null
           provider?: string | null
           role?: string | null
+          state?: string | null
+          timezone?: string | null
           updated_at?: string
+          zip_code?: string | null
         }
         Relationships: []
       }
@@ -375,6 +414,88 @@ export type Database = {
           value?: string
         }
         Relationships: []
+      }
+      student_achievements: {
+        Row: {
+          category: string | null
+          created_at: string
+          date_earned: string
+          description: string | null
+          id: string
+          student_id: string
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          date_earned: string
+          description?: string | null
+          id?: string
+          student_id: string
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          date_earned?: string
+          description?: string | null
+          id?: string
+          student_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_achievements_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_preferences: {
+        Row: {
+          communication_preference: string | null
+          created_at: string
+          id: string
+          lesson_duration_preference: number | null
+          notification_settings: Json | null
+          preferred_lesson_time: string | null
+          privacy_settings: Json | null
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          communication_preference?: string | null
+          created_at?: string
+          id?: string
+          lesson_duration_preference?: number | null
+          notification_settings?: Json | null
+          preferred_lesson_time?: string | null
+          privacy_settings?: Json | null
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          communication_preference?: string | null
+          created_at?: string
+          id?: string
+          lesson_duration_preference?: number | null
+          notification_settings?: Json | null
+          preferred_lesson_time?: string | null
+          privacy_settings?: Json | null
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_preferences_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       teachers: {
         Row: {

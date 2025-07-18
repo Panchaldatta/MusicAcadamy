@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, profile, signOut, isTeacher } = useAuth();
+  const { user, profile, signOut, isTeacher, isStudent } = useAuth();
 
   const navigationItems = [
     { name: "Home", href: "/" },
@@ -60,6 +60,11 @@ const Navigation = () => {
               <>
                 {isTeacher && (
                   <Button variant="ghost" onClick={() => navigate('/teacher-dashboard')}>
+                    Dashboard
+                  </Button>
+                )}
+                {isStudent && (
+                  <Button variant="ghost" onClick={() => navigate('/student-dashboard')}>
                     Dashboard
                   </Button>
                 )}
@@ -132,7 +137,19 @@ const Navigation = () => {
                               setIsOpen(false);
                             }}
                           >
-                            Dashboard
+                            Teacher Dashboard
+                          </Button>
+                        )}
+                        {isStudent && (
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              navigate('/student-dashboard');
+                              setIsOpen(false);
+                            }}
+                          >
+                            Student Dashboard
                           </Button>
                         )}
                         <div className="flex items-center gap-3 mb-3 p-2">
