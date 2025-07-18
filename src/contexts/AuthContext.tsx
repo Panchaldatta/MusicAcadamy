@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -61,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (session?.user) {
           console.log('🔥 User authenticated, fetching profile...');
-          // Fetch user profile
+          // Fetch user profile with a small delay to ensure the trigger has run
           setTimeout(async () => {
             const { data: profileData, error } = await supabase
               .from('profiles')
@@ -71,11 +72,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             
             if (error) {
               console.error('❌ Error fetching profile:', error);
+              // If profile doesn't exist and this is a Google user, the trigger should have created it
+              // Let's retry once more after a longer delay for Google OAuth
+              if (session.user.app_metadata?.provider === 'google') {
+                console.log('🔄 Retrying profile fetch for Google user...');
+                setTimeout(async () => {
+                  const { data: retryProfileData, error: retryError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single();
+                  
+                  if (retryError) {
+                    console.error('❌ Profile still not found after retry:', retryError);
+                  } else {
+                    console.log('✅ Profile found on retry:', retryProfileData);
+                    setProfile(retryProfileData);
+                  }
+                }, 2000);
+              }
             } else {
               console.log('✅ Profile fetched:', profileData);
               setProfile(profileData);
             }
-          }, 0);
+          }, 1000); // Increased delay for Google OAuth
         } else {
           console.log('🔥 User signed out, clearing profile');
           setProfile(null);
@@ -189,9 +209,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (error) {
       console.error('❌ Google sign in error:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = error.message;
+      if (error.message.includes('provider is not enabled')) {
+        errorMessage = 'Google authentication is not enabled. Please contact support.';
+      }
+      
       toast({
         title: "Google Sign In Failed",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     } else {
