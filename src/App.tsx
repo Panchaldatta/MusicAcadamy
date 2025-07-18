@@ -33,9 +33,9 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
           <TooltipProvider>
             <LenisProvider>
               <Toaster />
@@ -78,9 +78,9 @@ function App() {
               </Routes>
             </LenisProvider>
           </TooltipProvider>
-        </QueryClientProvider>
-      </AuthProvider>
-    </BrowserRouter>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
