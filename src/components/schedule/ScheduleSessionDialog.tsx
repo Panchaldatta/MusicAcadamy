@@ -54,7 +54,7 @@ const ScheduleSessionDialog = ({
     endTime: '10:00',
     students: 0,
     location: 'Online',
-    status: 'scheduled' as const,
+    status: 'scheduled' as 'scheduled' | 'completed' | 'cancelled',
     notes: ''
   });
 
@@ -81,7 +81,7 @@ const ScheduleSessionDialog = ({
         endTime: '10:00',
         students: 0,
         location: 'Online',
-        status: 'scheduled',
+        status: 'scheduled' as 'scheduled' | 'completed' | 'cancelled',
         notes: ''
       }));
     }
@@ -226,7 +226,7 @@ const ScheduleSessionDialog = ({
 
           <div>
             <Label htmlFor="status">Status</Label>
-            <Select value={formData.status} onValueChange={(value: any) => setFormData(prev => ({ ...prev, status: value }))}>
+            <Select value={formData.status} onValueChange={(value: 'scheduled' | 'completed' | 'cancelled') => setFormData(prev => ({ ...prev, status: value }))}>
               <SelectTrigger className="bg-white/10 border-white/20 text-white">
                 <SelectValue />
               </SelectTrigger>
