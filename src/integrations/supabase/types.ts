@@ -304,10 +304,12 @@ export type Database = {
           email: string | null
           email_verified: boolean | null
           first_name: string | null
+          google_id: string | null
           id: string
           is_active: boolean | null
           last_name: string | null
           phone: string | null
+          provider: string | null
           role: string | null
           updated_at: string
         }
@@ -319,10 +321,12 @@ export type Database = {
           email?: string | null
           email_verified?: boolean | null
           first_name?: string | null
+          google_id?: string | null
           id: string
           is_active?: boolean | null
           last_name?: string | null
           phone?: string | null
+          provider?: string | null
           role?: string | null
           updated_at?: string
         }
@@ -334,10 +338,12 @@ export type Database = {
           email?: string | null
           email_verified?: boolean | null
           first_name?: string | null
+          google_id?: string | null
           id?: string
           is_active?: boolean | null
           last_name?: string | null
           phone?: string | null
+          provider?: string | null
           role?: string | null
           updated_at?: string
         }
