@@ -2,51 +2,68 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Users, Video, Calendar } from "lucide-react";
+import { Clock, Users, Video, Calendar, MapPin } from "lucide-react";
+import { format, isToday, isTomorrow } from "date-fns";
+
+interface ClassSession {
+  id: string;
+  classroomName: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  students: number;
+  location: string;
+  status: 'scheduled' | 'completed' | 'cancelled' | 'starting_soon';
+}
 
 interface UpcomingClassesProps {
   detailed?: boolean;
+  sessions?: ClassSession[];
+  onJoinClass?: (sessionId: string) => void;
+  onViewDetails?: (sessionId: string) => void;
 }
 
-const UpcomingClasses = ({ detailed = false }: UpcomingClassesProps) => {
-  const upcomingClasses = [
+const UpcomingClasses = ({ 
+  detailed = false, 
+  sessions,
+  onJoinClass,
+  onViewDetails 
+}: UpcomingClassesProps) => {
+  // Mock data if no sessions provided
+  const defaultSessions: ClassSession[] = [
     {
-      id: 1,
-      name: "Piano Fundamentals",
-      time: "4:00 PM",
-      date: "Today",
+      id: "1",
+      classroomName: "Piano Fundamentals",
+      date: new Date(),
+      startTime: "16:00",
+      endTime: "17:00",
       students: 15,
-      duration: "60 min",
+      location: "Online",
       status: "starting_soon"
     },
     {
-      id: 2,
-      name: "Guitar Masterclass",
-      time: "6:00 PM",
-      date: "Today",
+      id: "2",
+      classroomName: "Guitar Masterclass",
+      date: new Date(),
+      startTime: "18:00",
+      endTime: "19:30",
       students: 8,
-      duration: "90 min",
+      location: "Studio A",
       status: "scheduled"
     },
     {
-      id: 3,
-      name: "Vocal Training Basics",
-      time: "5:30 PM",
-      date: "Tomorrow",
+      id: "3",
+      classroomName: "Vocal Training Basics",
+      date: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+      startTime: "17:30",
+      endTime: "18:30",
       students: 12,
-      duration: "60 min",
-      status: "scheduled"
-    },
-    {
-      id: 4,
-      name: "Piano Fundamentals",
-      time: "4:00 PM",
-      date: "Wednesday",
-      students: 15,
-      duration: "60 min",
+      location: "Online",
       status: "scheduled"
     }
   ];
+
+  const upcomingClasses = sessions || defaultSessions;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -70,6 +87,12 @@ const UpcomingClasses = ({ detailed = false }: UpcomingClassesProps) => {
     }
   };
 
+  const getDateDisplay = (date: Date) => {
+    if (isToday(date)) return "Today";
+    if (isTomorrow(date)) return "Tomorrow";
+    return format(date, "EEEE");
+  };
+
   if (!detailed) {
     return (
       <Card className="bg-white/10 backdrop-blur-md border-white/20">
@@ -85,11 +108,18 @@ const UpcomingClasses = ({ detailed = false }: UpcomingClassesProps) => {
         <CardContent>
           <div className="space-y-3">
             {upcomingClasses.slice(0, 3).map((classItem) => (
-              <div key={classItem.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+              <div key={classItem.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col">
-                    <span className="text-white font-medium text-sm">{classItem.name}</span>
-                    <span className="text-gray-400 text-xs">{classItem.date} at {classItem.time}</span>
+                    <span className="text-white font-medium text-sm">{classItem.classroomName}</span>
+                    <div className="flex items-center gap-2 text-gray-400 text-xs">
+                      <span>{getDateDisplay(classItem.date)} at {classItem.startTime}</span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {classItem.location}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -100,6 +130,18 @@ const UpcomingClasses = ({ detailed = false }: UpcomingClassesProps) => {
               </div>
             ))}
           </div>
+          {upcomingClasses.length > 3 && (
+            <div className="mt-4 pt-3 border-t border-white/10">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="w-full border-white/30 text-white hover:bg-white/10"
+                onClick={() => onViewDetails?.('all')}
+              >
+                View All Classes
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -124,8 +166,10 @@ const UpcomingClasses = ({ detailed = false }: UpcomingClassesProps) => {
                       <Video className="h-5 w-5 text-purple-400" />
                     </div>
                     <div>
-                      <h3 className="text-white font-semibold">{classItem.name}</h3>
-                      <p className="text-gray-400 text-sm">{classItem.date} at {classItem.time}</p>
+                      <h3 className="text-white font-semibold">{classItem.classroomName}</h3>
+                      <p className="text-gray-400 text-sm">
+                        {getDateDisplay(classItem.date)} at {classItem.startTime} - {classItem.endTime}
+                      </p>
                     </div>
                   </div>
                   <Badge className={`${getStatusColor(classItem.status)} text-white`}>
@@ -140,18 +184,31 @@ const UpcomingClasses = ({ detailed = false }: UpcomingClassesProps) => {
                       <span>{classItem.students} students</span>
                     </div>
                     <div className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      <span>{classItem.location}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      <span>{classItem.duration}</span>
+                      <span>{classItem.startTime} - {classItem.endTime}</span>
                     </div>
                   </div>
                   
                   <div className="flex gap-2">
                     {classItem.status === 'starting_soon' && (
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                      <Button 
+                        size="sm" 
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => onJoinClass?.(classItem.id)}
+                      >
                         Join Class
                       </Button>
                     )}
-                    <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-white/30 text-white hover:bg-white/10"
+                      onClick={() => onViewDetails?.(classItem.id)}
+                    >
                       View Details
                     </Button>
                   </div>

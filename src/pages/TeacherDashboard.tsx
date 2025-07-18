@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import TeacherSettingsTab from "@/components/TeacherSettingsTab";
 import DashboardStats from "@/components/DashboardStats";
 import DashboardTabs from "@/components/DashboardTabs";
+import ClassScheduleManager from "@/components/ClassScheduleManager";
 import { useTeacherClassrooms, useDeleteClassroom, useUpdateClassroom } from "@/hooks/useClassrooms";
 import { useToast } from "@/hooks/use-toast";
 
@@ -301,10 +302,7 @@ const TeacherDashboard = () => {
             )}
 
             {activeTab === "schedule" && (
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Class Schedule</h2>
-                <UpcomingClasses detailed={true} />
-              </div>
+              <ClassScheduleManager />
             )}
 
             {activeTab === "settings" && (
