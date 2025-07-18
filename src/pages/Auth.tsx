@@ -1,13 +1,15 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Music, Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
+import { Music, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
@@ -20,6 +22,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
+  const { toast } = useToast();
 
   const [signInData, setSignInData] = useState({
     email: "",
@@ -42,48 +45,154 @@ const Auth = () => {
     }
   }, [user, navigate, location]);
 
+  const validateSignUpData = () => {
+    if (!signUpData.firstName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "First name is required",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (!signUpData.lastName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Last name is required",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (!signUpData.email.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Email is required",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(signUpData.email)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid email address",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (signUpData.password.length < 6) {
+      toast({
+        title: "Validation Error",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (signUpData.password !== signUpData.confirmPassword) {
+      toast({
+        title: "Validation Error",
+        description: "Passwords do not match",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    const { error } = await signIn(signInData.email, signInData.password);
     
-    if (!error) {
-      const from = location.state?.from?.pathname || "/";
-      navigate(from, { replace: true });
+    if (!signInData.email.trim() || !signInData.password.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields",
+        variant: "destructive"
+      });
+      return;
     }
-    
-    setIsLoading(false);
+
+    setIsLoading(true);
+    console.log('🔥 Attempting email sign in for:', signInData.email);
+
+    try {
+      const { error } = await signIn(signInData.email, signInData.password);
+      
+      if (!error) {
+        console.log('✅ Email sign in successful');
+        const from = location.state?.from?.pathname || "/";
+        navigate(from, { replace: true });
+      } else {
+        console.error('❌ Email sign in failed:', error);
+      }
+    } catch (err) {
+      console.error('❌ Unexpected error during sign in:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    if (signUpData.password !== signUpData.confirmPassword) {
-      setIsLoading(false);
+    
+    if (!validateSignUpData()) {
       return;
     }
 
-    const { error } = await signUp(
-      signUpData.email,
-      signUpData.password,
-      signUpData.firstName,
-      signUpData.lastName,
-      signUpData.role
-    );
-    
-    if (!error) {
-      setActiveTab("signin");
+    setIsLoading(true);
+    console.log('🔥 Attempting email sign up for:', signUpData.email);
+
+    try {
+      const { error } = await signUp(
+        signUpData.email,
+        signUpData.password,
+        signUpData.firstName,
+        signUpData.lastName,
+        signUpData.role
+      );
+      
+      if (!error) {
+        console.log('✅ Email sign up successful');
+        toast({
+          title: "Account Created!",
+          description: "Please check your email to confirm your account before signing in.",
+        });
+        // Switch to sign in tab
+        setActiveTab("signin");
+        // Clear sign up form
+        setSignUpData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          role: "student"
+        });
+      } else {
+        console.error('❌ Email sign up failed:', error);
+      }
+    } catch (err) {
+      console.error('❌ Unexpected error during sign up:', err);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
-    await signInWithGoogle();
-    setIsGoogleLoading(false);
+    console.log('🔥 Attempting Google sign in...');
+    
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      console.error('❌ Unexpected error during Google sign in:', err);
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -335,12 +444,15 @@ const Auth = () => {
                               {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
+                          {signUpData.password && signUpData.confirmPassword && signUpData.password !== signUpData.confirmPassword && (
+                            <p className="text-destructive text-sm mt-1">Passwords do not match</p>
+                          )}
                         </div>
 
                         <Button 
                           type="submit" 
                           className="w-full" 
-                          disabled={isLoading || signUpData.password !== signUpData.confirmPassword}
+                          disabled={isLoading || (signUpData.password && signUpData.confirmPassword && signUpData.password !== signUpData.confirmPassword)}
                         >
                           {isLoading ? "Creating Account..." : "Create Account"}
                         </Button>

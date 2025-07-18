@@ -1,4 +1,5 @@
 
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -137,6 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string, role: string) => {
+    console.log('🔥 Starting email sign up process for:', email);
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -154,15 +156,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (error) {
+      console.error('❌ Email sign up error:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = error.message;
+      if (error.message.includes('User already registered')) {
+        errorMessage = 'An account with this email already exists. Please try signing in instead.';
+      } else if (error.message.includes('Password should be at least')) {
+        errorMessage = 'Password must be at least 6 characters long.';
+      } else if (error.message.includes('Unable to validate email address')) {
+        errorMessage = 'Please enter a valid email address.';
+      }
+      
       toast({
         title: "Sign Up Failed",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     } else {
+      console.log('✅ Email sign up successful - confirmation email sent');
       toast({
         title: "Check your email",
-        description: "Please check your email for a confirmation link.",
+        description: "Please check your email for a confirmation link to complete your registration.",
       });
     }
 
@@ -170,18 +185,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
+    console.log('🔥 Starting email sign in process for:', email);
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
     if (error) {
+      console.error('❌ Email sign in error:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = error.message;
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+      } else if (error.message.includes('Too many requests')) {
+        errorMessage = 'Too many login attempts. Please wait a moment before trying again.';
+      }
+      
       toast({
         title: "Sign In Failed",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     } else {
+      console.log('✅ Email sign in successful');
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
@@ -229,14 +259,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    console.log('🔥 Starting sign out process...');
     const { error } = await supabase.auth.signOut();
     if (error) {
+      console.error('❌ Sign out error:', error);
       toast({
         title: "Sign Out Failed",
         description: error.message,
         variant: "destructive"
       });
     } else {
+      console.log('✅ Sign out successful');
       setUser(null);
       setSession(null);
       setProfile(null);
