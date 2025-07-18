@@ -1,13 +1,12 @@
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { useCreateClassroom } from "@/hooks/useClassrooms";
-import { useToast } from "@/hooks/use-toast";
+import { useClassroomForm } from "@/hooks/useClassroomForm";
+import BasicInformationSection from "./classroom/form/BasicInformationSection";
+import PricingCapacitySection from "./classroom/form/PricingCapacitySection";
+import ScheduleDetailsSection from "./classroom/form/ScheduleDetailsSection";
+import AdditionalInfoSection from "./classroom/form/AdditionalInfoSection";
 
 interface CreateClassroomDialogProps {
   open: boolean;
@@ -16,68 +15,12 @@ interface CreateClassroomDialogProps {
 
 const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProps) => {
   const createClassroom = useCreateClassroom();
-  const { toast } = useToast();
-
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    subject: "",
-    schedule: "",
-    level: "",
-    price: 25,
-    capacity: 20,
-    prerequisites: "",
-    duration_weeks: 12,
-    sessions_per_week: 2,
-    session_duration_minutes: 60
-  });
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) newErrors.name = "Classroom name is required";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
-    if (!formData.subject) newErrors.subject = "Subject is required";
-    if (!formData.schedule.trim()) newErrors.schedule = "Schedule is required";
-    if (!formData.level) newErrors.level = "Level is required";
-    if (formData.price < 0) newErrors.price = "Price must be positive";
-    if (formData.capacity < 1) newErrors.capacity = "Capacity must be at least 1";
-    if (formData.duration_weeks < 1) newErrors.duration_weeks = "Duration must be at least 1 week";
-    if (formData.sessions_per_week < 1) newErrors.sessions_per_week = "Must have at least 1 session per week";
-    if (formData.session_duration_minutes < 15) newErrors.session_duration_minutes = "Session must be at least 15 minutes";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      description: "",
-      subject: "",
-      schedule: "",
-      level: "",
-      price: 25,
-      capacity: 20,
-      prerequisites: "",
-      duration_weeks: 12,
-      sessions_per_week: 2,
-      session_duration_minutes: 60
-    });
-    setErrors({});
-  };
+  const { formData, errors, updateFormData, validateForm, resetForm } = useClassroomForm();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast({
-        title: "Validation Error",
-        description: "Please fix the errors in the form",
-        variant: "destructive",
-      });
       return;
     }
     
@@ -100,32 +43,13 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to create classroom:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create classroom. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 
-  const subjects = [
-    "Piano",
-    "Guitar",
-    "Violin",
-    "Vocals",
-    "Drums",
-    "Bass",
-    "Saxophone",
-    "Flute",
-    "Trumpet",
-    "Music Theory"
-  ];
-
-  const levels = [
-    "Beginner",
-    "Intermediate", 
-    "Advanced"
-  ];
+  const handleCancel = () => {
+    resetForm();
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -140,246 +64,34 @@ const CreateClassroomDialog = ({ open, onOpenChange }: CreateClassroomDialogProp
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-purple-300 border-b border-white/10 pb-2">
-              Basic Information
-            </h3>
-            
-            <div>
-              <Label htmlFor="name" className="text-white">
-                Classroom Name <span className="text-red-400">*</span>
-              </Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g., Piano Fundamentals"
-                className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 ${
-                  errors.name ? 'border-red-500' : ''
-                }`}
-              />
-              {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
-            </div>
+          <BasicInformationSection 
+            formData={formData}
+            errors={errors}
+            onUpdateFormData={updateFormData}
+          />
 
-            <div>
-              <Label htmlFor="description" className="text-white">
-                Description <span className="text-red-400">*</span>
-              </Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe what students will learn in this classroom..."
-                className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 ${
-                  errors.description ? 'border-red-500' : ''
-                }`}
-                rows={3}
-              />
-              {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
-            </div>
+          <PricingCapacitySection 
+            formData={formData}
+            errors={errors}
+            onUpdateFormData={updateFormData}
+          />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="subject" className="text-white">
-                  Subject <span className="text-red-400">*</span>
-                </Label>
-                <Select value={formData.subject} onValueChange={(value) => setFormData({ ...formData, subject: value })}>
-                  <SelectTrigger className={`bg-white/10 border-white/20 text-white ${
-                    errors.subject ? 'border-red-500' : ''
-                  }`}>
-                    <SelectValue placeholder="Select subject" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-white/20">
-                    {subjects.map((subject) => (
-                      <SelectItem key={subject} value={subject} className="text-white hover:bg-white/10">
-                        {subject}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.subject && <p className="text-red-400 text-sm mt-1">{errors.subject}</p>}
-              </div>
+          <ScheduleDetailsSection 
+            formData={formData}
+            errors={errors}
+            onUpdateFormData={updateFormData}
+          />
 
-              <div>
-                <Label htmlFor="level" className="text-white">
-                  Level <span className="text-red-400">*</span>
-                </Label>
-                <Select value={formData.level} onValueChange={(value) => setFormData({ ...formData, level: value })}>
-                  <SelectTrigger className={`bg-white/10 border-white/20 text-white ${
-                    errors.level ? 'border-red-500' : ''
-                  }`}>
-                    <SelectValue placeholder="Select level" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-white/20">
-                    {levels.map((level) => (
-                      <SelectItem key={level} value={level} className="text-white hover:bg-white/10">
-                        {level}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.level && <p className="text-red-400 text-sm mt-1">{errors.level}</p>}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="schedule" className="text-white">
-                Schedule <span className="text-red-400">*</span>
-              </Label>
-              <Input
-                id="schedule"
-                value={formData.schedule}
-                onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
-                placeholder="e.g., Mon, Wed, Fri - 4:00 PM"
-                className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 ${
-                  errors.schedule ? 'border-red-500' : ''
-                }`}
-              />
-              {errors.schedule && <p className="text-red-400 text-sm mt-1">{errors.schedule}</p>}
-            </div>
-          </div>
-
-          {/* Pricing & Capacity */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-purple-300 border-b border-white/10 pb-2">
-              Pricing & Capacity
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="price" className="text-white">
-                  Price per Session ($) <span className="text-red-400">*</span>
-                </Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
-                  placeholder="25"
-                  className={`bg-white/10 border-white/20 text-white ${
-                    errors.price ? 'border-red-500' : ''
-                  }`}
-                  min="0"
-                />
-                {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="capacity" className="text-white">
-                  Maximum Students <span className="text-red-400">*</span>
-                </Label>
-                <Input
-                  id="capacity"
-                  type="number"
-                  value={formData.capacity}
-                  onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 20 })}
-                  placeholder="20"
-                  className={`bg-white/10 border-white/20 text-white ${
-                    errors.capacity ? 'border-red-500' : ''
-                  }`}
-                  min="1"
-                  max="100"
-                />
-                {errors.capacity && <p className="text-red-400 text-sm mt-1">{errors.capacity}</p>}
-              </div>
-            </div>
-          </div>
-
-          {/* Schedule Details */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-purple-300 border-b border-white/10 pb-2">
-              Schedule Details
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="duration_weeks" className="text-white">
-                  Duration (weeks) <span className="text-red-400">*</span>
-                </Label>
-                <Input
-                  id="duration_weeks"
-                  type="number"
-                  value={formData.duration_weeks}
-                  onChange={(e) => setFormData({ ...formData, duration_weeks: parseInt(e.target.value) || 12 })}
-                  placeholder="12"
-                  className={`bg-white/10 border-white/20 text-white ${
-                    errors.duration_weeks ? 'border-red-500' : ''
-                  }`}
-                  min="1"
-                />
-                {errors.duration_weeks && <p className="text-red-400 text-sm mt-1">{errors.duration_weeks}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="sessions_per_week" className="text-white">
-                  Sessions per Week <span className="text-red-400">*</span>
-                </Label>
-                <Input
-                  id="sessions_per_week"
-                  type="number"
-                  value={formData.sessions_per_week}
-                  onChange={(e) => setFormData({ ...formData, sessions_per_week: parseInt(e.target.value) || 2 })}
-                  placeholder="2"
-                  className={`bg-white/10 border-white/20 text-white ${
-                    errors.sessions_per_week ? 'border-red-500' : ''
-                  }`}
-                  min="1"
-                  max="7"
-                />
-                {errors.sessions_per_week && <p className="text-red-400 text-sm mt-1">{errors.sessions_per_week}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="session_duration_minutes" className="text-white">
-                  Session Duration (minutes) <span className="text-red-400">*</span>
-                </Label>
-                <Input
-                  id="session_duration_minutes"
-                  type="number"
-                  value={formData.session_duration_minutes}
-                  onChange={(e) => setFormData({ ...formData, session_duration_minutes: parseInt(e.target.value) || 60 })}
-                  placeholder="60"
-                  className={`bg-white/10 border-white/20 text-white ${
-                    errors.session_duration_minutes ? 'border-red-500' : ''
-                  }`}
-                  min="15"
-                  max="180"
-                />
-                {errors.session_duration_minutes && <p className="text-red-400 text-sm mt-1">{errors.session_duration_minutes}</p>}
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-purple-300 border-b border-white/10 pb-2">
-              Additional Information
-            </h3>
-            
-            <div>
-              <Label htmlFor="prerequisites" className="text-white">
-                Prerequisites (optional)
-              </Label>
-              <Textarea
-                id="prerequisites"
-                value={formData.prerequisites}
-                onChange={(e) => setFormData({ ...formData, prerequisites: e.target.value })}
-                placeholder="Any requirements or prior knowledge needed..."
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                rows={2}
-              />
-            </div>
-          </div>
+          <AdditionalInfoSection 
+            formData={formData}
+            onUpdateFormData={updateFormData}
+          />
 
           <div className="flex gap-3 pt-6 border-t border-white/10">
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => {
-                resetForm();
-                onOpenChange(false);
-              }}
+              onClick={handleCancel}
               className="flex-1 border-white/30 text-white hover:bg-white/10"
               disabled={createClassroom.isPending}
             >
