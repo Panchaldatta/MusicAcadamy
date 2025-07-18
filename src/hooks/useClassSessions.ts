@@ -60,7 +60,7 @@ export const useClassSessions = () => {
         endTime: session.end_time,
         students: session.student_count,
         location: session.location,
-        status: session.status,
+        status: session.status as 'scheduled' | 'completed' | 'cancelled',
         notes: session.notes
       })) || [];
     },
