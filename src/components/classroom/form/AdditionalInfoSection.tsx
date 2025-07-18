@@ -2,11 +2,13 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+interface AdditionalInfoFormData {
+  prerequisites: string;
+}
+
 interface AdditionalInfoSectionProps {
-  formData: {
-    prerequisites: string;
-  };
-  onUpdateFormData: (updates: Partial<typeof formData>) => void;
+  formData: AdditionalInfoFormData;
+  onUpdateFormData: (updates: Partial<AdditionalInfoFormData>) => void;
 }
 
 const AdditionalInfoSection = ({ formData, onUpdateFormData }: AdditionalInfoSectionProps) => {

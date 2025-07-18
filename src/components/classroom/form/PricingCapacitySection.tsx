@@ -2,13 +2,15 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+interface PricingCapacityFormData {
+  price: number;
+  capacity: number;
+}
+
 interface PricingCapacitySectionProps {
-  formData: {
-    price: number;
-    capacity: number;
-  };
+  formData: PricingCapacityFormData;
   errors: Record<string, string>;
-  onUpdateFormData: (updates: Partial<typeof formData>) => void;
+  onUpdateFormData: (updates: Partial<PricingCapacityFormData>) => void;
 }
 
 const PricingCapacitySection = ({ formData, errors, onUpdateFormData }: PricingCapacitySectionProps) => {

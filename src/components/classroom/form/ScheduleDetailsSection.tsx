@@ -2,14 +2,16 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+interface ScheduleDetailsFormData {
+  duration_weeks: number;
+  sessions_per_week: number;
+  session_duration_minutes: number;
+}
+
 interface ScheduleDetailsSectionProps {
-  formData: {
-    duration_weeks: number;
-    sessions_per_week: number;
-    session_duration_minutes: number;
-  };
+  formData: ScheduleDetailsFormData;
   errors: Record<string, string>;
-  onUpdateFormData: (updates: Partial<typeof formData>) => void;
+  onUpdateFormData: (updates: Partial<ScheduleDetailsFormData>) => void;
 }
 
 const ScheduleDetailsSection = ({ formData, errors, onUpdateFormData }: ScheduleDetailsSectionProps) => {

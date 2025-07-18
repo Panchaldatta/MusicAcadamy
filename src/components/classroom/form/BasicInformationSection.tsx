@@ -4,16 +4,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+interface BasicInformationFormData {
+  name: string;
+  description: string;
+  subject: string;
+  level: string;
+  schedule: string;
+}
+
 interface BasicInformationSectionProps {
-  formData: {
-    name: string;
-    description: string;
-    subject: string;
-    level: string;
-    schedule: string;
-  };
+  formData: BasicInformationFormData;
   errors: Record<string, string>;
-  onUpdateFormData: (updates: Partial<typeof formData>) => void;
+  onUpdateFormData: (updates: Partial<BasicInformationFormData>) => void;
 }
 
 const subjects = [
