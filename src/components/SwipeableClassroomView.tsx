@@ -2,10 +2,9 @@
 import React, { useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClassroomSwipes } from '@/hooks/useClassroomSwipes';
-import { ClassroomService } from '@/services/classroomService';
 import { filterClassroomsByKeywords, CLASSROOM_KEYWORDS } from '@/utils/classroomKeywords';
 import SearchFilters from './classroom/SearchFilters';
-import CompactClassroomCard from './classroom/CompactClassroomCard';
+import StackedClassroomCards from './classroom/StackedClassroomCards';
 import SwipeProgress from './classroom/SwipeProgress';
 import EmptyState from './classroom/EmptyState';
 import type { Database } from "@/integrations/supabase/types";
@@ -17,7 +16,6 @@ interface SwipeableClassroomViewProps {
 }
 
 const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classrooms }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [searchKeywords, setSearchKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -29,8 +27,6 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
     swipeHistory,
     likedClassrooms,
     passedClassrooms,
-    handleSwipeLeft,
-    handleSwipeRight,
     getSwipedClassroomIds
   } = useClassroomSwipes();
 
@@ -60,93 +56,17 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
     return filtered;
   }, [classrooms, searchKeywords, priceFilter, levelFilter, swipeHistory]);
 
-  const currentClassroom = filteredClassrooms[currentIndex];
   const popularKeywords = Object.keys(CLASSROOM_KEYWORDS).slice(0, 6);
   const hasActiveFilters = searchKeywords.length > 0 || priceFilter !== 'all' || levelFilter !== 'all';
-
-  const handleSwipeLeftAction = async (classroom: Classroom) => {
-    try {
-      // Record swipe in database
-      await ClassroomService.recordSwipe(classroom.id, 'left');
-      
-      // Update local state
-      handleSwipeLeft(classroom);
-      moveToNext();
-      
-      toast({
-        title: "Passed",
-        description: `You passed on "${classroom.name}"`,
-      });
-    } catch (error) {
-      console.error('Error recording swipe:', error);
-      toast({
-        title: "Error",
-        description: "Failed to record your swipe. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleSwipeRightAction = async (classroom: Classroom) => {
-    try {
-      // Record swipe in database
-      await ClassroomService.recordSwipe(classroom.id, 'right');
-      
-      // Update local state
-      handleSwipeRight(classroom);
-      moveToNext();
-      
-      toast({
-        title: "Liked!",
-        description: `You liked "${classroom.name}"`,
-      });
-    } catch (error) {
-      console.error('Error recording swipe:', error);
-      toast({
-        title: "Error",
-        description: "Failed to record your swipe. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const moveToNext = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, filteredClassrooms.length - 1));
-  };
-
-  const handleJoinClassroom = async (classroom: Classroom) => {
-    try {
-      // Record swipe in database
-      await ClassroomService.recordSwipe(classroom.id, 'right');
-      
-      toast({
-        title: "Amazing choice!",
-        description: `Welcome to "${classroom.name}". Check your email for next steps.`,
-      });
-      
-      // Update local state
-      handleSwipeRight(classroom);
-      moveToNext();
-    } catch (error) {
-      console.error('Error joining classroom:', error);
-      toast({
-        title: "Error",
-        description: "Failed to join classroom. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
 
   const addKeyword = (keyword: string) => {
     if (!searchKeywords.includes(keyword)) {
       setSearchKeywords(prev => [...prev, keyword]);
-      setCurrentIndex(0);
     }
   };
 
   const removeKeyword = (keyword: string) => {
     setSearchKeywords(prev => prev.filter(k => k !== keyword));
-    setCurrentIndex(0);
   };
 
   const handleKeywordInputSubmit = () => {
@@ -160,11 +80,10 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
     setSearchKeywords([]);
     setPriceFilter('all');
     setLevelFilter('all');
-    setCurrentIndex(0);
     setShowFilters(false);
   };
 
-  if (!currentClassroom && filteredClassrooms.length === 0) {
+  if (filteredClassrooms.length === 0) {
     return (
       <>
         <div className="max-w-sm mx-auto mb-6">
@@ -196,7 +115,7 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
   }
 
   return (
-    <div className="max-w-sm mx-auto space-y-4">
+    <div className="max-w-sm mx-auto space-y-6">
       <SearchFilters
         keywordInput={keywordInput}
         setKeywordInput={setKeywordInput}
@@ -214,19 +133,13 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
         popularKeywords={popularKeywords}
       />
 
-      {currentClassroom && (
-        <div className="py-2">
-          <CompactClassroomCard
-            classroom={currentClassroom}
-            onSwipeLeft={handleSwipeLeftAction}
-            onSwipeRight={handleSwipeRightAction}
-            onJoin={handleJoinClassroom}
-          />
-        </div>
-      )}
+      <StackedClassroomCards 
+        classrooms={filteredClassrooms}
+        maxVisible={3}
+      />
 
       <SwipeProgress
-        currentIndex={currentIndex}
+        currentIndex={0}
         totalClassrooms={filteredClassrooms.length}
         isFiltered={hasActiveFilters}
         likedCount={likedClassrooms.length}
