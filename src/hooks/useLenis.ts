@@ -16,7 +16,9 @@ export const useLenis = () => {
   const scrollToElement = useCallback((selector: string, options?: any) => {
     const element = document.querySelector(selector);
     if (element) {
-      scrollTo(element, options);
+      // Use the element's offsetTop to get its position
+      const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
+      scrollTo(elementTop, options);
     }
   }, [scrollTo]);
 
