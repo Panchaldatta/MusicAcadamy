@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Menu, Music, Heart, User, LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Menu, Music, Heart, User, LogOut, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,6 +22,14 @@ const Navigation = () => {
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
+
+  const handleProfileClick = () => {
+    if (isStudent) {
+      navigate('/student-dashboard');
+    } else if (isTeacher) {
+      navigate('/teacher-dashboard');
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -80,10 +88,15 @@ const Navigation = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleProfileClick}>
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleProfileClick}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={signOut}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>
@@ -163,6 +176,17 @@ const Navigation = () => {
                             {profile?.first_name} {profile?.last_name}
                           </span>
                         </div>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start"
+                          onClick={() => {
+                            handleProfileClick();
+                            setIsOpen(false);
+                          }}
+                        >
+                          <User className="mr-2 h-4 w-4" />
+                          Profile & Settings
+                        </Button>
                         <Button 
                           variant="outline" 
                           className="w-full justify-start"
