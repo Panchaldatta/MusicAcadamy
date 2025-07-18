@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Play, Sparkles, Users, Music2, Award, Clock } from 'lucide-react';
+import { ArrowRight, Play, Star, Music, Award, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSiteStats } from '@/hooks/useSiteStats';
 
@@ -16,160 +16,153 @@ const HeroSection = () => {
   const studentCount = studentStat ? studentStat.value : '500+';
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/30 overflow-hidden">
-      {/* Animated background elements */}
+    <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-red-50 overflow-hidden">
+      {/* Enhanced Background Pattern */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-br from-orange-200/20 to-red-200/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-amber-200/15 to-orange-200/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        {/* Geometric shapes */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-orange-200/30 to-red-200/30 rounded-full blur-xl"></div>
+        <div className="absolute top-60 right-20 w-40 h-40 bg-gradient-to-br from-amber-200/30 to-orange-200/30 rounded-full blur-xl"></div>
+        <div className="absolute bottom-40 left-1/4 w-24 h-24 bg-gradient-to-br from-red-200/30 to-orange-200/30 rounded-full blur-lg"></div>
         
-        {/* Floating music notes */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-20 text-orange-300/30 text-6xl animate-bounce">♪</div>
-          <div className="absolute top-40 right-32 text-red-300/30 text-4xl animate-bounce delay-500">♫</div>
-          <div className="absolute bottom-32 left-1/3 text-amber-300/30 text-5xl animate-bounce delay-1000">♬</div>
-          <div className="absolute top-1/2 right-20 text-orange-300/30 text-3xl animate-bounce delay-700">♩</div>
+        {/* Musical notes pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-32 left-16 text-4xl rotate-12">🎵</div>
+          <div className="absolute top-48 right-32 text-3xl -rotate-12">🎶</div>
+          <div className="absolute bottom-60 left-32 text-5xl rotate-6">🎼</div>
+          <div className="absolute top-72 left-2/3 text-3xl -rotate-6">🎵</div>
+          <div className="absolute bottom-32 right-16 text-4xl rotate-12">🎶</div>
         </div>
       </div>
 
-      <div className="relative z-10 container mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-screen py-20">
+      <div className="relative z-10 container mx-auto px-6 pt-24 pb-16">
+        <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
           {/* Left Content */}
-          <div className="space-y-8 lg:pr-8">
-            {/* Premium badge */}
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 border border-orange-200/50 shadow-lg">
-              <Sparkles className="h-4 w-4 text-orange-500" />
-              <span className="text-sm font-medium text-gray-700">
-                Premium Music Education Platform
+          <div className="space-y-10">
+            {/* Badge */}
+            <div className="inline-flex items-center bg-gradient-to-r from-orange-100 to-red-100 backdrop-blur-sm rounded-full px-6 py-3 border border-orange-200/50 shadow-lg">
+              <Star className="h-4 w-4 text-orange-600 mr-2 fill-current" />
+              <span className="text-sm font-semibold text-orange-800">
+                Trusted by {studentCount} music enthusiasts
               </span>
             </div>
             
-            {/* Main heading with modern typography */}
+            {/* Main Heading */}
             <div className="space-y-6">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight">
-                <span className="block text-slate-900">Learn Music</span>
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-red-500 to-orange-600">
-                  Like Never Before
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold leading-tight">
+                <span className="text-gray-900">Master</span>
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-red-600 to-orange-700">
+                  Indian Music
                 </span>
               </h1>
               
-              <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-lg font-medium">
-                Experience the future of music education with world-class instructors, 
-                interactive lessons, and personalized learning paths.
+              <p className="text-xl md:text-2xl text-gray-700 leading-relaxed max-w-xl font-light">
+                Connect with legendary gurus and discover the timeless beauty of Indian classical music through immersive online lessons.
               </p>
             </div>
 
-            {/* Action buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-6">
               <Button 
                 asChild
                 size="lg" 
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-6 text-base rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-0"
+                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-10 py-7 text-lg rounded-3xl shadow-2xl hover:shadow-orange-300/25 transition-all duration-300 transform hover:scale-105"
               >
-                <Link to="/browse-teachers" className="flex items-center gap-2">
-                  Start Your Journey
-                  <ArrowRight className="h-4 w-4" />
+                <Link to="/browse-teachers">
+                  Start Learning Today
+                  <ArrowRight className="ml-3 h-5 w-5" />
                 </Link>
               </Button>
               
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-2 border-slate-200 hover:border-orange-200 hover:bg-orange-50 px-8 py-6 text-base rounded-2xl bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                className="border-2 border-orange-300 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 px-10 py-7 text-lg rounded-3xl bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <Play className="mr-2 h-4 w-4" />
-                Watch Demo
+                <Play className="mr-3 h-5 w-5" />
+                Watch Preview
               </Button>
             </div>
 
-            {/* Stats row */}
-            <div className="flex items-center gap-8 pt-6">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center">
-                  <Users className="h-5 w-5 text-orange-600" />
+            {/* Enhanced Trust Indicators */}
+            <div className="grid grid-cols-3 gap-8 pt-8 border-t border-orange-200/50">
+              <div className="text-center group">
+                <div className="flex items-center justify-center mb-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mr-2">
+                    <Star className="h-4 w-4 text-orange-600 fill-current" />
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900">4.9</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-slate-900">{studentCount}</div>
-                  <div className="text-sm text-slate-500">Active Students</div>
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Avg Rating</div>
               </div>
-              
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center">
-                  <Award className="h-5 w-5 text-amber-600" />
+              <div className="text-center group">
+                <div className="flex items-center justify-center mb-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mr-2">
+                    <Users className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900">50+</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-slate-900">4.9★</div>
-                  <div className="text-sm text-slate-500">Rating</div>
+                <div className="text-sm text-gray-600 font-medium">Expert Gurus</div>
+              </div>
+              <div className="text-center group">
+                <div className="flex items-center justify-center mb-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mr-2">
+                    <Award className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900">24/7</div>
                 </div>
+                <div className="text-sm text-gray-600 font-medium">Support</div>
               </div>
             </div>
           </div>
 
-          {/* Right Content - Interactive Visual */}
-          <div className="relative flex items-center justify-center lg:justify-end">
-            {/* Main card */}
+          {/* Right Content - Enhanced Visual */}
+          <div className="relative flex items-center justify-center">
+            {/* Main central element */}
             <div className="relative">
-              <div className="w-80 h-96 bg-gradient-to-br from-white to-orange-50/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center">
-                      <Music2 className="h-6 w-6 text-white" />
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-slate-500">Next Session</div>
-                      <div className="text-lg font-semibold text-slate-900">2:00 PM</div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-2xl font-bold text-slate-900">Classical Sitar</h3>
-                    <p className="text-slate-600">Master the ancient art of sitar with Guru Ramesh Kumar</p>
-                    
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-slate-500">Progress</span>
-                        <span className="text-sm font-medium text-slate-700">68%</span>
-                      </div>
-                      <div className="w-full bg-slate-200 rounded-full h-2">
-                        <div className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full w-2/3"></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4 pt-4">
-                      <div className="flex -space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-orange-200 to-red-200 rounded-full border-2 border-white"></div>
-                        <div className="w-8 h-8 bg-gradient-to-br from-amber-200 to-orange-200 rounded-full border-2 border-white"></div>
-                        <div className="w-8 h-8 bg-gradient-to-br from-red-200 to-orange-200 rounded-full border-2 border-white"></div>
-                      </div>
-                      <span className="text-sm text-slate-500">+12 others learning</span>
-                    </div>
-                  </div>
+              <div className="w-96 h-96 bg-gradient-to-br from-white/80 to-orange-50/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/50 p-12 flex items-center justify-center">
+                <div className="text-center space-y-6">
+                  <div className="text-9xl animate-pulse">🎼</div>
+                  <h3 className="text-3xl font-bold text-gray-900">Begin Your Journey</h3>
+                  <p className="text-gray-600 text-lg">Learn from masters</p>
                 </div>
               </div>
             </div>
             
-            {/* Floating notifications */}
-            <div className="absolute -top-6 -left-6 bg-white rounded-2xl shadow-xl p-4 border border-orange-100 animate-bounce">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-slate-700">Live session starting</span>
-              </div>
-            </div>
-            
-            <div className="absolute -bottom-6 -right-6 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl shadow-xl p-4 border border-white animate-pulse">
-              <div className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-orange-600" />
+            {/* Enhanced Floating Cards */}
+            <div className="absolute -top-8 -right-8 bg-gradient-to-br from-white to-orange-50 rounded-3xl shadow-2xl p-6 border border-orange-100 animate-bounce max-w-xs">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center">
+                  <Music className="h-6 w-6 text-orange-600" />
+                </div>
                 <div>
-                  <div className="text-sm font-medium text-slate-700">24/7 Access</div>
-                  <div className="text-xs text-slate-500">Learn anytime</div>
+                  <div className="font-bold text-gray-900 text-lg">Live Sessions</div>
+                  <div className="text-orange-600 font-medium">Starting now</div>
                 </div>
               </div>
             </div>
             
-            <div className="absolute top-1/2 -left-12 bg-white rounded-xl shadow-lg p-3 border border-amber-100 animate-bounce delay-1000">
-              <div className="text-center">
-                <div className="text-lg font-bold text-slate-900">50+</div>
-                <div className="text-xs text-slate-500">Expert Instructors</div>
+            <div className="absolute -bottom-8 -left-8 bg-gradient-to-br from-white to-red-50 rounded-3xl shadow-2xl p-6 border border-red-100 animate-pulse max-w-xs">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center">
+                  <Award className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900 text-lg">Certified Gurus</div>
+                  <div className="text-red-600 font-medium">Verified experts</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute top-1/2 -left-16 bg-gradient-to-br from-white to-amber-50 rounded-3xl shadow-xl p-4 border border-amber-100 animate-bounce delay-1000">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center">
+                  🏆
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900">Top Rated</div>
+                  <div className="text-amber-600 text-sm font-medium">Platform</div>
+                </div>
               </div>
             </div>
           </div>
