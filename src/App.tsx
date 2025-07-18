@@ -21,17 +21,25 @@ import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-const queryClient = new QueryClient();
+// Create QueryClient instance outside of component to prevent recreation on each render
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
       <AuthProvider>
-        <TooltipProvider>
-          <LenisProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <LenisProvider>
+              <Toaster />
+              <Sonner />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/about" element={<About />} />
@@ -68,11 +76,11 @@ function App() {
                 />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-          </LenisProvider>
-        </TooltipProvider>
+            </LenisProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
       </AuthProvider>
-    </QueryClientProvider>
+    </BrowserRouter>
   );
 }
 

@@ -1,5 +1,3 @@
-
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +16,20 @@ interface Profile {
   email_verified: boolean | null;
   google_id: string | null;
   provider: string | null;
+  date_of_birth: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zip_code: string | null;
+  country: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  emergency_contact_relationship: string | null;
+  music_experience_level: string | null;
+  learning_goals: string | null;
+  availability: string | null;
+  timezone: string | null;
+  created_at: string | null;
 }
 
 interface AuthContextType {

@@ -74,15 +74,27 @@ const StudentPreferences = () => {
         const notificationSettings = data.notification_settings || {};
         const privacySettings = data.privacy_settings || {};
 
+        // Safely access properties with proper type checking
+        const emailNotifications = typeof notificationSettings === 'object' && notificationSettings !== null && 'email' in notificationSettings 
+          ? Boolean(notificationSettings.email) : true;
+        const smsNotifications = typeof notificationSettings === 'object' && notificationSettings !== null && 'sms' in notificationSettings 
+          ? Boolean(notificationSettings.sms) : false;
+        const pushNotifications = typeof notificationSettings === 'object' && notificationSettings !== null && 'push' in notificationSettings 
+          ? Boolean(notificationSettings.push) : true;
+        const profileVisible = typeof privacySettings === 'object' && privacySettings !== null && 'profile_visible' in privacySettings 
+          ? Boolean(privacySettings.profile_visible) : true;
+        const contactVisible = typeof privacySettings === 'object' && privacySettings !== null && 'contact_visible' in privacySettings 
+          ? Boolean(privacySettings.contact_visible) : false;
+
         form.reset({
           lesson_duration_preference: data.lesson_duration_preference || 60,
           preferred_lesson_time: data.preferred_lesson_time || '',
           communication_preference: data.communication_preference as 'email' | 'phone' | 'text' || 'email',
-          email_notifications: notificationSettings.email ?? true,
-          sms_notifications: notificationSettings.sms ?? false,
-          push_notifications: notificationSettings.push ?? true,
-          profile_visible: privacySettings.profile_visible ?? true,
-          contact_visible: privacySettings.contact_visible ?? false,
+          email_notifications: emailNotifications,
+          sms_notifications: smsNotifications,
+          push_notifications: pushNotifications,
+          profile_visible: profileVisible,
+          contact_visible: contactVisible,
         });
       }
     } catch (error) {
