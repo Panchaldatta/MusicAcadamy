@@ -205,7 +205,7 @@ const Auth = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Music className="h-10 w-10 text-primary-foreground" />
               </div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Welcome to MuseSync</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Welcome to Soundsync</h1>
               <p className="text-muted-foreground">Start your musical journey</p>
             </div>
 

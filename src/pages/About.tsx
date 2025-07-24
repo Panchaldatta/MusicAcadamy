@@ -54,7 +54,7 @@ const About = () => {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-orange-100 border border-orange-200 rounded-full px-6 py-3 mb-8">
               <Music className="h-5 w-5 text-orange-600" />
-              <span className="text-orange-700 font-medium">About MuseSync</span>
+              <span className="text-orange-700 font-medium">About Soundsync</span>
             </div>
             
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
@@ -65,7 +65,7 @@ const About = () => {
             </h1>
             
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              MuseSync connects passionate students with master musicians and acclaimed gurus, 
+              Soundsync connects passionate students with master musicians and acclaimed gurus, 
               making authentic Indian classical music education accessible to learners worldwide.
             </p>
 
@@ -147,7 +147,7 @@ const About = () => {
 
             <Card className="border-orange-200 bg-white/70 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-2xl text-gray-900 mb-4">Why Choose MuseSync?</CardTitle>
+                <CardTitle className="text-2xl text-gray-900 mb-4">Why Choose Soundsync?</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-start gap-3">

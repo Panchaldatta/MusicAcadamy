@@ -89,7 +89,7 @@ const Signup = () => {
       
       toast({
         title: "Account Created!",
-        description: "Welcome to MuseSync! Please check your email to verify your account.",
+        description: "Welcome to Soundsync! Please check your email to verify your account.",
       });
       
       // Navigate to login page
@@ -142,7 +142,7 @@ const Signup = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Music className="h-10 w-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Join MuseSync</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Join Soundsync</h1>
               <p className="text-gray-600">Start your musical journey with expert gurus</p>
             </div>
 

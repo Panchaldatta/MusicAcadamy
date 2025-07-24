@@ -47,7 +47,7 @@ const Footer = () => {
                 <Music className="h-7 w-7 text-white" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
-                MuseSync
+                Soundsync
               </span>
             </Link>
             <p className="text-gray-300 mb-6 leading-relaxed">
@@ -62,7 +62,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3 text-gray-300">
                 <Mail className="h-4 w-4 text-orange-400" />
-                <span>support@musesync.com</span>
+                <span>support@Soundsync.com</span>
               </div>
               <div className="flex items-center gap-3 text-gray-300">
                 <MapPin className="h-4 w-4 text-orange-400" />
@@ -177,7 +177,7 @@ const Footer = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
             <div>
-              © {currentYear} MuseSync. All rights reserved.
+              © {currentYear} Soundsync. All rights reserved.
             </div>
             <div className="flex gap-6">
               <Link to="/contact" className="hover:text-orange-400 transition-colors">

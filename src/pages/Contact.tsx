@@ -76,9 +76,9 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email",
-      details: "support@musesync.com",
+      details: "support@Soundsync.com",
       description: "We'll respond within 24 hours",
-      action: () => window.open("mailto:support@musesync.com")
+      action: () => window.open("mailto:support@Soundsync.com")
     },
     {
       icon: MapPin,
