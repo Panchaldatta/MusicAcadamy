@@ -1,11 +1,12 @@
 
-# SangamGuru - Indian Classical Music Learning Platform
+#soundsync - Indian Classical Music Learning Platform
 
 A modern web application connecting music students with expert Indian classical music teachers (gurus). Built with React, TypeScript, Tailwind CSS, and Supabase.
 
 ## 🎯 Overview
 
-SangamGuru is a comprehensive platform that enables students to discover, connect with, and learn from verified Indian classical music teachers. The application features a Tinder-like swipe interface for teacher discovery, detailed teacher profiles, and a robust filtering system.
+soundsync is a comprehensive platform that enables students to discover, connect with, and learn from verified Indian classical music teachers.
+The application features a Tinder-like swipe interface for teacher discovery, detailed teacher profiles, and a robust filtering system.
 
 ## 🚀 Features
 
@@ -92,30 +93,6 @@ The application follows clean architecture principles:
 - **npm** or **yarn**
 - **Supabase Account**
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd sangamguru
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**
-   - The Supabase configuration is already set up in `src/integrations/supabase/client.ts`
-   - No additional environment variables needed for development
-
-4. **Start development server**
-   ```bash
-   npm run dev
-   ```
-
-5. **Access the application**
-   - Open [http://localhost:5173](http://localhost:5173) in your browser
 
 ## 🗄️ Database Schema
 
@@ -161,25 +138,10 @@ All tables implement Row Level Security policies to ensure data access control:
 ### Service Layer Architecture
 All backend operations are abstracted through service classes:
 
-```typescript
-// Example: TeacherService
-export class TeacherService {
-  static async getAllTeachers(): Promise<Teacher[]>
-  static async getTeachersBySubject(subject: string): Promise<Teacher[]>
-  static async searchTeachers(searchTerm: string): Promise<Teacher[]>
-}
-```
+
 
 ### Custom Hooks
 Business logic is encapsulated in custom hooks:
-
-```typescript
-// Example: useTeacherFilters
-export const useTeacherFilters = (teachers: Teacher[]) => {
-  // Filter and sort logic
-  return { filters, filteredTeachers, updateFilter, clearFilters }
-}
-```
 
 ## 🎨 UI/UX Features
 
@@ -220,12 +182,6 @@ export const useTeacherFilters = (teachers: Teacher[]) => {
 - **Lazy Loading**: Components loaded on demand
 - **Route-based Splitting**: Separate bundles for different pages
 
-## 🚀 Deployment
-
-### Build for Production
-```bash
-npm run build
-```
 
 ### Deployment Options
 1. **Lovable Platform**: Direct deployment from the Lovable interface
@@ -243,12 +199,6 @@ npm run build
 - **Component Testing**: Individual component functionality
 - **Integration Testing**: Service layer and API integration
 - **E2E Testing**: Full user workflow testing
-
-### Running Tests
-```bash
-npm run test        # Run unit tests
-npm run test:e2e    # Run end-to-end tests
-```
 
 ## 🔧 Development Guidelines
 
@@ -318,8 +268,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Tailwind CSS**: For the utility-first CSS framework
 - **React Community**: For the amazing ecosystem and tools
 
----
 
-**Built with ❤️ for the Indian classical music community**
-
-For more information, visit our [website](https://sangamguru.lovable.app) or contact our team.
