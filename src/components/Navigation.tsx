@@ -38,7 +38,7 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Music className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">MuseSync</span>
+            <span className="text-xl font-bold text-foreground">SoundSync</span>
           </Link>
 
           {/* Desktop Navigation */}
