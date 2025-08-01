@@ -1,48 +1,51 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { AuthService, Profile } from '@/services/authService';
 import { useToast } from '@/hooks/use-toast';
-
-interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  role: string | null;
-  avatar_url: string | null;
-  phone: string | null;
-  bio: string | null;
-  is_active: boolean | null;
-  email_verified: boolean | null;
-  google_id: string | null;
-  provider: string | null;
-  date_of_birth: string | null;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  zip_code: string | null;
-  country: string | null;
-  emergency_contact_name: string | null;
-  emergency_contact_phone: string | null;
-  emergency_contact_relationship: string | null;
-  music_experience_level: string | null;
-  learning_goals: string | null;
-  availability: string | null;
-  timezone: string | null;
-  created_at: string | null;
-}
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, firstName: string, lastName: string, role: string) => Promise<{ error: any }>;
+  
+  // Student authentication
+  signUpStudent: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: any }>;
+  
+  // Teacher authentication
+  signUpTeacher: (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string,
+    teacherData?: any
+  ) => Promise<{ error: any }>;
+  
+  // Admin authentication
+  signUpAdmin: (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string,
+    adminCode: string
+  ) => Promise<{ error: any }>;
+  
+  // Universal sign in
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithGoogle: (role?: 'student' | 'teacher') => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  
+  // Role checks
+  isAdmin: boolean;
   isTeacher: boolean;
   isStudent: boolean;
+  
+  // Profile management
+  updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
+  
+  // Admin functions
+  assignRole: (userId: string, role: 'student' | 'teacher' | 'admin') => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -69,7 +72,7 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('🔥 Auth state changed:', event, session?.user?.email);
         
         setSession(session);
@@ -77,32 +80,23 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
         
         if (session?.user) {
           console.log('🔥 User authenticated, fetching profile...');
-          // Fetch user profile with a small delay to ensure the trigger has run
+          // Fetch user profile
           setTimeout(async () => {
-            const { data: profileData, error } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
+            const { profile: profileData, error } = await AuthService.getCurrentProfile();
             
             if (error) {
               console.error('❌ Error fetching profile:', error);
-              // If profile doesn't exist and this is a Google user, the trigger should have created it
-              // Let's retry once more after a longer delay for Google OAuth
+              // Retry for Google OAuth users
               if (session.user.app_metadata?.provider === 'google') {
                 console.log('🔄 Retrying profile fetch for Google user...');
                 setTimeout(async () => {
-                  const { data: retryProfileData, error: retryError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .single();
+                  const { profile: retryProfile, error: retryError } = await AuthService.getCurrentProfile();
                   
                   if (retryError) {
                     console.error('❌ Profile still not found after retry:', retryError);
                   } else {
-                    console.log('✅ Profile found on retry:', retryProfileData);
-                    setProfile(retryProfileData);
+                    console.log('✅ Profile found on retry:', retryProfile);
+                    setProfile(retryProfile);
                   }
                 }, 2000);
               }
@@ -110,7 +104,7 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
               console.log('✅ Profile fetched:', profileData);
               setProfile(profileData);
             }
-          }, 1000); // Increased delay for Google OAuth
+          }, 1000);
         } else {
           console.log('🔥 User signed out, clearing profile');
           setProfile(null);
@@ -129,20 +123,15 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data: profileData, error }) => {
-            if (error) {
-              console.error('❌ Error fetching existing profile:', error);
-            } else {
-              console.log('✅ Existing profile loaded:', profileData);
-              setProfile(profileData);
-            }
-            setLoading(false);
-          });
+        AuthService.getCurrentProfile().then(({ profile: profileData, error }) => {
+          if (error) {
+            console.error('❌ Error fetching existing profile:', error);
+          } else {
+            console.log('✅ Existing profile loaded:', profileData);
+            setProfile(profileData);
+          }
+          setLoading(false);
+        });
       } else {
         setLoading(false);
       }
@@ -151,72 +140,93 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, firstName: string, lastName: string, role: string) => {
-    console.log('🔥 Starting email sign up process for:', email);
-    const redirectUrl = `${window.location.origin}/`;
+  // Student signup
+  const signUpStudent = async (email: string, password: string, firstName: string, lastName: string) => {
+    const { error } = await AuthService.signUpStudent(email, password, firstName, lastName);
     
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          role: role,
-          provider: 'email'
-        }
-      }
-    });
-
     if (error) {
-      console.error('❌ Email sign up error:', error);
-      
-      // Provide more specific error messages
-      let errorMessage = error.message;
-      if (error.message.includes('User already registered')) {
-        errorMessage = 'An account with this email already exists. Please try signing in instead.';
-      } else if (error.message.includes('Password should be at least')) {
-        errorMessage = 'Password must be at least 6 characters long.';
-      } else if (error.message.includes('Unable to validate email address')) {
-        errorMessage = 'Please enter a valid email address.';
-      }
-      
+      console.error('❌ Student sign up error:', error);
       toast({
-        title: "Sign Up Failed",
-        description: errorMessage,
+        title: "Student Sign Up Failed",
+        description: error.message,
         variant: "destructive"
       });
     } else {
-      console.log('✅ Email sign up successful - confirmation email sent');
+      console.log('✅ Student sign up successful');
       toast({
         title: "Check your email",
-        description: "Please check your email for a confirmation link to complete your registration.",
+        description: "Please check your email for a confirmation link to complete your student registration.",
       });
     }
 
     return { error };
   };
 
-  const signIn = async (email: string, password: string) => {
-    console.log('🔥 Starting email sign in process for:', email);
+  // Teacher signup
+  const signUpTeacher = async (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string,
+    teacherData?: any
+  ) => {
+    const { error } = await AuthService.signUpTeacher(email, password, firstName, lastName, teacherData);
     
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
     if (error) {
-      console.error('❌ Email sign in error:', error);
-      
-      // Provide more specific error messages
+      console.error('❌ Teacher sign up error:', error);
+      toast({
+        title: "Teacher Sign Up Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      console.log('✅ Teacher sign up successful');
+      toast({
+        title: "Check your email",
+        description: "Please check your email for a confirmation link to complete your teacher registration.",
+      });
+    }
+
+    return { error };
+  };
+
+  // Admin signup
+  const signUpAdmin = async (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string,
+    adminCode: string
+  ) => {
+    const { error } = await AuthService.signUpAdmin(email, password, firstName, lastName, adminCode);
+    
+    if (error) {
+      console.error('❌ Admin sign up error:', error);
+      toast({
+        title: "Admin Sign Up Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      console.log('✅ Admin sign up successful');
+      toast({
+        title: "Check your email",
+        description: "Please check your email for a confirmation link to complete your admin registration.",
+      });
+    }
+
+    return { error };
+  };
+
+  // Sign in
+  const signIn = async (email: string, password: string) => {
+    const { error } = await AuthService.signIn(email, password);
+    
+    if (error) {
+      console.error('❌ Sign in error:', error);
       let errorMessage = error.message;
       if (error.message.includes('Invalid login credentials')) {
         errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-      } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = 'Please check your email and click the confirmation link before signing in.';
-      } else if (error.message.includes('Too many requests')) {
-        errorMessage = 'Too many login attempts. Please wait a moment before trying again.';
       }
       
       toast({
@@ -225,7 +235,7 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
         variant: "destructive"
       });
     } else {
-      console.log('✅ Email sign in successful');
+      console.log('✅ Sign in successful');
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
@@ -235,46 +245,26 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     return { error };
   };
 
-  const signInWithGoogle = async () => {
-    console.log('🔥 Starting Google sign in...');
-    const redirectUrl = `${window.location.origin}/`;
-    console.log('🔥 Redirect URL:', redirectUrl);
+  // Google sign in
+  const signInWithGoogle = async (role: 'student' | 'teacher' = 'student') => {
+    const { error } = await AuthService.signInWithGoogle(role);
     
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
-    });
-
     if (error) {
       console.error('❌ Google sign in error:', error);
-      
-      // Provide more specific error messages
-      let errorMessage = error.message;
-      if (error.message.includes('provider is not enabled')) {
-        errorMessage = 'Google authentication is not enabled. Please contact support.';
-      }
-      
       toast({
         title: "Google Sign In Failed",
-        description: errorMessage,
+        description: error.message,
         variant: "destructive"
       });
-    } else {
-      console.log('✅ Google sign in initiated successfully');
     }
 
     return { error };
   };
 
+  // Sign out
   const signOut = async () => {
-    console.log('🔥 Starting sign out process...');
-    const { error } = await supabase.auth.signOut();
+    const { error } = await AuthService.signOut();
+    
     if (error) {
       console.error('❌ Sign out error:', error);
       toast({
@@ -294,6 +284,57 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     }
   };
 
+  // Profile update
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user) {
+      return { error: { message: 'User not authenticated' } };
+    }
+
+    const { profile: updatedProfile, error } = await AuthService.updateProfile(user.id, updates);
+    
+    if (error) {
+      console.error('❌ Profile update error:', error);
+      toast({
+        title: "Profile Update Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      console.log('✅ Profile updated successfully');
+      setProfile(updatedProfile);
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been updated successfully.",
+      });
+    }
+
+    return { error };
+  };
+
+  // Admin: Assign role
+  const assignRole = async (userId: string, role: 'student' | 'teacher' | 'admin') => {
+    const { error } = await AuthService.assignUserRole(userId, role);
+    
+    if (error) {
+      console.error('❌ Role assignment error:', error);
+      toast({
+        title: "Role Assignment Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      console.log('✅ Role assigned successfully');
+      toast({
+        title: "Role Assigned",
+        description: `User role has been updated to ${role}.`,
+      });
+    }
+
+    return { error };
+  };
+
+  // Role checks
+  const isAdmin = profile?.role === 'admin';
   const isTeacher = profile?.role === 'teacher';
   const isStudent = profile?.role === 'student';
 
@@ -302,12 +343,17 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     session,
     profile,
     loading,
-    signUp,
+    signUpStudent,
+    signUpTeacher,
+    signUpAdmin,
     signIn,
     signInWithGoogle,
     signOut,
+    isAdmin,
     isTeacher,
-    isStudent
+    isStudent,
+    updateProfile,
+    assignRole
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
