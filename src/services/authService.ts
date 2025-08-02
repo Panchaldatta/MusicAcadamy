@@ -216,10 +216,22 @@ export class AuthService {
 
   // Admin-only: Assign role to user
   static async assignUserRole(userId: string, role: 'student' | 'teacher' | 'admin'): Promise<{ error: any }> {
-    const { error } = await supabase.rpc('assign_user_role', {
-      user_id: userId,
-      new_role: role
-    });
+    // Verify current user is admin
+    const { data: currentProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', (await supabase.auth.getUser()).data.user?.id)
+      .single();
+
+    if (currentProfile?.role !== 'admin') {
+      return { error: { message: 'Unauthorized: Only admins can assign roles' } };
+    }
+
+    // Update the user's role
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role, updated_at: new Date().toISOString() })
+      .eq('id', userId);
 
     return { error };
   }
@@ -240,12 +252,35 @@ export class AuthService {
       return { teacherId: null, error: { message: 'User not authenticated' } };
     }
 
-    const { data: teacherId, error } = await supabase.rpc('register_teacher', {
-      user_id: user.id,
-      teacher_data: teacherData
-    });
+    // Verify the user is a teacher
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
 
-    return { teacherId, error };
+    if (profile?.role !== 'teacher') {
+      return { teacherId: null, error: { message: 'Unauthorized or user is not a teacher' } };
+    }
+
+    // Create teacher record
+    const { data: teacher, error } = await supabase
+      .from('teachers')
+      .insert({
+        id: user.id,
+        name: teacherData.name,
+        subject: teacherData.subject,
+        experience: teacherData.experience,
+        location: teacherData.location,
+        price: teacherData.price || 50,
+        specialties: teacherData.specialties || [],
+        languages: teacherData.languages || ['English'],
+        verified: false
+      })
+      .select('id')
+      .single();
+
+    return { teacherId: teacher?.id || null, error };
   }
 
   // Check user permissions
