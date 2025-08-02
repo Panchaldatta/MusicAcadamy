@@ -40,19 +40,19 @@ const MusicStats = () => {
   }
 
   return (
-    <div className="py-16 bg-white">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+    <div className="py-12 sm:py-16 bg-white">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {stats.map((stat) => {
             const IconComponent = iconMap[stat.label.toLowerCase() as keyof typeof iconMap] || Users;
             
             return (
               <div key={stat.id} className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <IconComponent className="h-8 w-8 text-orange-600" />
+                <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <IconComponent className="h-6 sm:h-8 w-6 sm:w-8 text-orange-600" />
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</h3>
-                <p className="text-gray-600 capitalize">{stat.label}</p>
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">{stat.value}</h3>
+                <p className="text-gray-600 capitalize text-sm sm:text-base">{stat.label}</p>
               </div>
             );
           })}

@@ -86,7 +86,7 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
   if (filteredClassrooms.length === 0) {
     return (
       <>
-        <div className="max-w-sm mx-auto mb-6">
+        <div className="w-full max-w-md mx-auto mb-4 sm:mb-6 px-4 sm:px-0">
           <SearchFilters
             keywordInput={keywordInput}
             setKeywordInput={setKeywordInput}
@@ -115,7 +115,7 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
   }
 
   return (
-    <div className="max-w-sm mx-auto space-y-6">
+    <div className="w-full max-w-md mx-auto space-y-4 sm:space-y-6 px-4 sm:px-0">
       <SearchFilters
         keywordInput={keywordInput}
         setKeywordInput={setKeywordInput}

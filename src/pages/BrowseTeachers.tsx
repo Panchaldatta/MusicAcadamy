@@ -123,45 +123,45 @@ const BrowseTeachers = () => {
     <>
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-20">
-        <div className="container mx-auto px-6 py-8">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {/* Enhanced Header */}
-          <div className="text-center mb-16 relative animate-fade-in-down">
+          <div className="text-center mb-12 sm:mb-16 relative animate-fade-in-down">
             <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-400/20 rounded-3xl blur-3xl"></div>
             <div className="relative">
-              <div className="flex justify-center mb-6">
-                <div className="p-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-scale-in">
-                  <Sparkles className="h-12 w-12 text-white" />
+              <div className="flex justify-center mb-4 sm:mb-6">
+                <div className="p-3 sm:p-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-scale-in">
+                  <Sparkles className="h-8 sm:h-12 w-8 sm:w-12 text-white" />
                 </div>
               </div>
-              <h1 className="text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent px-4">
                 Find Your Perfect Music Teacher
               </h1>
-              <p className="text-gray-600 text-xl max-w-4xl mx-auto leading-relaxed mb-8">
+              <p className="text-gray-600 text-base sm:text-lg lg:text-xl max-w-4xl mx-auto leading-relaxed mb-6 sm:mb-8 px-4">
                 Connect with expert gurus and master Indian classical music. Our verified teachers offer personalized lessons tailored to your learning style and musical goals.
               </p>
               
               {/* Stats */}
-              <div className="flex justify-center gap-8 mb-8 animate-fade-in-up">
+              <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 mb-6 sm:mb-8 animate-fade-in-up px-4">
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                    <span className="text-2xl font-bold text-gray-900">{teachers.length}+</span>
+                    <Star className="h-4 sm:h-5 w-4 sm:w-5 text-yellow-400 fill-current" />
+                    <span className="text-xl sm:text-2xl font-bold text-gray-900">{teachers.length}+</span>
                   </div>
-                  <p className="text-gray-600">Expert Teachers</p>
+                  <p className="text-gray-600 text-sm sm:text-base">Expert Teachers</p>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <TrendingUp className="h-5 w-5 text-green-500" />
-                    <span className="text-2xl font-bold text-gray-900">98%</span>
+                    <TrendingUp className="h-4 sm:h-5 w-4 sm:w-5 text-green-500" />
+                    <span className="text-xl sm:text-2xl font-bold text-gray-900">98%</span>
                   </div>
-                  <p className="text-gray-600">Success Rate</p>
+                  <p className="text-gray-600 text-sm sm:text-base">Success Rate</p>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Sparkles className="h-5 w-5 text-purple-500" />
-                    <span className="text-2xl font-bold text-gray-900">5000+</span>
+                    <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-purple-500" />
+                    <span className="text-xl sm:text-2xl font-bold text-gray-900">5000+</span>
                   </div>
-                  <p className="text-gray-600">Happy Students</p>
+                  <p className="text-gray-600 text-sm sm:text-base">Happy Students</p>
                 </div>
               </div>
             </div>
