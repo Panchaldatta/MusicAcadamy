@@ -588,6 +588,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_user_role: {
+        Args: { user_id: string; new_role: string }
+        Returns: undefined
+      }
       get_user_role: {
         Args: { user_id?: string }
         Returns: string
@@ -599,6 +603,10 @@ export type Database = {
       is_teacher: {
         Args: { user_id?: string }
         Returns: boolean
+      }
+      register_teacher: {
+        Args: { user_id: string; teacher_data: Json }
+        Returns: string
       }
     }
     Enums: {

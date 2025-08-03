@@ -19,6 +19,9 @@ import ClassroomSwipeHistoryPage from "./pages/ClassroomSwipeHistoryPage";
 import SwipeHistoryPage from "./pages/SwipeHistory";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
+import StudentAuth from "./pages/auth/StudentAuth";
+import TeacherAuth from "./pages/auth/TeacherAuth";
+import AdminAuth from "./pages/auth/AdminAuth";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -48,6 +51,9 @@ function App() {
                 <Route path="/browse-teachers" element={<BrowseTeachers />} />
                 <Route path="/browse-classrooms" element={<BrowseClassrooms />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/student" element={<StudentAuth />} />
+                <Route path="/auth/teacher" element={<TeacherAuth />} />
+                <Route path="/auth/admin" element={<AdminAuth />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/swipe-history" element={<SwipeHistoryPage />} />
                 <Route path="/classroom-swipe-history" element={<ClassroomSwipeHistoryPage />} />

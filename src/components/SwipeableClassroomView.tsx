@@ -7,6 +7,7 @@ import SearchFilters from './classroom/SearchFilters';
 import StackedClassroomCards from './classroom/StackedClassroomCards';
 import SwipeProgress from './classroom/SwipeProgress';
 import EmptyState from './classroom/EmptyState';
+import EnrollmentDialog from './EnrollmentDialog';
 import type { Database } from "@/integrations/supabase/types";
 
 type Classroom = Database['public']['Tables']['classrooms']['Row'];
@@ -21,6 +22,8 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
   const [showFilters, setShowFilters] = useState(false);
   const [priceFilter, setPriceFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [levelFilter, setLevelFilter] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');
+  const [selectedClassroom, setSelectedClassroom] = useState<Classroom | null>(null);
+  const [showEnrollmentDialog, setShowEnrollmentDialog] = useState(false);
   const { toast } = useToast();
   
   const {
@@ -146,6 +149,44 @@ const SwipeableClassroomView: React.FC<SwipeableClassroomViewProps> = ({ classro
         passedCount={passedClassrooms.length}
         onResetFilters={resetAllFilters}
         hasActiveFilters={hasActiveFilters}
+      />
+
+      {/* Show enrollment button for liked classes */}
+      {likedClassrooms.length > 0 && (
+        <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+          <h3 className="font-semibold text-green-800 mb-2">
+            You have {likedClassrooms.length} liked class{likedClassrooms.length !== 1 ? 'es' : ''}!
+          </h3>
+          <p className="text-green-700 text-sm mb-3">
+            Ready to enroll in your favorite classes?
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {likedClassrooms.slice(0, 3).map((classroom, index) => (
+              <button
+                key={classroom.id}
+                onClick={() => {
+                  setSelectedClassroom(classroom);
+                  setShowEnrollmentDialog(true);
+                }}
+                className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors"
+              >
+                Enroll in {classroom.name}
+              </button>
+            ))}
+            {likedClassrooms.length > 3 && (
+              <span className="text-green-600 text-sm px-3 py-1">
+                +{likedClassrooms.length - 3} more
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Enrollment Dialog */}
+      <EnrollmentDialog
+        isOpen={showEnrollmentDialog}
+        onClose={() => setShowEnrollmentDialog(false)}
+        classroom={selectedClassroom}
       />
     </div>
   );

@@ -44,9 +44,17 @@ export const useClassroomSwipes = () => {
     setLikedClassrooms(prev => [...prev, classroom]);
     
     toast({
-      title: "Classroom Liked!",
-      description: `You liked "${classroom.name}". Great choice!`,
+      title: "Classroom Liked! 💖",
+      description: `You liked "${classroom.name}". Ready to enroll for ₹${classroom.price}?`,
     });
+    
+    // Show enrollment option after a brief delay
+    setTimeout(() => {
+      toast({
+        title: "💡 Enrollment Available",
+        description: `You can now enroll in "${classroom.name}" for ₹${classroom.price}. Contact us to proceed!`,
+      });
+    }, 2000);
   };
 
   const getSwipedClassroomIds = () => {

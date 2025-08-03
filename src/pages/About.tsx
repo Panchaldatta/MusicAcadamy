@@ -70,12 +70,21 @@ const About = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white"
+                onClick={() => window.location.href = '/browse-teachers'}
+              >
                 Find a Guru
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-orange-600 text-orange-600 hover:bg-orange-50">
-                Watch Demo
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                onClick={() => window.location.href = '/browse-classrooms'}
+              >
+                Browse Classes
               </Button>
             </div>
           </div>
@@ -185,11 +194,20 @@ const About = () => {
                 Join thousands of students learning authentic Indian classical music with expert gurus
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-orange-600 hover:bg-gray-100"
+                  onClick={() => window.location.href = '/browse-teachers'}
+                >
                   Find Your Guru
                 </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                  Start Free Trial
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white/10"
+                  onClick={() => window.location.href = '/contact'}
+                >
+                  Contact Us
                 </Button>
               </div>
             </CardContent>

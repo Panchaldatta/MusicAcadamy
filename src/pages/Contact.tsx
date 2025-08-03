@@ -240,10 +240,28 @@ const Contact = () => {
                     <CardTitle className="text-xl text-gray-900">Response Time</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 mb-4">
                       We typically respond to all inquiries within 24 hours. For urgent matters, 
                       please call us directly at +91 98765 43210.
                     </p>
+                    <div className="flex flex-col gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => window.location.href = '/browse-teachers'}
+                      >
+                        Browse Teachers
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => window.location.href = '/browse-classrooms'}
+                      >
+                        Browse Classes
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
