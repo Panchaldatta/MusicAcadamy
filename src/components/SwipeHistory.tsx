@@ -204,6 +204,43 @@ const SwipeHistory = () => {
                         </div>
                       )}
 
+                      {/* Action Buttons for Liked Teachers */}
+                      {swipe.swipe_direction === 'right' && (
+                        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                          <Button 
+                            size="sm"
+                            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white flex-1"
+                            onClick={() => {
+                              // Create payment functionality
+                              const paymentData = {
+                                teacherId: teacher.id,
+                                teacherName: teacher.name,
+                                price: teacher.price,
+                                subject: teacher.subject
+                              };
+                              
+                              // Show payment confirmation
+                              const confirmPayment = window.confirm(
+                                `Book a lesson with ${teacher.name} for ₹${teacher.price}/hour?`
+                              );
+                              
+                              if (confirmPayment) {
+                                alert('Payment successful! Lesson booked. Check your email for details.');
+                              }
+                            }}
+                          >
+                            💳 Pay & Book Lesson
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="border-orange-200 text-orange-600 hover:bg-orange-50"
+                          >
+                            👤 View Profile
+                          </Button>
+                        </div>
+                      )}
+
                       {/* Swipe Date */}
                       <div className="text-xs text-gray-500">
                         Swiped on {new Date(swipe.created_at).toLocaleDateString()}

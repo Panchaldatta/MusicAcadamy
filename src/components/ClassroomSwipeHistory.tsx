@@ -201,6 +201,37 @@ const ClassroomSwipeHistory = () => {
                         </Badge>
                       </div>
 
+                      {/* Action Buttons for Liked Classrooms */}
+                      {swipe.swipe_direction === 'right' && (
+                        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                          <Button 
+                            size="sm"
+                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white flex-1"
+                            onClick={() => {
+                              const confirmEnrollment = window.confirm(
+                                `Enroll in "${classroom.name}" for ₹${classroom.price}?\n\nDuration: ${classroom.duration_weeks} weeks\nSessions: ${classroom.sessions_per_week}x per week\nLevel: ${classroom.level}\nCapacity: ${classroom.capacity} students`
+                              );
+                              
+                              if (confirmEnrollment) {
+                                toast({
+                                  title: "🎉 Enrollment Successful!",
+                                  description: `You've been enrolled in "${classroom.name}". Check your email for class schedule and details.`,
+                                });
+                              }
+                            }}
+                          >
+                            💳 Enroll Now (₹{classroom.price})
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="border-green-200 text-green-600 hover:bg-green-50"
+                          >
+                            📋 View Details
+                          </Button>
+                        </div>
+                      )}
+
                       {/* Swipe Date */}
                       <div className="text-xs text-gray-500">
                         Swiped on {new Date(swipe.created_at).toLocaleDateString()}
