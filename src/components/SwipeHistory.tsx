@@ -5,10 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, X, Star, MapPin, Clock, Award, User } from "lucide-react";
 import { useSwipedTeachers } from "@/hooks/useUserSwipes";
 import { useState } from "react";
+import LikedTeachersSection from "./LikedTeachersSection";
 
 const SwipeHistory = () => {
   const [filter, setFilter] = useState<'all' | 'left' | 'right'>('all');
-  const { data: swipedTeachers, isLoading, error } = useSwipedTeachers(filter === 'all' ? undefined : filter);
+  const { data: swipedTeachers, isLoading, error, refetch } = useSwipedTeachers(filter === 'all' ? undefined : filter);
 
   console.log('SwipeHistory - swipedTeachers:', swipedTeachers);
   console.log('SwipeHistory - isLoading:', isLoading);
@@ -20,6 +21,17 @@ const SwipeHistory = () => {
     all: allSwipes?.length || 0,
     right: allSwipes?.filter(s => s.swipe_direction === 'right').length || 0,
     left: allSwipes?.filter(s => s.swipe_direction === 'left').length || 0,
+  };
+
+  // Prepare liked teachers data for the new component
+  const likedTeachers = swipedTeachers?.filter(s => s.swipe_direction === 'right').map(swipe => ({
+    id: swipe.id,
+    teacher: swipe.teachers,
+    created_at: swipe.created_at
+  })) || [];
+
+  const handlePaymentComplete = () => {
+    refetch();
   };
 
   if (isLoading) {
@@ -204,42 +216,7 @@ const SwipeHistory = () => {
                         </div>
                       )}
 
-                      {/* Action Buttons for Liked Teachers */}
-                      {swipe.swipe_direction === 'right' && (
-                        <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                          <Button 
-                            size="sm"
-                            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white flex-1"
-                            onClick={() => {
-                              // Create payment functionality
-                              const paymentData = {
-                                teacherId: teacher.id,
-                                teacherName: teacher.name,
-                                price: teacher.price,
-                                subject: teacher.subject
-                              };
-                              
-                              // Show payment confirmation
-                              const confirmPayment = window.confirm(
-                                `Book a lesson with ${teacher.name} for ₹${teacher.price}/hour?`
-                              );
-                              
-                              if (confirmPayment) {
-                                alert('Payment successful! Lesson booked. Check your email for details.');
-                              }
-                            }}
-                          >
-                            💳 Pay & Book Lesson
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="border-orange-200 text-orange-600 hover:bg-orange-50"
-                          >
-                            👤 View Profile
-                          </Button>
-                        </div>
-                      )}
+                      {/* Removed inline action buttons - now handled by LikedTeachersSection */}
 
                       {/* Swipe Date */}
                       <div className="text-xs text-gray-500">
@@ -252,6 +229,14 @@ const SwipeHistory = () => {
             );
           })}
         </div>
+      )}
+
+      {/* Show liked teachers section when viewing all or right swipes */}
+      {(filter === 'all' || filter === 'right') && (
+        <LikedTeachersSection 
+          likedTeachers={likedTeachers}
+          onPaymentComplete={handlePaymentComplete}
+        />
       )}
     </div>
   );

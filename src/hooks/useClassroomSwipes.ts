@@ -26,11 +26,6 @@ export const useClassroomSwipes = () => {
     
     setSwipeHistory(prev => [...prev, record]);
     setPassedClassrooms(prev => [...prev, classroom]);
-    
-    toast({
-      title: "Classroom Passed",
-      description: `You passed on "${classroom.name}"`,
-    });
   };
 
   const handleSwipeRight = (classroom: Classroom) => {
@@ -45,16 +40,8 @@ export const useClassroomSwipes = () => {
     
     toast({
       title: "Classroom Liked! 💖",
-      description: `You liked "${classroom.name}". Ready to enroll for ₹${classroom.price}?`,
+      description: `You liked "${classroom.name}". Check the liked section below to enroll!`,
     });
-    
-    // Show enrollment option after a brief delay
-    setTimeout(() => {
-      toast({
-        title: "💡 Enrollment Available",
-        description: `You can now enroll in "${classroom.name}" for ₹${classroom.price}. Contact us to proceed!`,
-      });
-    }, 2000);
   };
 
   const getSwipedClassroomIds = () => {
