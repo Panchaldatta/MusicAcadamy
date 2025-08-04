@@ -4,7 +4,6 @@ project_id = "jzdolobncemqdqazgwoq"
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://lovable.dev"]
 
 [auth.external.google]
 enabled = true

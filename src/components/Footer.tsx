@@ -62,11 +62,11 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3 text-gray-300">
                 <Mail className="h-4 w-4 text-orange-400" />
-                <span>support@Soundsync.com</span>
+                <span>support@Soundsync.studio</span>
               </div>
               <div className="flex items-center gap-3 text-gray-300">
                 <MapPin className="h-4 w-4 text-orange-400" />
-                <span>Mumbai, Maharashtra</span>
+                <span>Pune, Maharashtra</span>
               </div>
             </div>
           </div>
