@@ -18,6 +18,7 @@ const Navigation = () => {
     { name: "Home", href: "/" },
     { name: "Browse Classrooms", href: "/browse-classrooms" },
     { name: "Browse Teachers", href: "/browse-teachers" },
+    { name: "Gov Exam Roadmap", href: "/gov-exam-roadmap" },
     { name: "Classroom History", href: "/classroom-swipe-history" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },

@@ -221,6 +221,51 @@ export type Database = {
         }
         Relationships: []
       }
+      gov_exam_roadmaps: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          difficulty_level: string
+          duration_months: number
+          exam_name: string
+          id: string
+          is_active: boolean
+          milestones: Json | null
+          resources: Json | null
+          syllabus: Json | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          difficulty_level?: string
+          duration_months?: number
+          exam_name: string
+          id?: string
+          is_active?: boolean
+          milestones?: Json | null
+          resources?: Json | null
+          syllabus?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          difficulty_level?: string
+          duration_months?: number
+          exam_name?: string
+          id?: string
+          is_active?: boolean
+          milestones?: Json | null
+          resources?: Json | null
+          syllabus?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lesson_bookings: {
         Row: {
           created_at: string
@@ -550,6 +595,44 @@ export type Database = {
           verified?: boolean | null
         }
         Relationships: []
+      }
+      user_roadmap_progress: {
+        Row: {
+          completed_milestones: Json | null
+          current_milestone: number
+          id: string
+          last_updated: string
+          roadmap_id: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_milestones?: Json | null
+          current_milestone?: number
+          id?: string
+          last_updated?: string
+          roadmap_id: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_milestones?: Json | null
+          current_milestone?: number
+          id?: string
+          last_updated?: string
+          roadmap_id?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roadmap_progress_roadmap_id_fkey"
+            columns: ["roadmap_id"]
+            isOneToOne: false
+            referencedRelation: "gov_exam_roadmaps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_swipes: {
         Row: {

@@ -12,6 +12,7 @@ export const ROUTES = {
   BROWSE_TEACHERS: '/browse-teachers',
   TEACHER_DASHBOARD: '/teacher-dashboard',
   SWIPE_HISTORY: '/swipe-history',
+  GOV_EXAM_ROADMAP: '/gov-exam-roadmap',
 } as const;
 
 export const FILTER_OPTIONS = {

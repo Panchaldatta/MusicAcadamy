@@ -16,6 +16,7 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherDashboardAdmin from "./pages/TeacherDashboardAdmin";
 import StudentDashboard from "./pages/StudentDashboard";
 import ClassroomSwipeHistoryPage from "./pages/ClassroomSwipeHistoryPage";
+import GovExamRoadmap from "./pages/GovExamRoadmap";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
 import StudentAuth from "./pages/auth/StudentAuth";
@@ -55,6 +56,14 @@ function App() {
                 <Route path="/auth/admin" element={<AdminAuth />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/classroom-swipe-history" element={<ClassroomSwipeHistoryPage />} />
+                <Route 
+                  path="/gov-exam-roadmap" 
+                  element={
+                    <ProtectedRoute>
+                      <GovExamRoadmap />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="/teacher-dashboard"
                   element={
