@@ -16,7 +16,6 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherDashboardAdmin from "./pages/TeacherDashboardAdmin";
 import StudentDashboard from "./pages/StudentDashboard";
 import ClassroomSwipeHistoryPage from "./pages/ClassroomSwipeHistoryPage";
-import SwipeHistoryPage from "./pages/SwipeHistory";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
 import StudentAuth from "./pages/auth/StudentAuth";
@@ -55,7 +54,6 @@ function App() {
                 <Route path="/auth/teacher" element={<TeacherAuth />} />
                 <Route path="/auth/admin" element={<AdminAuth />} />
                 <Route path="/signup" element={<Signup />} />
-                <Route path="/swipe-history" element={<SwipeHistoryPage />} />
                 <Route path="/classroom-swipe-history" element={<ClassroomSwipeHistoryPage />} />
                 <Route
                   path="/teacher-dashboard"

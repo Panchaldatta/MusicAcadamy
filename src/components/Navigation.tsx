@@ -18,7 +18,7 @@ const Navigation = () => {
     { name: "Home", href: "/" },
     { name: "Browse Classrooms", href: "/browse-classrooms" },
     { name: "Browse Teachers", href: "/browse-teachers" },
-    { name: "Swipe History", href: "/swipe-history" },
+    { name: "Classroom History", href: "/classroom-swipe-history" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
@@ -52,7 +52,7 @@ const Navigation = () => {
                         to={item.href}
                         className="px-3 py-2 text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-2"
                       >
-                        {item.name === "Swipe History" && <Heart className="h-4 w-4" />}
+                        {item.name === "Classroom History" && <Heart className="h-4 w-4" />}
                         {item.name}
                       </Link>
                     </NavigationMenuLink>
@@ -133,7 +133,7 @@ const Navigation = () => {
                       onClick={() => setIsOpen(false)}
                       className="px-4 py-2 text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-2"
                     >
-                      {item.name === "Swipe History" && <Heart className="h-4 w-4" />}
+                      {item.name === "Classroom History" && <Heart className="h-4 w-4" />}
                       {item.name}
                     </Link>
                   ))}
