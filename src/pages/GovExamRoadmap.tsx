@@ -128,10 +128,10 @@ const GovExamRoadmapPage = () => {
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight">Government Exam Roadmaps</h1>
+            <h1 className="text-4xl font-bold tracking-tight">Music Education Exam Roadmaps</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Structured preparation plans for major government examinations. 
-              Track your progress and follow expert-curated study paths.
+              Structured preparation plans for music education and certification examinations. 
+              Track your progress and follow expert-curated study paths for music careers.
             </p>
           </div>
 
@@ -173,10 +173,10 @@ const GovExamRoadmapPage = () => {
 
           {/* Filter Categories */}
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">All Categories</Badge>
-            <Badge variant="outline">Civil Services</Badge>
-            <Badge variant="outline">Banking</Badge>
-            <Badge variant="outline">Staff Selection Commission</Badge>
+            <Badge variant="secondary">All Music Exams</Badge>
+            <Badge variant="outline">Music Teacher Certification</Badge>
+            <Badge variant="outline">Music Theory Exams</Badge>
+            <Badge variant="outline">Performance Assessments</Badge>
           </div>
 
           {/* Roadmaps Grid */}

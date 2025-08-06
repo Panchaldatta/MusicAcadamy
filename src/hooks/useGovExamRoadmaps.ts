@@ -39,6 +39,7 @@ export const useGovExamRoadmaps = () => {
         .from('gov_exam_roadmaps')
         .select('*')
         .eq('is_active', true)
+        .ilike('category', '%music%')
         .order('exam_name');
 
       if (error) throw error;
