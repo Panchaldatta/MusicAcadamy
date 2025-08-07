@@ -22,6 +22,7 @@ import Signup from "./pages/Signup";
 import StudentAuth from "./pages/auth/StudentAuth";
 import TeacherAuth from "./pages/auth/TeacherAuth";
 import AdminAuth from "./pages/auth/AdminAuth";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -55,6 +56,7 @@ function App() {
                 <Route path="/auth/teacher" element={<TeacherAuth />} />
                 <Route path="/auth/admin" element={<AdminAuth />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/classroom-swipe-history" element={<ClassroomSwipeHistoryPage />} />
                 <Route 
                   path="/gov-exam-roadmap" 
