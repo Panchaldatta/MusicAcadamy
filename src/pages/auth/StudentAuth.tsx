@@ -33,7 +33,9 @@ const StudentAuth = () => {
     lastName: "",
     email: "",
     password: "",
+    age: "",
     confirmPassword: ""
+
   });
 
   useEffect(() => {
@@ -142,7 +144,7 @@ const StudentAuth = () => {
         signUpData.email,
         signUpData.password,
         signUpData.firstName,
-        signUpData.lastName
+        signUpData.age
       );
       
       if (!error) {
@@ -151,6 +153,7 @@ const StudentAuth = () => {
           firstName: "",
           lastName: "",
           email: "",
+          age: "",
           password: "",
           confirmPassword: ""
         });
@@ -359,6 +362,19 @@ const StudentAuth = () => {
                             value={signUpData.email}
                             onChange={(e) => setSignUpData({...signUpData, email: e.target.value})}
                             placeholder="your@email.com"
+                            required
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="course" className="flex items-center gap-2">
+                            Age
+                          </Label>
+                          <Input
+                            id="age"
+                            value={signUpData.age}
+                            onChange={(e) => setSignUpData({...signUpData, age: e.target.value})}
+                            placeholder="Enter your age"
                             required
                             className="mt-1"
                           />

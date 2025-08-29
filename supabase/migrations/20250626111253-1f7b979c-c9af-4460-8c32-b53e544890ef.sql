@@ -164,9 +164,10 @@ INSERT INTO public.site_stats (label, value, display_order) VALUES
 ('Cities in India', '50+', 4);
 
 -- Insert sample teachers data with Indian names and locations
+
 INSERT INTO public.teachers (name, subject, rating, reviews, price, experience, location, image_url, specialties, verified, response_time, languages) VALUES
 ('Pandit Ravi Sharma', 'Tabla & Percussion', 4.9, 127, 800, '15 years', 'Mumbai, Maharashtra', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', ARRAY['Classical', 'Folk', 'Fusion'], true, '< 30 min', ARRAY['Hindi', 'English']),
-('Ustad Asha Bhosle', 'Classical Vocals & Hindustani', 5.0, 200, 1200, '20 years', 'Delhi, NCR', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', ARRAY['Hindustani', 'Bhajan', 'Ghazal'], true, '< 15 min', ARRAY['Hindi', 'Urdu', 'English']),
+('Asha Bhosle', 'Classical Vocals & Hindustani', 5.0, 200, 1200, '20 years', 'Delhi, NCR', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', ARRAY['Hindustani', 'Bhajan', 'Ghazal'], true, '< 15 min', ARRAY['Hindi', 'Urdu', 'English']),
 ('Maestro Vikram Singh', 'Sitar & String Instruments', 4.8, 156, 1000, '18 years', 'Jaipur, Rajasthan', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', ARRAY['Classical', 'Ragas', 'Folk'], true, '< 1 hour', ARRAY['Hindi', 'Rajasthani', 'English']),
 ('Guru Priya Nair', 'Harmonium & Devotional Music', 4.9, 89, 600, '12 years', 'Kochi, Kerala', 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face', ARRAY['Devotional', 'Classical', 'Bhajan'], true, '< 2 hours', ARRAY['Malayalam', 'Tamil', 'Hindi', 'English']);
 

@@ -221,7 +221,7 @@ const TeacherSettingsTab = () => {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Security Settings */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 hover:border-white/30 hover:shadow-xl hover:shadow-white/10 transition-all duration-300 group">
+        {/* <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 hover:border-white/30 hover:shadow-xl hover:shadow-white/10 transition-all duration-300 group">
           <CardHeader>
             <CardTitle className="text-white flex items-center group-hover:text-purple-200 transition-colors">
               <Shield className="h-5 w-5 mr-2 text-purple-400 group-hover:scale-110 transition-transform duration-200" />
@@ -268,10 +268,10 @@ const TeacherSettingsTab = () => {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Account Settings */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 hover:border-white/30 hover:shadow-xl hover:shadow-white/10 transition-all duration-300 group">
+        {/* <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 hover:border-white/30 hover:shadow-xl hover:shadow-white/10 transition-all duration-300 group">
           <CardHeader>
             <CardTitle className="text-white flex items-center group-hover:text-purple-200 transition-colors">
               <CreditCard className="h-5 w-5 mr-2 text-purple-400 group-hover:scale-110 transition-transform duration-200" />
@@ -321,7 +321,7 @@ const TeacherSettingsTab = () => {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
