@@ -3,21 +3,17 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Navigation from '@/components/Navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Trophy, Settings, Calendar } from 'lucide-react';
+import { User, BookOpen, Settings } from 'lucide-react';
 import StudentProfileForm from '@/components/student/StudentProfileForm';
-import StudentAchievements from '@/components/student/StudentAchievements';
-import StudentPreferences from '@/components/student/StudentPreferences';
 import StudentHeader from '@/components/student/dashboard/StudentHeader';
 import StudentStatsGrid from '@/components/student/dashboard/StudentStatsGrid';
-import StudentProfileSummary from '@/components/student/dashboard/StudentProfileSummary';
 import StudentQuickActions from '@/components/student/dashboard/StudentQuickActions';
-import StudentProgressCard from '@/components/student/dashboard/StudentProgressCard';
 import LoadingState from '@/components/common/LoadingState';
-import { useStudentAchievements } from '@/hooks/useStudentAchievements';
+import MyClassrooms from '@/components/StudentDashboard/MyClassrooms';
+import MyBookings from '@/components/StudentDashboard/MyBookings';
 
 const StudentDashboard = () => {
   const { profile, loading } = useAuth();
-  const { achievementsCount } = useStudentAchievements();
   const [activeTab, setActiveTab] = useState('overview');
 
   if (loading) {
@@ -51,7 +47,7 @@ const StudentDashboard = () => {
 
           {/* Main Content */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-card border border-border shadow-sm">
+            <TabsList className="grid w-full grid-cols-3 h-12 p-1 bg-card border border-border shadow-sm">
               <TabsTrigger 
                 value="overview" 
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
@@ -60,57 +56,40 @@ const StudentDashboard = () => {
                 <span className="hidden sm:inline">Overview</span>
               </TabsTrigger>
               <TabsTrigger 
+                value="classrooms" 
+                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">My Classes</span>
+              </TabsTrigger>
+              <TabsTrigger 
                 value="profile" 
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
               >
                 <Settings className="h-4 w-4" />
                 <span className="hidden sm:inline">Profile</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="achievements" 
-                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-              >
-                <Trophy className="h-4 w-4" />
-                <span className="hidden sm:inline">Achievements</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="preferences" 
-                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-              >
-                <Calendar className="h-4 w-4" />
-                <span className="hidden sm:inline">Preferences</span>
-              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-8 mt-8">
               {/* Stats Grid */}
-              <StudentStatsGrid profile={profile} achievementsCount={achievementsCount} />
+              <StudentStatsGrid profile={profile} />
 
-              {/* Main Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column - Profile Summary */}
-                <div className="lg:col-span-1">
-                  <StudentProfileSummary profile={profile} />
-                </div>
-
-                {/* Right Column - Quick Actions & Progress */}
-                <div className="lg:col-span-2 space-y-8">
-                  <StudentQuickActions onTabChange={setActiveTab} />
-                  <StudentProgressCard profile={profile} />
-                </div>
+              {/* Quick Actions */}
+              <StudentQuickActions onTabChange={setActiveTab} />
+              
+              {/* Recent Activity */}
+              <div className="grid gap-8">
+                <MyBookings />
               </div>
+            </TabsContent>
+
+            <TabsContent value="classrooms" className="mt-8">
+              <MyClassrooms />
             </TabsContent>
 
             <TabsContent value="profile" className="mt-8">
               <StudentProfileForm />
-            </TabsContent>
-
-            <TabsContent value="achievements" className="mt-8">
-              <StudentAchievements />
-            </TabsContent>
-
-            <TabsContent value="preferences" className="mt-8">
-              <StudentPreferences />
             </TabsContent>
           </Tabs>
         </div>

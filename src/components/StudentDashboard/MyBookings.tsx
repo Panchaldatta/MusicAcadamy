@@ -4,27 +4,55 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, User, Video, MessageCircle, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface Booking {
+interface LessonBooking {
   id: string;
   lesson_date: string;
   lesson_duration: number;
   price: number;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   notes?: string;
   teachers: {
     name: string;
     subject: string;
-    image_url?: string;
   };
 }
 
-interface MyBookingsProps {
-  bookings: Booking[];
-}
-
-const MyBookings: React.FC<MyBookingsProps> = ({ bookings }) => {
+const MyBookings: React.FC = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Fetch student's lesson bookings
+  const { data: bookings = [], isLoading } = useQuery({
+    queryKey: ['student-bookings', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('lesson_bookings')
+        .select(`
+          id,
+          lesson_date,
+          lesson_duration,
+          price,
+          status,
+          notes,
+          teachers (
+            name,
+            subject
+          )
+        `)
+        .eq('student_id', user.id)
+        .order('lesson_date', { ascending: false });
+
+      if (error) throw error;
+      return (data || []) as LessonBooking[];
+    },
+    enabled: !!user?.id,
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,19 +64,33 @@ const MyBookings: React.FC<MyBookingsProps> = ({ bookings }) => {
     }
   };
 
-  const handleJoinLesson = (booking: Booking) => {
+  const handleJoinLesson = (booking: LessonBooking) => {
     toast({
       title: "Video Call",
       description: "Opening video call room...",
     });
   };
 
-  const handleMessageTeacher = (booking: Booking) => {
+  const handleMessageTeacher = (booking: LessonBooking) => {
     toast({
       title: "Message Sent",
       description: `Message sent to ${booking.teachers.name}`,
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="animate-pulse">
+          <div className="h-6 bg-muted rounded w-1/4 mb-4"></div>
+          <div className="space-y-3">
+            <div className="h-32 bg-muted rounded"></div>
+            <div className="h-32 bg-muted rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const upcomingBookings = bookings.filter(b => 
     b.status === 'confirmed' && new Date(b.lesson_date) > new Date()

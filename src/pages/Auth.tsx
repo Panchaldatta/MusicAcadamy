@@ -21,7 +21,7 @@ const Auth = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signUpStudent, signInWithGoogle, user } = useAuth();
+  const { signIn, signUpStudent, signUpTeacher, signInWithGoogle, user } = useAuth();
   const { toast } = useToast();
 
   const [signInData, setSignInData] = useState({
@@ -35,7 +35,8 @@ const Auth = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "student"
+    role: "student",
+    age: ""
   });
 
   useEffect(() => {
@@ -101,6 +102,15 @@ const Auth = () => {
       return false;
     }
 
+    if (!signUpData.age.trim() || parseInt(signUpData.age) < 13 || parseInt(signUpData.age) > 100) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid age between 13 and 100",
+        variant: "destructive"
+      });
+      return false;
+    }
+
     return true;
   };
 
@@ -147,7 +157,8 @@ const Auth = () => {
     console.log('🔥 Attempting email sign up for:', signUpData.email);
 
     try {
-      const { error } = await signUpStudent(
+      const signUpMethod = signUpData.role === 'teacher' ? signUpTeacher : signUpStudent;
+      const { error } = await signUpMethod(
         signUpData.email,
         signUpData.password,
         signUpData.firstName,
@@ -169,7 +180,8 @@ const Auth = () => {
           email: "",
           password: "",
           confirmPassword: "",
-          role: "student"
+          role: "student",
+          age: ""
         });
       } else {
         console.error('❌ Email sign up failed:', error);
@@ -385,17 +397,33 @@ const Auth = () => {
                           />
                         </div>
                         
-                        <div>
-                          <Label htmlFor="role">I am a</Label>
-                          <Select value={signUpData.role} onValueChange={(value) => setSignUpData({...signUpData, role: value})}>
-                            <SelectTrigger className="mt-1">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="student">Student</SelectItem>
-                              <SelectItem value="teacher">Teacher</SelectItem>
-                            </SelectContent>
-                          </Select>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="age">Age</Label>
+                            <Input
+                              id="age"
+                              type="number"
+                              value={signUpData.age}
+                              onChange={(e) => setSignUpData({...signUpData, age: e.target.value})}
+                              placeholder="25"
+                              required
+                              min="13"
+                              max="100"
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="role">I am a</Label>
+                            <Select value={signUpData.role} onValueChange={(value) => setSignUpData({...signUpData, role: value})}>
+                              <SelectTrigger className="mt-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="student">Student</SelectItem>
+                                <SelectItem value="teacher">Teacher</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                         
                         <div>

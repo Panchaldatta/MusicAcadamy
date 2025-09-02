@@ -127,11 +127,20 @@ All tables implement Row Level Security policies to ensure data access control:
 ## 🔐 Authentication
 
 - **Provider**: Supabase Auth
-- **Methods**: Email/Password
+- **Methods**: Email/Password, Google OAuth
 - **Features**: 
   - User registration and login
   - Profile management
   - Role-based access control
+  - Teacher and Student registration flows
+
+### Admin Credentials
+For testing the admin dashboard, use the following credentials:
+- **Email**: admin@soundsync.com
+- **Password**: AdminPass123!
+- **Role**: Admin
+
+*Note: These are test credentials for development purposes only.*
 
 ## 📱 API Integration
 
