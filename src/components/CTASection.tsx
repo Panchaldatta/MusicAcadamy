@@ -35,7 +35,7 @@ const CTASection = () => {
               size="lg" 
               className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-10 py-6 text-xl rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
-              <Link to="/browse-teachers">
+              <Link to="/auth/student?tab=signup">
                 Find Your Guru Now
                 <ArrowRight className="ml-3 h-6 w-6" />
               </Link>

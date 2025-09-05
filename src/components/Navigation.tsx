@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, profile, signOut, isTeacher, isStudent } = useAuth();
+  const { user, profile, signOut, isTeacher, isStudent, isAdmin } = useAuth();
 
   const navigationItems = [
     { name: "Home", href: "/" },
@@ -77,6 +77,11 @@ const Navigation = () => {
                     Dashboard
                   </Button>
                 )}
+                {isAdmin && (
+                  <Button variant="ghost" onClick={() => navigate('/teacher-dashboard-admin')}>
+                    Admin Dashboard
+                  </Button>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -107,12 +112,39 @@ const Navigation = () => {
               </>
             ) : (
               <>
-                <Button variant="ghost" onClick={() => navigate('/auth')}>
-                  Sign In
-                </Button>
-                <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                  Get Started
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost">
+                      Sign In
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => navigate('/auth/student')}>
+                      Sign In as Student
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/auth/teacher')}>
+                      Sign In as Teacher
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/auth/admin')}>
+                      Admin Portal
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                      Get Started
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => navigate('/auth/student?tab=signup')}>
+                      Join as Student
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/auth/teacher?tab=signup')}>
+                      Become a Teacher
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             )}
           </div>
@@ -166,6 +198,18 @@ const Navigation = () => {
                             Student Dashboard
                           </Button>
                         )}
+                        {isAdmin && (
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              navigate('/teacher-dashboard-admin');
+                              setIsOpen(false);
+                            }}
+                          >
+                            Admin Dashboard
+                          </Button>
+                        )}
                         <div className="flex items-center gap-3 mb-3 p-2">
                           <Avatar className="h-8 w-8">
                             <AvatarImage src={profile?.avatar_url || ""} alt={profile?.first_name || ""} />
@@ -202,25 +246,60 @@ const Navigation = () => {
                       </>
                     ) : (
                       <>
-                        <Button 
-                          variant="ghost" 
-                          className="w-full justify-start"
-                          onClick={() => {
-                            navigate('/auth');
-                            setIsOpen(false);
-                          }}
-                        >
-                          Sign In
-                        </Button>
-                        <Button 
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                          onClick={() => {
-                            navigate('/auth');
-                            setIsOpen(false);
-                          }}
-                        >
-                          Get Started
-                        </Button>
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-muted-foreground px-2">Sign In</p>
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              navigate('/auth/student');
+                              setIsOpen(false);
+                            }}
+                          >
+                            As Student
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              navigate('/auth/teacher');
+                              setIsOpen(false);
+                            }}
+                          >
+                            As Teacher
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-start"
+                            onClick={() => {
+                              navigate('/auth/admin');
+                              setIsOpen(false);
+                            }}
+                          >
+                            Admin Portal
+                          </Button>
+                        </div>
+                        <div className="space-y-2 pt-2">
+                          <p className="text-sm font-medium text-muted-foreground px-2">Get Started</p>
+                          <Button 
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => {
+                              navigate('/auth/student?tab=signup');
+                              setIsOpen(false);
+                            }}
+                          >
+                            Join as Student
+                          </Button>
+                          <Button 
+                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => {
+                              navigate('/auth/teacher?tab=signup');
+                              setIsOpen(false);
+                            }}
+                          >
+                            Become a Teacher
+                          </Button>
+                        </div>
                       </>
                     )}
                   </div>

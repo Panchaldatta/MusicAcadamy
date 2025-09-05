@@ -12,30 +12,37 @@ interface StudentStatsGridProps {
 }
 
 const StudentStatsGrid = ({ profile }: StudentStatsGridProps) => {
+  // Calculate real learning data based on profile
+  const joinDate = new Date(profile.created_at);
+  const now = new Date();
+  const daysSinceJoin = Math.floor((now.getTime() - joinDate.getTime()) / (1000 * 60 * 60 * 24));
+  const totalHours = Math.max(daysSinceJoin * 0.5, 0); // Estimate 30 min learning per day
+  const progress = Math.min((daysSinceJoin / 30) * 100, 100); // Progress based on 30-day cycle
+
   const stats = [
     {
-      title: "Active Classes",
-      value: "3",
+      title: "Learning Days",
+      value: Math.max(daysSinceJoin, 0).toString(),
       icon: BookOpen,
       color: "text-blue-600",
       bgColor: "from-blue-50 to-blue-100",
-      description: "Enrolled courses"
+      description: "Days since joining"
     },
     {
       title: "Hours Learned",
-      value: "24",
+      value: totalHours.toFixed(0),
       icon: Clock,
       color: "text-green-600", 
       bgColor: "from-green-50 to-green-100",
-      description: "Total learning time"
+      description: "Estimated learning time"
     },
     {
       title: "Progress",
-      value: "78%",
+      value: `${progress.toFixed(0)}%`,
       icon: TrendingUp,
       color: "text-purple-600",
       bgColor: "from-purple-50 to-purple-100",
-      description: "Overall completion"
+      description: "Learning journey"
     }
   ];
 

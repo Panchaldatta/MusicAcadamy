@@ -62,7 +62,7 @@ const HeroSection = () => {
                 size="lg" 
                 className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group"
               >
-                <Link to="/browse-teachers">
+                <Link to="/auth/student?tab=signup">
                   Start Learning Today
                   <ArrowRight className="ml-2 h-4 sm:h-5 w-4 sm:w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>

@@ -10,9 +10,16 @@ type ClassroomSwipeInsert = Database['public']['Tables']['classroom_swipes']['In
 
 export class ClassroomService {
   static async getTeacherClassrooms(): Promise<Classroom[]> {
+    const { data: user } = await supabase.auth.getUser();
+    
+    if (!user.user) {
+      throw new Error('User must be authenticated to view classrooms');
+    }
+
     const { data, error } = await supabase
       .from('classrooms')
       .select('*')
+      .eq('teacher_id', user.user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
