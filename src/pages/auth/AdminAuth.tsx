@@ -38,7 +38,7 @@ const AdminAuth = () => {
 
   useEffect(() => {
     if (user) {
-      const from = location.state?.from?.pathname || "/teacher-dashboard-admin";
+      const from = location.state?.from?.pathname || "/admin-dashboard";
       navigate(from, { replace: true });
     }
   }, [user, navigate, location]);
@@ -128,7 +128,7 @@ const AdminAuth = () => {
       const { error } = await signIn(signInData.email, signInData.password);
       
       if (!error) {
-        const from = location.state?.from?.pathname || "/teacher-dashboard-admin";
+        const from = location.state?.from?.pathname || "/admin-dashboard";
         navigate(from, { replace: true });
       }
     } catch (err) {

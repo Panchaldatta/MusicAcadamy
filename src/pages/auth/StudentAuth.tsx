@@ -144,7 +144,7 @@ const StudentAuth = () => {
         signUpData.email,
         signUpData.password,
         signUpData.firstName,
-        signUpData.age
+        signUpData.lastName
       );
       
       if (!error) {

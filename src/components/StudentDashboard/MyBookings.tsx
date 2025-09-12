@@ -48,10 +48,15 @@ const MyBookings: React.FC = () => {
         .eq('student_id', user.id)
         .order('lesson_date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching lesson bookings:', error);
+        return [];
+      }
       return (data || []) as LessonBooking[];
     },
     enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 60 * 1000, // Refetch every minute for real-time updates
   });
 
   const getStatusColor = (status: string) => {

@@ -78,7 +78,7 @@ const Navigation = () => {
                   </Button>
                 )}
                 {isAdmin && (
-                  <Button variant="ghost" onClick={() => navigate('/teacher-dashboard-admin')}>
+                  <Button variant="ghost" onClick={() => navigate('/admin-dashboard')}>
                     Admin Dashboard
                   </Button>
                 )}
@@ -203,7 +203,7 @@ const Navigation = () => {
                             variant="ghost" 
                             className="w-full justify-start"
                             onClick={() => {
-                              navigate('/teacher-dashboard-admin');
+                              navigate('/admin-dashboard');
                               setIsOpen(false);
                             }}
                           >

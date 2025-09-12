@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { BookOpen, Calendar, Clock, User, Video, Download, Users, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useStudentEnrollments } from "@/hooks/useEnrollments";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ClassroomEnrollment {
@@ -33,40 +33,8 @@ const MyClassrooms: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Fetch student's classroom enrollments
-  const { data: enrollments = [], isLoading } = useQuery({
-    queryKey: ['student-enrollments', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('classroom_enrollments')
-        .select(`
-          id,
-          enrolled_at,
-          status,
-          classrooms (
-            id,
-            name,
-            subject,
-            duration_weeks,
-            session_duration_minutes,
-            sessions_per_week,
-            level,
-            image_url,
-            description,
-            teachers (
-              name
-            )
-          )
-        `)
-        .eq('student_id', user.id)
-        .order('enrolled_at', { ascending: false });
-
-      return data || [];
-    },
-    enabled: !!user?.id,
-  });
+  // Fetch student's classroom enrollments using custom hook
+  const { data: enrollments = [], isLoading } = useStudentEnrollments();
 
   const calculateProgress = (enrolledAt: string, durationWeeks: number) => {
     const startDate = new Date(enrolledAt);

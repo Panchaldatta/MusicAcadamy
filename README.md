@@ -135,11 +135,12 @@ All tables implement Row Level Security policies to ensure data access control:
   - Teacher and Student registration flows
 
 ### Admin Credentials
-For testing the admin dashboard, you can create an admin account using the admin registration form:
-- **Admin Code**: ADMIN_INVITE_2024
-- **Dashboard URL**: `/teacher-dashboard-admin`
+For testing the admin dashboard, use these pre-configured credentials:
+- **Email**: admin@soundsync.com
+- **Password**: Admin@123
+- **Dashboard URL**: `/admin-dashboard`
 
-*Note: The admin code is required for security. Use the admin registration form with this code to create your admin account.*
+*Alternatively, you can create a new admin account using the admin registration form with invitation code: ADMIN_INVITE_2024*
 
 ## 📱 API Integration
 
