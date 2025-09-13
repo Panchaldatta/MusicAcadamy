@@ -24,7 +24,8 @@ export interface ClassroomEnrollment {
 
 export class EnrollmentService {
   static async getStudentEnrollments(studentId: string): Promise<ClassroomEnrollment[]> {
-    const { data, error } = await supabase
+    // First get the enrollments with classroom data
+    const { data: enrollments, error: enrollmentError } = await supabase
       .from('classroom_enrollments')
       .select(`
         id,
@@ -42,20 +43,49 @@ export class EnrollmentService {
           level,
           image_url,
           description,
-          teachers (
-            name
-          )
+          teacher_id
         )
       `)
       .eq('student_id', studentId)
       .order('enrolled_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching enrollments:', error);
-      throw error;
+    if (enrollmentError) {
+      console.error('Error fetching enrollments:', enrollmentError);
+      throw enrollmentError;
     }
 
-    return (data || []) as unknown as ClassroomEnrollment[];
+    if (!enrollments || enrollments.length === 0) {
+      return [];
+    }
+
+    // Get unique teacher IDs
+    const teacherIds = [...new Set(enrollments
+      .map(e => e.classrooms?.teacher_id)
+      .filter(Boolean)
+    )];
+
+    // Fetch teacher data separately
+    const { data: teachers, error: teacherError } = await supabase
+      .from('teachers')
+      .select('id, name')
+      .in('id', teacherIds);
+
+    if (teacherError) {
+      console.error('Error fetching teachers:', teacherError);
+      // Continue without teacher data rather than failing completely
+    }
+
+    // Create a teacher lookup map
+    const teacherMap = new Map(teachers?.map(t => [t.id, t]) || []);
+
+    // Combine the data
+    return enrollments.map(enrollment => ({
+      ...enrollment,
+      classrooms: enrollment.classrooms ? {
+        ...enrollment.classrooms,
+        teachers: teacherMap.get(enrollment.classrooms.teacher_id) || { name: 'Unknown Teacher' }
+      } : undefined
+    })) as unknown as ClassroomEnrollment[];
   }
 
   static async enrollStudent(studentId: string, classroomId: string): Promise<ClassroomEnrollment> {
