@@ -2,6 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, BookOpen, DollarSign, Star } from "lucide-react";
+import { useTeacherAnalytics } from "@/hooks/useTeacherAnalytics";
 
 interface DashboardStatsProps {
   totalStudents: number;
@@ -11,6 +12,8 @@ interface DashboardStatsProps {
 }
 
 const DashboardStats = ({ totalStudents, totalClassrooms, totalRevenue, averageRating }: DashboardStatsProps) => {
+  const { data: analytics } = useTeacherAnalytics();
+
   const stats = [
     {
       title: "Total Students",
@@ -18,7 +21,7 @@ const DashboardStats = ({ totalStudents, totalClassrooms, totalRevenue, averageR
       icon: Users,
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
-      change: "+12%"
+      change: analytics?.studentGrowth || "0%"
     },
     {
       title: "Active Classrooms",
@@ -26,7 +29,7 @@ const DashboardStats = ({ totalStudents, totalClassrooms, totalRevenue, averageR
       icon: BookOpen,
       color: "text-green-500",
       bgColor: "bg-green-500/10",
-      change: `${totalClassrooms > 0 ? '+' : ''}${totalClassrooms} total`
+      change: `${totalClassrooms} total`
     },
     {
       title: "Monthly Revenue",
@@ -34,7 +37,7 @@ const DashboardStats = ({ totalStudents, totalClassrooms, totalRevenue, averageR
       icon: DollarSign,
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
-      change: "+18%"
+      change: analytics?.revenueGrowth || "0%"
     },
     {
       title: "Average Rating",
@@ -42,7 +45,7 @@ const DashboardStats = ({ totalStudents, totalClassrooms, totalRevenue, averageR
       icon: Star,
       color: "text-yellow-500",
       bgColor: "bg-yellow-500/10",
-      change: "+0.2"
+      change: analytics?.ratingChange || "0"
     }
   ];
 

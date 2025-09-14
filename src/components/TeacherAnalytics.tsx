@@ -1,26 +1,32 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { useTeacherAnalytics } from "@/hooks/useTeacherAnalytics";
 
 interface TeacherAnalyticsProps {
   detailed?: boolean;
 }
 
 const TeacherAnalytics = ({ detailed = false }: TeacherAnalyticsProps) => {
-  const monthlyData = [
-    { month: 'Jan', students: 20, revenue: 800 },
-    { month: 'Feb', students: 25, revenue: 1000 },
-    { month: 'Mar', students: 30, revenue: 1200 },
-    { month: 'Apr', students: 35, revenue: 1400 },
-    { month: 'May', students: 32, revenue: 1280 },
-    { month: 'Jun', students: 38, revenue: 1520 }
-  ];
+  const { data: analytics, isLoading } = useTeacherAnalytics();
 
-  const subjectData = [
-    { name: 'Piano', students: 15, color: '#8B5CF6' },
-    { name: 'Guitar', students: 8, color: '#10B981' },
-    { name: 'Vocals', students: 12, color: '#F59E0B' }
-  ];
+  if (isLoading) {
+    return (
+      <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <CardHeader>
+          <CardTitle className="text-white">Loading Analytics...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse">
+            <div className="h-48 bg-white/20 rounded"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const monthlyData = analytics?.monthlyData || [];
+  const subjectData = analytics?.subjectData || [];
 
   if (!detailed) {
     return (

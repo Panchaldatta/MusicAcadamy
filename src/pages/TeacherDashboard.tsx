@@ -15,10 +15,12 @@ import DashboardStats from "@/components/DashboardStats";
 import DashboardTabs from "@/components/DashboardTabs";
 import ClassScheduleManager from "@/components/ClassScheduleManager";
 import { useTeacherClassrooms, useDeleteClassroom, useUpdateClassroom } from "@/hooks/useClassrooms";
+import { useTeacherAnalytics } from "@/hooks/useTeacherAnalytics";
 import { useToast } from "@/hooks/use-toast";
 
 const TeacherDashboard = () => {
   const { data: classrooms = [], isLoading, error } = useTeacherClassrooms();
+  const { data: analytics } = useTeacherAnalytics();
   const deleteClassroom = useDeleteClassroom();
   const updateClassroom = useUpdateClassroom();
   const { toast } = useToast();
@@ -81,17 +83,10 @@ const TeacherDashboard = () => {
     }
   };
 
-  // Calculate real stats from classroom data
-  const totalStudents = classrooms.reduce((sum, classroom) => {
-    return sum + Math.floor(classroom.capacity * 0.6); // Estimate 60% capacity
-  }, 0);
-
-  const totalRevenue = classrooms.reduce((sum, classroom) => {
-    const estimatedStudents = Math.floor(classroom.capacity * 0.6);
-    return sum + (estimatedStudents * classroom.price * (classroom.sessions_per_week || 2) * 4);
-  }, 0);
-
-  const averageRating = 4.8; // This would come from actual ratings in a real app
+  // Use real analytics data
+  const totalStudents = analytics?.totalStudents || 0;
+  const totalRevenue = analytics?.totalRevenue || 0;
+  const averageRating = analytics?.averageRating || 0;
 
   if (error) {
     return (

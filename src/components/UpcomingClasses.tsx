@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Users, Video, Calendar, MapPin } from "lucide-react";
 import { format, isToday, isTomorrow } from "date-fns";
+import { useUpcomingTeacherSessions } from "@/hooks/useTeacherSessions";
 
 interface ClassSession {
   id: string;
@@ -29,41 +30,30 @@ const UpcomingClasses = ({
   onJoinClass,
   onViewDetails 
 }: UpcomingClassesProps) => {
-  // Mock data if no sessions provided
-  const defaultSessions: ClassSession[] = [
-    {
-      id: "1",
-      classroomName: "Piano Fundamentals",
-      date: new Date(),
-      startTime: "16:00",
-      endTime: "17:00",
-      students: 15,
-      location: "Online",
-      status: "starting_soon"
-    },
-    {
-      id: "2",
-      classroomName: "Guitar Masterclass",
-      date: new Date(),
-      startTime: "18:00",
-      endTime: "19:30",
-      students: 8,
-      location: "Studio A",
-      status: "scheduled"
-    },
-    {
-      id: "3",
-      classroomName: "Vocal Training Basics",
-      date: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
-      startTime: "17:30",
-      endTime: "18:30",
-      students: 12,
-      location: "Online",
-      status: "scheduled"
-    }
-  ];
+  const { data: teacherSessions = [], isLoading } = useUpcomingTeacherSessions();
 
-  const upcomingClasses = sessions || defaultSessions;
+  // Convert teacher sessions to ClassSession format
+  const convertedSessions: ClassSession[] = teacherSessions.map(session => {
+    const sessionDate = new Date(session.session_date);
+    // Check if session is starting within the next hour
+    const now = new Date();
+    const sessionDateTime = new Date(`${session.session_date}T${session.start_time}`);
+    const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+    const isStartingSoon = sessionDateTime <= oneHourFromNow && sessionDateTime > now;
+
+    return {
+      id: session.id,
+      classroomName: session.classroom?.name || 'Unnamed Classroom',
+      date: sessionDate,
+      startTime: session.start_time,
+      endTime: session.end_time,
+      students: session.student_count,
+      location: session.location,
+      status: isStartingSoon ? 'starting_soon' : session.status as any
+    };
+  });
+
+  const upcomingClasses = sessions || convertedSessions;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -92,6 +82,29 @@ const UpcomingClasses = ({
     if (isTomorrow(date)) return "Tomorrow";
     return format(date, "EEEE");
   };
+
+  if (isLoading && !sessions) {
+    return (
+      <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center">
+            <Calendar className="h-5 w-5 mr-2 text-green-400" />
+            Upcoming Classes
+          </CardTitle>
+          <CardDescription className="text-gray-300">
+            Loading your upcoming classes...
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-16 bg-white/10 rounded-lg"></div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!detailed) {
     return (
