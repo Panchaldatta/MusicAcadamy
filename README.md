@@ -167,18 +167,227 @@ Business logic is encapsulated in custom hooks:
 - **Loading States**: Consistent loading indicators
 - **Error States**: User-friendly error handling
 
-## 🔍 Search & Filtering
+## 🔍 Browse Teachers Functionality
 
-### Advanced Filtering System
-- **Subject-based filtering**: Filter by music instruments/subjects
-- **Location filtering**: Find teachers in specific cities
-- **Price range filtering**: Budget-based teacher selection
-- **Rating & experience sorting**: Sort by quality metrics
+The Browse Teachers page (`/browse-teachers`) is a comprehensive teacher discovery system that allows students to search, filter, and book lessons with music teachers. Here's how it works:
 
-### Search Functionality
-- **Full-text search**: Search across teacher names, subjects, and specialties
-- **URL-based search**: Shareable search URLs with parameters
-- **Real-time filtering**: Instant results as users type
+### Architecture Overview
+
+```
+BrowseTeachers (Page Component)
+├── Navigation
+├── FilterBar (Search & Filters)
+├── TeacherGrid
+│   └── TeacherModernCard[] (Individual teacher cards)
+│       └── PaymentDialog (Booking interface)
+└── Footer
+```
+
+### Data Flow & State Management
+
+#### 1. **Data Fetching Layer**
+```typescript
+// Main data hooks
+const { data: teachers, isLoading, error } = useTeachers();
+const { filters, filteredAndSortedTeachers, updateFilter, clearFilters } = useTeacherFilters(teachers);
+```
+
+#### 2. **Teacher Service (`src/services/teacherService.ts`)**
+- **`getAllTeachers()`**: Fetches all teachers from Supabase
+- **`getTeachersBySubject(subject)`**: Filters teachers by music subject
+- **`searchTeachers(searchTerm)`**: Full-text search across names, subjects, and specialties
+
+#### 3. **Filter System (`src/utils/teacherFilters.ts`)**
+The filtering system uses a utility class `TeacherFilterUtils` that processes teachers through multiple criteria:
+
+```typescript
+interface TeacherFilters {
+  searchTerm: string;          // Name/subject/specialty search
+  selectedSubject: string;     // Music instrument filter
+  selectedLocation: string;    // City-based filter
+  priceRange: string;         // Budget range (e.g., "1500-2000")
+  sortBy: string;             // Sort criteria (rating, price, experience)
+}
+```
+
+**Filter Processing:**
+- **Search Matching**: Searches across teacher name, subject, and specialties
+- **Subject Filtering**: Exact match against selected instrument
+- **Location Filtering**: City-based geographical filtering
+- **Price Range Filtering**: Numerical range filtering with support for "above X" ranges
+- **Sorting**: Multi-criteria sorting (rating, price, experience, reviews)
+
+### Component Architecture
+
+#### 1. **FilterBar Component**
+**Location**: `src/components/FilterBar.tsx`
+
+**Features**:
+- **Search Input**: Real-time text search with debouncing
+- **Subject Dropdown**: Pre-defined music subjects (Sitar, Tabla, Vocals, etc.)
+- **Location Dropdown**: Major Indian cities
+- **Price Range Selector**: Budget-based filtering
+- **Sort Options**: Multiple sorting criteria
+- **Active Filters Display**: Visual representation of applied filters
+- **Clear Filters**: Reset all filters functionality
+
+**Responsive Design**:
+- Mobile: Single column layout with full-width inputs
+- Tablet: 2-column grid layout
+- Desktop: 4-column grid for optimal space usage
+
+#### 2. **TeacherGrid Component**
+**Location**: `src/components/TeacherGrid.tsx`
+
+Renders filtered teachers in a responsive grid:
+- **Empty State**: Displays when no teachers match filters
+- **Loading State**: Skeleton loading during data fetch
+- **Teacher Cards**: Individual `TeacherModernCard` components
+
+#### 3. **TeacherModernCard Component**
+**Location**: `src/components/TeacherModernCard.tsx`
+
+**Features**:
+- **Teacher Avatar**: Profile image with fallback to initials
+- **Verification Badge**: Verified teacher indicator
+- **Rating System**: Star rating with review count
+- **Teacher Information**: Subject, location, experience, response time
+- **Pricing**: Per-hour rate display
+- **Action Buttons**: "View Profile" and "Pay & Book"
+- **Hover Effects**: Enhanced interactions with animations
+
+**Responsive Layout**:
+- **Mobile**: Vertical card layout, full-width image
+- **Desktop**: Horizontal layout with side-by-side image and content
+
+### URL Integration & Deep Linking
+
+The Browse Teachers page supports URL-based search parameters for shareable links:
+
+```typescript
+// URL Parameters
+?search=sitar          // Pre-fill search term
+?subject=Tabla         // Pre-select subject filter  
+?location=Mumbai       // Pre-select location filter
+```
+
+**Implementation**:
+```typescript
+const [searchParams] = useSearchParams();
+
+useEffect(() => {
+  const searchParam = searchParams.get('search');
+  const subjectParam = searchParams.get('subject');
+  const locationParam = searchParams.get('location');
+  
+  if (searchParam) updateFilter('searchTerm', searchParam);
+  if (subjectParam) updateFilter('selectedSubject', subjectParam);
+  if (locationParam) updateFilter('selectedLocation', locationParam);
+}, [searchParams, updateFilter]);
+```
+
+### Payment Integration
+
+#### Payment Flow
+1. **Teacher Selection**: User clicks "Pay & Book" on teacher card
+2. **Payment Dialog**: `PaymentDialog` component opens with teacher details
+3. **Stripe Integration**: Secure payment processing via Stripe
+4. **Payment Success**: Redirect to success page with confirmation
+5. **Booking Creation**: Lesson booking record created in database
+
+#### Payment Status Handling
+```typescript
+useEffect(() => {
+  const paymentStatus = searchParams.get('payment');
+  const sessionId = searchParams.get('session_id');
+
+  if (paymentStatus === 'success' && sessionId) {
+    // Verify payment via Supabase Edge Function
+    supabase.functions.invoke('verify-payment', { body: { sessionId } });
+  }
+}, [searchParams]);
+```
+
+### Performance Optimizations
+
+#### 1. **React Query Caching**
+- Teachers data cached with automatic background updates
+- Intelligent cache invalidation
+- Optimistic updates for better UX
+
+#### 2. **Filter Optimization**
+```typescript
+const filteredAndSortedTeachers = useMemo(() => {
+  const filtered = TeacherFilterUtils.filterTeachers(teachers, filters);
+  return TeacherFilterUtils.sortTeachers(filtered, filters.sortBy);
+}, [teachers, filters]);
+```
+
+#### 3. **Lazy Loading**
+- Components loaded on-demand
+- Images lazy-loaded with intersection observer
+- Progressive enhancement for slower connections
+
+### Error Handling & Loading States
+
+#### Loading States
+- **Initial Load**: Full-page skeleton with branded messaging
+- **Filter Changes**: Maintained state during filter updates
+- **Empty Results**: Helpful messaging with filter reset option
+
+#### Error Handling
+- **Network Errors**: Retry mechanism with user feedback
+- **Data Errors**: Graceful degradation with error boundaries
+- **Payment Errors**: Clear error messaging with recovery options
+
+### Accessibility Features
+
+#### Keyboard Navigation
+- Full keyboard support for all interactive elements
+- Proper tab order and focus management
+- Screen reader optimized labels and descriptions
+
+#### Visual Accessibility
+- High contrast color schemes
+- Scalable font sizes
+- Alternative text for all images
+- Loading indicators for screen readers
+
+### Mobile Optimization
+
+#### Touch Interactions
+- Large touch targets (minimum 44px)
+- Swipe gestures for card interactions
+- Pull-to-refresh functionality
+
+#### Performance
+- Optimized images with multiple sizes
+- Efficient bundle splitting
+- Service worker for offline functionality
+
+### Real-time Features
+
+#### Live Updates
+- Teacher availability status updates
+- Real-time pricing changes
+- Instant notification for booking confirmations
+
+#### WebSocket Integration
+```typescript
+// Real-time teacher updates via Supabase
+const channel = supabase
+  .channel('teacher-updates')
+  .on('postgres_changes', 
+    { event: '*', schema: 'public', table: 'teachers' },
+    (payload) => {
+      // Update local teacher data
+      queryClient.invalidateQueries(['teachers']);
+    }
+  )
+  .subscribe();
+```
+
+This comprehensive system provides a smooth, efficient, and user-friendly way for students to discover and connect with music teachers while maintaining high performance and accessibility standards.
 
 ## 📊 Performance Optimizations
 
