@@ -22,7 +22,7 @@ const initialFormData: ClassroomFormData = {
   subject: "",
   schedule: "",
   level: "",
-  price: 25,
+  price: 399, // Default to Standard Package
   capacity: 20,
   prerequisites: "",
   duration_weeks: 12,
