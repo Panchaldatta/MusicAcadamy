@@ -62,8 +62,14 @@ const PaymentSuccess = () => {
             .from('classroom_enrollments')
             .select(`
               *,
-              classrooms!inner(name, subject, duration_weeks, session_duration_minutes, price, teacher_id),
-              classrooms.teachers!inner(name)
+              classrooms!inner(
+                name, 
+                subject, 
+                duration_weeks, 
+                session_duration_minutes, 
+                price, 
+                teacher_id
+              )
             `)
             .eq('status', 'active')
             .order('enrolled_at', { ascending: false })
@@ -71,7 +77,22 @@ const PaymentSuccess = () => {
             .single();
 
           if (!enrollmentError && enrollmentData) {
-            setBookingDetails({ type: 'classroom', data: enrollmentData });
+            // Fetch teacher name separately
+            const { data: teacherData } = await supabase
+              .from('teachers')
+              .select('name')
+              .eq('id', enrollmentData.classrooms.teacher_id)
+              .single();
+            
+            const enrichedData = {
+              ...enrollmentData,
+              classrooms: {
+                ...enrollmentData.classrooms,
+                teachers: { name: teacherData?.name || 'Unknown Teacher' }
+              }
+            };
+            
+            setBookingDetails({ type: 'classroom', data: enrichedData });
           }
         }
 

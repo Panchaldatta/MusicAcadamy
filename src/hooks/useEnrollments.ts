@@ -10,6 +10,9 @@ export const useStudentEnrollments = () => {
     queryKey: ['student-enrollments', user?.id],
     queryFn: () => user?.id ? EnrollmentService.getStudentEnrollments(user.id) : [],
     enabled: !!user?.id,
+    staleTime: 30 * 1000, // 30 seconds - shorter for real-time updates
+    refetchInterval: 60 * 1000, // Refetch every minute
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   });
 };
 

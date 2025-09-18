@@ -75,18 +75,8 @@ serve(async (req) => {
       },
     });
 
-    // Create pending enrollment record
-    const supabaseService = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-
-    await supabaseService.from("classroom_enrollments").insert({
-      student_id: user.id,
-      classroom_id: classroomId,
-      status: "active", // Activate immediately on successful payment intent
-    });
+    // Note: We'll create the enrollment only after payment verification
+    // This prevents creating enrollments for failed payments
 
     console.log("Classroom payment session created:", session.id);
 
