@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { BarChart3, BookOpen, TrendingUp, Calendar, Settings } from "lucide-react";
+import { BarChart3, BookOpen, TrendingUp, Calendar, Settings, Users } from "lucide-react";
 
 interface Tab {
   id: string;
@@ -18,6 +18,7 @@ const DashboardTabs = ({ activeTab, onTabChange }: DashboardTabsProps) => {
     { id: "overview", label: "Overview", icon: BarChart3 },
     { id: "classrooms", label: "Classrooms", icon: BookOpen },
     { id: "analytics", label: "Analytics", icon: TrendingUp },
+    { id: "enrollments", label: "Enrollments", icon: Users },
     { id: "schedule", label: "Schedule", icon: Calendar },
     { id: "settings", label: "Settings", icon: Settings }
   ];

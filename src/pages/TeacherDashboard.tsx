@@ -14,6 +14,7 @@ import TeacherSettingsTab from "@/components/TeacherSettingsTab";
 import DashboardStats from "@/components/DashboardStats";
 import DashboardTabs from "@/components/DashboardTabs";
 import ClassScheduleManager from "@/components/ClassScheduleManager";
+import TeacherEnrollments from "@/components/TeacherEnrollments";
 import { useTeacherClassrooms, useDeleteClassroom, useUpdateClassroom } from "@/hooks/useClassrooms";
 import { useTeacherAnalytics } from "@/hooks/useTeacherAnalytics";
 import { useToast } from "@/hooks/use-toast";
@@ -293,6 +294,13 @@ const TeacherDashboard = () => {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Teaching Analytics</h2>
                 <TeacherAnalytics detailed={true} />
+              </div>
+            )}
+
+            {activeTab === "enrollments" && (
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-6">Student Enrollments</h2>
+                <TeacherEnrollments />
               </div>
             )}
 

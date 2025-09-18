@@ -6,6 +6,7 @@ import { Heart, X, Star, Users, Clock, BookOpen, DollarSign } from "lucide-react
 import { useState, useEffect } from "react";
 import { ClassroomService } from "@/services/classroomService";
 import { useToast } from "@/hooks/use-toast";
+import ClassroomPaymentDialog from "@/components/ClassroomPaymentDialog";
 import type { Database } from "@/integrations/supabase/types";
 
 type ClassroomSwipe = Database['public']['Tables']['classroom_swipes']['Row'] & {
@@ -16,6 +17,7 @@ const ClassroomSwipeHistory = () => {
   const [filter, setFilter] = useState<'all' | 'left' | 'right'>('all');
   const [swipes, setSwipes] = useState<ClassroomSwipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedClassroom, setSelectedClassroom] = useState<Database['public']['Tables']['classrooms']['Row'] | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -207,18 +209,7 @@ const ClassroomSwipeHistory = () => {
                           <Button 
                             size="sm"
                             className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white flex-1"
-                            onClick={() => {
-                              const confirmEnrollment = window.confirm(
-                                `Enroll in "${classroom.name}" for ₹${classroom.price}?\n\nDuration: ${classroom.duration_weeks} weeks\nSessions: ${classroom.sessions_per_week}x per week\nLevel: ${classroom.level}\nCapacity: ${classroom.capacity} students`
-                              );
-                              
-                              if (confirmEnrollment) {
-                                toast({
-                                  title: "🎉 Enrollment Successful!",
-                                  description: `You've been enrolled in "${classroom.name}". Check your email for class schedule and details.`,
-                                });
-                              }
-                            }}
+                            onClick={() => setSelectedClassroom(classroom)}
                           >
                             💳 Enroll Now (₹{classroom.price})
                           </Button>
@@ -243,6 +234,21 @@ const ClassroomSwipeHistory = () => {
             );
           })}
         </div>
+      )}
+
+      {/* Payment Dialog */}
+      {selectedClassroom && (
+        <ClassroomPaymentDialog
+          classroom={selectedClassroom}
+          isOpen={!!selectedClassroom}
+          onClose={() => setSelectedClassroom(null)}
+          onPaymentComplete={() => {
+            toast({
+              title: "Payment Initiated 🚀",
+              description: "Please complete your payment to confirm enrollment.",
+            });
+          }}
+        />
       )}
     </div>
   );
