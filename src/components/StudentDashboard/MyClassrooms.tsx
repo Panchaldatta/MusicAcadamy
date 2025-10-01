@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useStudentEnrollments } from "@/hooks/useEnrollments";
 import { useAuth } from "@/contexts/AuthContext";
+import { format, isFuture, isToday } from "date-fns";
 
 interface ClassroomEnrollment {
   id: string;
@@ -29,12 +30,65 @@ interface ClassroomEnrollment {
   };
 }
 
+interface UpcomingSession {
+  id: string;
+  session_date: string;
+  start_time: string;
+  end_time: string;
+  meet_link?: string;
+  classroom_id: string;
+  classroom_name: string;
+}
+
 const MyClassrooms: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const [upcomingSessions, setUpcomingSessions] = useState<UpcomingSession[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(false);
 
   // Fetch student's classroom enrollments using custom hook
   const { data: enrollments = [], isLoading } = useStudentEnrollments();
+
+  // Fetch upcoming sessions for enrolled classrooms
+  useEffect(() => {
+    const fetchUpcomingSessions = async () => {
+      if (!user || !enrollments || enrollments.length === 0) return;
+
+      setLoadingSessions(true);
+      try {
+        const enrolledClassroomIds = enrollments
+          .filter((e: any) => e.status === 'active')
+          .map((e: any) => e.classroom_id);
+
+        if (enrolledClassroomIds.length === 0) return;
+
+        const { data, error } = await supabase
+          .from('class_sessions')
+          .select('id, session_date, start_time, end_time, meet_link, classroom_id, classrooms(name)')
+          .in('classroom_id', enrolledClassroomIds)
+          .gte('session_date', new Date().toISOString().split('T')[0])
+          .eq('status', 'scheduled')
+          .order('session_date', { ascending: true })
+          .order('start_time', { ascending: true })
+          .limit(10);
+
+        if (error) throw error;
+
+        const sessions = (data || []).map((session: any) => ({
+          ...session,
+          classroom_name: session.classrooms?.name || 'Unknown Classroom'
+        }));
+
+        setUpcomingSessions(sessions);
+      } catch (error) {
+        console.error('Error fetching upcoming sessions:', error);
+      } finally {
+        setLoadingSessions(false);
+      }
+    };
+
+    fetchUpcomingSessions();
+  }, [user, enrollments]);
 
   const calculateProgress = (enrolledAt: string, durationWeeks: number) => {
     const startDate = new Date(enrolledAt);
@@ -52,12 +106,20 @@ const MyClassrooms: React.FC = () => {
     return Math.max(durationWeeks - elapsedWeeks, 0);
   };
 
-  const handleJoinClass = (enrollment: ClassroomEnrollment) => {
-    toast({
-      title: "Joining Class",
-      description: `Opening ${enrollment.classrooms.name} virtual classroom...`,
-    });
-    // In a real app, this would open the virtual classroom or video call
+  const handleJoinClass = (meetLink: string, classroomName: string) => {
+    if (meetLink) {
+      window.open(meetLink, '_blank');
+      toast({
+        title: "Opening Class",
+        description: `Joining ${classroomName}...`,
+      });
+    } else {
+      toast({
+        title: "No Meet Link",
+        description: "The teacher hasn't added a Google Meet link yet.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleAccessMaterials = (enrollment: ClassroomEnrollment) => {
@@ -95,6 +157,68 @@ const MyClassrooms: React.FC = () => {
 
   return (
     <div className="space-y-8">
+      {/* Upcoming Sessions */}
+      {upcomingSessions.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-3">
+              <Video className="h-6 w-6 text-primary" />
+              Upcoming Live Sessions
+            </h2>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              {upcomingSessions.length} Scheduled
+            </Badge>
+          </div>
+
+          <div className="grid gap-4 mb-8">
+            {upcomingSessions.slice(0, 3).map((session) => {
+              const sessionDate = new Date(`${session.session_date}T${session.start_time}`);
+              const isSessionToday = isToday(sessionDate);
+              
+              return (
+                <Card key={session.id} className={`border-l-4 ${isSessionToday ? 'border-l-green-500 bg-green-50/50 dark:bg-green-900/10' : 'border-l-primary'}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className={`w-10 h-10 ${isSessionToday ? 'bg-green-500' : 'bg-primary'} rounded-lg flex items-center justify-center`}>
+                            <Video className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-foreground">{session.classroom_name}</h4>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {format(sessionDate, 'MMM dd, yyyy')}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {session.start_time} - {session.end_time}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {isSessionToday && (
+                          <Badge className="bg-green-500 text-white">Today</Badge>
+                        )}
+                      </div>
+                      <Button
+                        onClick={() => handleJoinClass(session.meet_link || '', session.classroom_name)}
+                        disabled={!session.meet_link}
+                        className="bg-primary hover:bg-primary/90"
+                      >
+                        <Video className="h-4 w-4 mr-2" />
+                        {session.meet_link ? 'Join Class' : 'No Link Yet'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Active Classrooms */}
       <div>
         <div className="flex items-center justify-between mb-6">
@@ -167,14 +291,6 @@ const MyClassrooms: React.FC = () => {
 
                       {/* Action Buttons */}
                       <div className="flex flex-col gap-3">
-                        <Button 
-                          onClick={() => handleJoinClass(enrollment)}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                          size="lg"
-                        >
-                          <Video className="h-4 w-4 mr-2" />
-                          Join Live Class
-                        </Button>
                         <Button 
                           variant="outline"
                           onClick={() => handleAccessMaterials(enrollment)}

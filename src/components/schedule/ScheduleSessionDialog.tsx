@@ -19,6 +19,7 @@ interface ClassSession {
   location: string;
   status: 'scheduled' | 'completed' | 'cancelled';
   notes?: string;
+  meetLink?: string;
 }
 
 interface Classroom {
@@ -54,7 +55,8 @@ const ScheduleSessionDialog = ({
     students: 0,
     location: 'Online',
     status: 'scheduled' as 'scheduled' | 'completed' | 'cancelled',
-    notes: ''
+    notes: '',
+    meetLink: ''
   });
 
   useEffect(() => {
@@ -68,7 +70,8 @@ const ScheduleSessionDialog = ({
         students: session.students,
         location: session.location,
         status: session.status,
-        notes: session.notes || ''
+        notes: session.notes || '',
+        meetLink: session.meetLink || ''
       });
     } else if (selectedDate) {
       setFormData(prev => ({
@@ -81,7 +84,8 @@ const ScheduleSessionDialog = ({
         students: 0,
         location: 'Online',
         status: 'scheduled' as 'scheduled' | 'completed' | 'cancelled',
-        notes: ''
+        notes: '',
+        meetLink: ''
       }));
     }
   }, [session, selectedDate]);
@@ -128,7 +132,8 @@ const ScheduleSessionDialog = ({
       students: formData.students,
       location: formData.location,
       status: formData.status,
-      notes: formData.notes
+      notes: formData.notes,
+      meetLink: formData.meetLink
     });
 
     onOpenChange(false);
@@ -235,6 +240,18 @@ const ScheduleSessionDialog = ({
                 <SelectItem value="cancelled" className="text-white hover:bg-white/10">Cancelled</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="meetLink">Google Meet Link (Optional)</Label>
+            <Input
+              id="meetLink"
+              type="url"
+              value={formData.meetLink}
+              onChange={(e) => setFormData(prev => ({ ...prev, meetLink: e.target.value }))}
+              placeholder="https://meet.google.com/xxx-xxxx-xxx"
+              className="bg-white/10 border-white/20 text-white"
+            />
           </div>
 
           <div>

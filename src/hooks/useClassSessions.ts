@@ -14,6 +14,7 @@ interface ClassSession {
   location: string;
   status: 'scheduled' | 'completed' | 'cancelled';
   notes?: string;
+  meet_link?: string;
   created_at: string;
   updated_at: string;
 }
@@ -27,6 +28,7 @@ interface CreateSessionData {
   location: string;
   status: 'scheduled' | 'completed' | 'cancelled';
   notes?: string;
+  meet_link?: string;
 }
 
 interface UpdateSessionData extends Partial<CreateSessionData> {
@@ -61,7 +63,8 @@ export const useClassSessions = () => {
         students: session.student_count,
         location: session.location,
         status: session.status as 'scheduled' | 'completed' | 'cancelled',
-        notes: session.notes
+        notes: session.notes,
+        meetLink: session.meet_link
       })) || [];
     },
   });

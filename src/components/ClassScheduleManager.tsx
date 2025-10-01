@@ -23,6 +23,7 @@ interface ClassSession {
   location: string;
   status: 'scheduled' | 'completed' | 'cancelled';
   notes?: string;
+  meetLink?: string;
 }
 
 const ClassScheduleManager = () => {
@@ -71,7 +72,8 @@ const ClassScheduleManager = () => {
         student_count: sessionData.students,
         location: sessionData.location,
         status: sessionData.status,
-        notes: sessionData.notes
+        notes: sessionData.notes,
+        meet_link: sessionData.meetLink
       };
 
       if (editingSession) {

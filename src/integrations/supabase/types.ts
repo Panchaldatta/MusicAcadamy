@@ -48,6 +48,7 @@ export type Database = {
           end_time: string
           id: string
           location: string
+          meet_link: string | null
           notes: string | null
           session_date: string
           start_time: string
@@ -62,6 +63,7 @@ export type Database = {
           end_time: string
           id?: string
           location?: string
+          meet_link?: string | null
           notes?: string | null
           session_date: string
           start_time: string
@@ -76,6 +78,7 @@ export type Database = {
           end_time?: string
           id?: string
           location?: string
+          meet_link?: string | null
           notes?: string | null
           session_date?: string
           start_time?: string
