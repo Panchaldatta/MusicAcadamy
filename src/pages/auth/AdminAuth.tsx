@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Lock, Eye, EyeOff, Shield, Key } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Shield } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,8 +32,7 @@ const AdminAuth = () => {
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    adminCode: ""
+    confirmPassword: ""
   });
 
   useEffect(() => {
@@ -99,15 +98,6 @@ const AdminAuth = () => {
       return false;
     }
 
-    if (!signUpData.adminCode.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Admin invitation code is required",
-        variant: "destructive"
-      });
-      return false;
-    }
-
     return true;
   };
 
@@ -151,8 +141,7 @@ const AdminAuth = () => {
         signUpData.email,
         signUpData.password,
         signUpData.firstName,
-        signUpData.lastName,
-        signUpData.adminCode
+        signUpData.lastName
       );
       
       if (!error) {
@@ -162,8 +151,7 @@ const AdminAuth = () => {
           lastName: "",
           email: "",
           password: "",
-          confirmPassword: "",
-          adminCode: ""
+          confirmPassword: ""
         });
       }
     } catch (err) {
@@ -179,19 +167,19 @@ const AdminAuth = () => {
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center pt-20 pb-8">
         <div className="container mx-auto px-6">
           <div className="max-w-md mx-auto">
-            <div className="text-center mb-8">
+              <div className="text-center mb-8">
               <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Shield className="h-10 w-10 text-white" />
               </div>
               <h1 className="text-3xl font-bold text-foreground mb-2">Admin Portal</h1>
-              <p className="text-muted-foreground">Administrative access only</p>
+              <p className="text-muted-foreground">Sign in or register for administrative access</p>
             </div>
 
             <Card className="border border-red-200 bg-card/80 backdrop-blur-sm shadow-lg">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl text-foreground">Admin Access</CardTitle>
                 <CardDescription>
-                  Sign in to your admin account or register with invitation code
+                  Sign in to your admin account or create a new admin account
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -258,15 +246,6 @@ const AdminAuth = () => {
                   
                   <TabsContent value="signup">
                     <div className="space-y-4">
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                        <div className="flex items-center gap-2">
-                          <Key className="h-4 w-4 text-yellow-600" />
-                          <p className="text-sm text-yellow-800">
-                            Admin registration requires a valid invitation code. Contact your system administrator.
-                          </p>
-                        </div>
-                      </div>
-
                       <form onSubmit={handleSignUp} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
@@ -304,22 +283,6 @@ const AdminAuth = () => {
                             value={signUpData.email}
                             onChange={(e) => setSignUpData({...signUpData, email: e.target.value})}
                             placeholder="admin@soundsync.com"
-                            required
-                            className="mt-1"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="admin-code" className="flex items-center gap-2">
-                            <Key className="h-4 w-4" />
-                            Admin Invitation Code
-                          </Label>
-                          <Input
-                            id="admin-code"
-                            type="password"
-                            value={signUpData.adminCode}
-                            onChange={(e) => setSignUpData({...signUpData, adminCode: e.target.value})}
-                            placeholder="Enter invitation code"
                             required
                             className="mt-1"
                           />

@@ -27,8 +27,7 @@ interface AuthContextType {
     email: string, 
     password: string, 
     firstName: string, 
-    lastName: string,
-    adminCode: string
+    lastName: string
   ) => Promise<{ error: any }>;
   
   // Universal sign in
@@ -195,10 +194,9 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     email: string, 
     password: string, 
     firstName: string, 
-    lastName: string,
-    adminCode: string
+    lastName: string
   ) => {
-    const { error } = await AuthService.signUpAdmin(email, password, firstName, lastName, adminCode);
+    const { error } = await AuthService.signUpAdmin(email, password, firstName, lastName);
     
     if (error) {
       console.error('❌ Admin sign up error:', error);

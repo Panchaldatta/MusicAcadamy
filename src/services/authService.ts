@@ -104,23 +104,13 @@ export class AuthService {
     };
   }
 
-  // Admin authentication (requires special invitation)
+  // Admin authentication
   static async signUpAdmin(
     email: string,
     password: string,
     firstName: string,
-    lastName: string,
-    adminCode: string
+    lastName: string
   ): Promise<AuthResponse> {
-    // Verify admin code before proceeding
-    if (adminCode !== 'ADMIN_INVITE_2024') {
-      return {
-        user: null,
-        session: null,
-        error: { message: 'Invalid admin invitation code' }
-      };
-    }
-
     const redirectUrl = `${window.location.origin}/auth/admin?tab=signin`;
     
     const { data, error } = await supabase.auth.signUp({
