@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
+  userRoles: string[];
   loading: boolean;
   
   // Student authentication
@@ -36,6 +37,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   
   // Role checks
+  hasRole: (role: string) => boolean;
   isAdmin: boolean;
   isTeacher: boolean;
   isStudent: boolean;
@@ -63,6 +65,7 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -103,10 +106,23 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
               console.log('✅ Profile fetched:', profileData);
               setProfile(profileData);
             }
+            
+            // Fetch user roles from user_roles table
+            const { data: roles } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id);
+            
+            if (roles) {
+              const roleStrings = roles.map(r => r.role);
+              console.log('✅ Roles fetched:', roleStrings);
+              setUserRoles(roleStrings);
+            }
           }, 1000);
         } else {
           console.log('🔥 User signed out, clearing profile');
           setProfile(null);
+          setUserRoles([]);
         }
         
         setLoading(false);
@@ -129,7 +145,20 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
             console.log('✅ Existing profile loaded:', profileData);
             setProfile(profileData);
           }
-          setLoading(false);
+          
+          // Fetch user roles
+          supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .then(({ data: roles }) => {
+              if (roles) {
+                const roleStrings = roles.map(r => r.role);
+                console.log('✅ Existing roles loaded:', roleStrings);
+                setUserRoles(roleStrings);
+              }
+              setLoading(false);
+            });
         });
       } else {
         setLoading(false);
@@ -275,6 +304,7 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
       setUser(null);
       setSession(null);
       setProfile(null);
+      setUserRoles([]);
       toast({
         title: "Signed out",
         description: "You have been signed out successfully.",
@@ -322,6 +352,16 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
       });
     } else {
       console.log('✅ Role assigned successfully');
+      // Refresh roles after assignment if it's the current user
+      if (user && userId === user.id) {
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId);
+        if (roles) {
+          setUserRoles(roles.map(r => r.role));
+        }
+      }
       toast({
         title: "Role Assigned",
         description: `User role has been updated to ${role}.`,
@@ -332,14 +372,16 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
   };
 
   // Role checks
-  const isAdmin = profile?.role === 'admin';
-  const isTeacher = profile?.role === 'teacher';
-  const isStudent = profile?.role === 'student';
+  const hasRole = (role: string) => userRoles.includes(role);
+  const isAdmin = userRoles.includes('admin');
+  const isTeacher = userRoles.includes('teacher');
+  const isStudent = userRoles.includes('student');
 
   const value = {
     user,
     session,
     profile,
+    userRoles,
     loading,
     signUpStudent,
     signUpTeacher,
@@ -347,6 +389,7 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     signIn,
     signInWithGoogle,
     signOut,
+    hasRole,
     isAdmin,
     isTeacher,
     isStudent,

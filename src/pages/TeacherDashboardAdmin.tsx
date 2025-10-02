@@ -27,11 +27,11 @@ const TeacherDashboardAdmin = () => {
   const [dashboardMetrics, setDashboardMetrics] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
-  const { profile, loading: authLoading } = useAuth();
+  const { isAdmin, loading: authLoading } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!authLoading && profile?.role !== 'admin') {
+    if (!authLoading && !isAdmin) {
       toast({
         title: "Access Denied",
         description: "You don't have permission to access the admin dashboard.",
@@ -40,10 +40,10 @@ const TeacherDashboardAdmin = () => {
       return;
     }
 
-    if (profile?.role === 'admin') {
+    if (isAdmin) {
       loadDashboardData();
     }
-  }, [profile, authLoading, toast]);
+  }, [isAdmin, authLoading, toast]);
 
   const loadDashboardData = async () => {
     try {
@@ -148,7 +148,7 @@ const TeacherDashboardAdmin = () => {
     );
   }
 
-  if (profile?.role !== 'admin') {
+  if (!isAdmin) {
     return (
       <>
         <Navigation />
