@@ -9,7 +9,6 @@ import {
   BookOpen, 
   TrendingUp, 
   Activity, 
-  Calendar, 
   Settings,
   BarChart3,
   RefreshCw,
@@ -21,29 +20,58 @@ import Footer from "@/components/Footer";
 import { AdminService } from "@/services/adminService";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const TeacherDashboardAdmin = () => {
   const [adminStats, setAdminStats] = useState<any[]>([]);
   const [dashboardMetrics, setDashboardMetrics] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
-  const { isAdmin, loading: authLoading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { loading: authLoading } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      toast({
-        title: "Access Denied",
-        description: "You don't have permission to access the admin dashboard.",
-        variant: "destructive"
-      });
-      return;
-    }
+    const checkAdminAndLoad = async () => {
+      if (authLoading) return;
 
-    if (isAdmin) {
-      loadDashboardData();
-    }
-  }, [isAdmin, authLoading, toast]);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsAdmin(false);
+          setLoading(false);
+          return;
+        }
+
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+
+        if (!roleData) {
+          setIsAdmin(false);
+          setLoading(false);
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to access the admin dashboard.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        setIsAdmin(true);
+        await loadDashboardData();
+      } catch (error) {
+        console.error('Error checking admin role:', error);
+        setIsAdmin(false);
+        setLoading(false);
+      }
+    };
+
+    checkAdminAndLoad();
+  }, [authLoading, toast]);
 
   const loadDashboardData = async () => {
     try {

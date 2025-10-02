@@ -174,19 +174,42 @@ export class AuthService {
 
   // Get current user profile
   static async getCurrentProfile(): Promise<{ profile: Profile | null; error: any }> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return { profile: null, error: null };
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        return { profile: null, error: null };
+      }
+
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        return { profile: null, error };
+      }
+
+      // Fetch role from user_roles table
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .order('role', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      // Override profile role with user_roles data
+      if (roleData) {
+        profile.role = roleData.role;
+      }
+
+      return { profile: profile as Profile, error: null };
+    } catch (error) {
+      console.error('Error in getCurrentProfile:', error);
+      return { profile: null, error };
     }
-
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-
-    return { profile: profile as Profile, error };
   }
 
   // Update profile (excluding role)
@@ -275,8 +298,22 @@ export class AuthService {
 
   // Check user permissions
   static async hasRole(role: 'student' | 'teacher' | 'admin'): Promise<boolean> {
-    const { profile } = await this.getCurrentProfile();
-    return profile?.role === role || false;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', role)
+        .maybeSingle();
+
+      return !!roleData;
+    } catch (error) {
+      console.error('Error checking user role:', error);
+      return false;
+    }
   }
 
   static async isAdmin(): Promise<boolean> {
