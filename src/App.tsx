@@ -13,7 +13,7 @@ import Contact from "./pages/Contact";
 import BrowseTeachers from "./pages/BrowseTeachers";
 import BrowseClassrooms from "./pages/BrowseClassrooms";
 import TeacherDashboard from "./pages/TeacherDashboard";
-import TeacherDashboardAdmin from "./pages/TeacherDashboardAdmin";
+import AdminDashboard from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import ClassroomSwipeHistoryPage from "./pages/ClassroomSwipeHistoryPage";
 import GovExamRoadmap from "./pages/GovExamRoadmap";
@@ -86,7 +86,7 @@ function App() {
                   path="/admin-dashboard"
                   element={
                     <ProtectedRoute requireRole="admin">
-                      <TeacherDashboardAdmin />
+                      <AdminDashboard />
                     </ProtectedRoute>
                   }
                 />
