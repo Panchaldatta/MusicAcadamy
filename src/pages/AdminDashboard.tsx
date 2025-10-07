@@ -16,7 +16,11 @@ import {
   UserCheck,
   GraduationCap,
   DollarSign,
-  AlertCircle
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Edit,
+  Trash2
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -30,6 +34,8 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
   const [recentClassrooms, setRecentClassrooms] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [allClassrooms, setAllClassrooms] = useState<any[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,13 +48,20 @@ const AdminDashboard = () => {
       const metrics = await AdminService.getDashboardMetrics();
       setDashboardMetrics(metrics);
 
-      // Fetch recent users
+      // Fetch recent users (for overview)
       const { data: users } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(10);
       setRecentUsers(users || []);
+
+      // Fetch ALL users (for user management tab)
+      const { data: allUsersData } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      setAllUsers(allUsersData || []);
 
       // Fetch recent classrooms with teacher info from profiles
       const { data: classrooms, error: classroomsError } = await supabase
@@ -65,6 +78,21 @@ const AdminDashboard = () => {
       }
       
       setRecentClassrooms(classrooms || []);
+
+      // Fetch ALL classrooms (for classroom management tab)
+      const { data: allClassroomsData, error: allClassroomsError } = await supabase
+        .from('classrooms')
+        .select(`
+          *,
+          teacher:profiles!teacher_id(first_name, last_name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (allClassroomsError) {
+        console.error('Error fetching all classrooms:', allClassroomsError);
+      }
+      
+      setAllClassrooms(allClassroomsData || []);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       toast({
@@ -74,6 +102,86 @@ const AdminDashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleClassroomStatus = async (classroomId: string, currentStatus: string) => {
+    try {
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      const { error } = await supabase
+        .from('classrooms')
+        .update({ status: newStatus })
+        .eq('id', classroomId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Classroom ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`,
+      });
+
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error toggling classroom status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update classroom status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: !currentStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `User ${!currentStatus ? 'activated' : 'deactivated'} successfully`,
+      });
+
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error toggling user status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update user status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteClassroom = async (classroomId: string) => {
+    if (!confirm('Are you sure you want to delete this classroom? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('classrooms')
+        .delete()
+        .eq('id', classroomId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Classroom deleted successfully",
+      });
+
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error deleting classroom:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete classroom",
+        variant: "destructive"
+      });
     }
   };
 
@@ -308,45 +416,68 @@ const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white">User Management</CardTitle>
                 <CardDescription className="text-gray-300">
-                  Manage all platform users
+                  Manage all platform users ({allUsers.length} total)
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-gray-300">Name</TableHead>
-                      <TableHead className="text-gray-300">Email</TableHead>
-                      <TableHead className="text-gray-300">Role</TableHead>
-                      <TableHead className="text-gray-300">Status</TableHead>
-                      <TableHead className="text-gray-300">Joined</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="text-white font-medium">
-                          {user.first_name} {user.last_name}
-                        </TableCell>
-                        <TableCell className="text-gray-300">{user.email}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{user.role}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={user.is_active ? 'default' : 'secondary'}
-                            className={user.is_active ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300'}
-                          >
-                            {user.is_active ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-gray-300">
-                          {new Date(user.created_at).toLocaleDateString()}
-                        </TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-gray-300">Name</TableHead>
+                        <TableHead className="text-gray-300">Email</TableHead>
+                        <TableHead className="text-gray-300">Role</TableHead>
+                        <TableHead className="text-gray-300">Status</TableHead>
+                        <TableHead className="text-gray-300">Joined</TableHead>
+                        <TableHead className="text-gray-300 text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {allUsers.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="text-white font-medium">
+                            {user.first_name} {user.last_name}
+                          </TableCell>
+                          <TableCell className="text-gray-300">{user.email}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{user.role}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant={user.is_active ? 'default' : 'secondary'}
+                              className={user.is_active ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300'}
+                            >
+                              {user.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-gray-300">
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              size="sm"
+                              variant={user.is_active ? "destructive" : "default"}
+                              onClick={() => toggleUserStatus(user.id, user.is_active)}
+                              className="text-xs"
+                            >
+                              {user.is_active ? (
+                                <>
+                                  <XCircle className="h-3 w-3 mr-1" />
+                                  Deactivate
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Activate
+                                </>
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -356,45 +487,84 @@ const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white">Classroom Management</CardTitle>
                 <CardDescription className="text-gray-300">
-                  Monitor and manage all classrooms
+                  Monitor and manage all classrooms ({allClassrooms.length} total)
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-gray-300">Classroom</TableHead>
-                      <TableHead className="text-gray-300">Subject</TableHead>
-                      <TableHead className="text-gray-300">Teacher</TableHead>
-                      <TableHead className="text-gray-300">Status</TableHead>
-                      <TableHead className="text-gray-300">Price</TableHead>
-                      <TableHead className="text-gray-300">Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentClassrooms.map((classroom) => (
-                      <TableRow key={classroom.id}>
-                        <TableCell className="text-white font-medium">{classroom.name}</TableCell>
-                        <TableCell className="text-gray-300">{classroom.subject}</TableCell>
-                        <TableCell className="text-gray-300">
-                          {classroom.teacher ? `${classroom.teacher.first_name} ${classroom.teacher.last_name}` : 'N/A'}
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={classroom.status === 'active' ? 'default' : 'secondary'}
-                            className={classroom.status === 'active' ? 'bg-green-500/20 text-green-300' : ''}
-                          >
-                            {classroom.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-gray-300">${classroom.price}</TableCell>
-                        <TableCell className="text-gray-300">
-                          {new Date(classroom.created_at).toLocaleDateString()}
-                        </TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-gray-300">Classroom</TableHead>
+                        <TableHead className="text-gray-300">Subject</TableHead>
+                        <TableHead className="text-gray-300">Teacher</TableHead>
+                        <TableHead className="text-gray-300">Status</TableHead>
+                        <TableHead className="text-gray-300">Price</TableHead>
+                        <TableHead className="text-gray-300">Level</TableHead>
+                        <TableHead className="text-gray-300">Created</TableHead>
+                        <TableHead className="text-gray-300 text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {allClassrooms.map((classroom) => (
+                        <TableRow key={classroom.id}>
+                          <TableCell className="text-white font-medium">{classroom.name}</TableCell>
+                          <TableCell className="text-gray-300">{classroom.subject}</TableCell>
+                          <TableCell className="text-gray-300">
+                            {classroom.teacher ? `${classroom.teacher.first_name} ${classroom.teacher.last_name}` : 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant={classroom.status === 'active' ? 'default' : 'secondary'}
+                              className={classroom.status === 'active' ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300'}
+                            >
+                              {classroom.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-gray-300">${classroom.price}</TableCell>
+                          <TableCell className="text-gray-300">
+                            <Badge variant="outline" className="text-xs">
+                              {classroom.level}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-gray-300">
+                            {new Date(classroom.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex gap-2 justify-end">
+                              <Button
+                                size="sm"
+                                variant={classroom.status === 'active' ? "outline" : "default"}
+                                onClick={() => toggleClassroomStatus(classroom.id, classroom.status)}
+                                className="text-xs"
+                              >
+                                {classroom.status === 'active' ? (
+                                  <>
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    Deactivate
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Activate
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => deleteClassroom(classroom.id)}
+                                className="text-xs"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           )}
