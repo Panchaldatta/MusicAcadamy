@@ -50,12 +50,20 @@ const AdminDashboard = () => {
         .limit(10);
       setRecentUsers(users || []);
 
-      // Fetch recent classrooms
-      const { data: classrooms } = await supabase
+      // Fetch recent classrooms with teacher info from profiles
+      const { data: classrooms, error: classroomsError } = await supabase
         .from('classrooms')
-        .select('*, teachers(name)')
+        .select(`
+          *,
+          teacher:profiles!teacher_id(first_name, last_name)
+        `)
         .order('created_at', { ascending: false })
         .limit(10);
+
+      if (classroomsError) {
+        console.error('Error fetching classrooms:', classroomsError);
+      }
+      
       setRecentClassrooms(classrooms || []);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -93,7 +101,7 @@ const AdminDashboard = () => {
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
       description: "Registered users",
-      trend: "+12% from last month"
+      trend: `${dashboardMetrics.monthlySignups || 0} this month`
     },
     {
       title: "Teachers",
@@ -102,7 +110,7 @@ const AdminDashboard = () => {
       color: "text-green-500",
       bgColor: "bg-green-500/10",
       description: "Active teachers",
-      trend: "+8% from last month"
+      trend: `${Math.round((dashboardMetrics.totalTeachers / (dashboardMetrics.totalUsers || 1)) * 100)}% of users`
     },
     {
       title: "Students",
@@ -111,7 +119,7 @@ const AdminDashboard = () => {
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
       description: "Active students",
-      trend: "+15% from last month"
+      trend: `${Math.round((dashboardMetrics.totalStudents / (dashboardMetrics.totalUsers || 1)) * 100)}% of users`
     },
     {
       title: "Total Classrooms",
@@ -120,7 +128,7 @@ const AdminDashboard = () => {
       color: "text-orange-500",
       bgColor: "bg-orange-500/10",
       description: "All classrooms",
-      trend: "+5 new this week"
+      trend: `${dashboardMetrics.totalClassrooms || 0} total`
     },
     {
       title: "Active Classes",
@@ -129,7 +137,7 @@ const AdminDashboard = () => {
       color: "text-emerald-500",
       bgColor: "bg-emerald-500/10",
       description: "Currently active",
-      trend: `${Math.round((dashboardMetrics.activeClassrooms / dashboardMetrics.totalClassrooms) * 100) || 0}% active`
+      trend: `${Math.round((dashboardMetrics.activeClassrooms / (dashboardMetrics.totalClassrooms || 1)) * 100) || 0}% active`
     },
     {
       title: "Platform Activity",
@@ -138,7 +146,7 @@ const AdminDashboard = () => {
       color: "text-pink-500",
       bgColor: "bg-pink-500/10",
       description: "Total interactions",
-      trend: "+120 today"
+      trend: `${dashboardMetrics.totalSwipes || 0} total swipes`
     }
   ];
 
@@ -369,7 +377,7 @@ const AdminDashboard = () => {
                         <TableCell className="text-white font-medium">{classroom.name}</TableCell>
                         <TableCell className="text-gray-300">{classroom.subject}</TableCell>
                         <TableCell className="text-gray-300">
-                          {classroom.teachers?.name || 'N/A'}
+                          {classroom.teacher ? `${classroom.teacher.first_name} ${classroom.teacher.last_name}` : 'N/A'}
                         </TableCell>
                         <TableCell>
                           <Badge 
