@@ -21,7 +21,7 @@ const Auth = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signUpStudent, signUpTeacher, signInWithGoogle, user } = useAuth();
+  const { signIn, signUpStudent, signUpTeacher, signUpAdmin, signInWithGoogle, user, userRoles } = useAuth();
   const { toast } = useToast();
 
   const [signInData, setSignInData] = useState({
@@ -40,11 +40,20 @@ const Auth = () => {
   });
 
   useEffect(() => {
-    if (user) {
-      const from = location.state?.from?.pathname || "/";
-      navigate(from, { replace: true });
+    if (user && userRoles.length > 0) {
+      // Redirect based on user role
+      if (userRoles.includes('admin')) {
+        navigate('/admin-dashboard', { replace: true });
+      } else if (userRoles.includes('teacher')) {
+        navigate('/teacher-dashboard', { replace: true });
+      } else if (userRoles.includes('student')) {
+        navigate('/student-dashboard', { replace: true });
+      } else {
+        const from = location.state?.from?.pathname || "/";
+        navigate(from, { replace: true });
+      }
     }
-  }, [user, navigate, location]);
+  }, [user, userRoles, navigate, location]);
 
   const validateSignUpData = () => {
     if (!signUpData.firstName.trim()) {
@@ -134,8 +143,7 @@ const Auth = () => {
       
       if (!error) {
         console.log('✅ Email sign in successful');
-        const from = location.state?.from?.pathname || "/";
-        navigate(from, { replace: true });
+        // Redirect will be handled by useEffect based on user roles
       } else {
         console.error('❌ Email sign in failed:', error);
       }
@@ -157,7 +165,15 @@ const Auth = () => {
     console.log('🔥 Attempting email sign up for:', signUpData.email);
 
     try {
-      const signUpMethod = signUpData.role === 'teacher' ? signUpTeacher : signUpStudent;
+      let signUpMethod;
+      if (signUpData.role === 'admin') {
+        signUpMethod = signUpAdmin;
+      } else if (signUpData.role === 'teacher') {
+        signUpMethod = signUpTeacher;
+      } else {
+        signUpMethod = signUpStudent;
+      }
+      
       const { error } = await signUpMethod(
         signUpData.email,
         signUpData.password,
@@ -421,6 +437,7 @@ const Auth = () => {
                               <SelectContent>
                                 <SelectItem value="student">Student</SelectItem>
                                 <SelectItem value="teacher">Teacher</SelectItem>
+                                <SelectItem value="admin">Admin</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
