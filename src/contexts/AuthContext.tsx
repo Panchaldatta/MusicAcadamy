@@ -10,15 +10,42 @@ interface AuthContextType {
   profile: Profile | null;
   userRoles: string[];
   loading: boolean;
-  signUp: (email: string, password: string, firstName: string, lastName: string, role: 'student' | 'teacher' | 'admin') => Promise<{ error: any }>;
+  
+  // Student authentication
+  signUpStudent: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: any }>;
+  
+  // Teacher authentication
+  signUpTeacher: (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string,
+    teacherData?: any
+  ) => Promise<{ error: any }>;
+  
+  // Admin authentication
+  signUpAdmin: (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string
+  ) => Promise<{ error: any }>;
+  
+  // Universal sign in
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithGoogle: (role?: 'student' | 'teacher') => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  
+  // Role checks
   hasRole: (role: string) => boolean;
   isAdmin: boolean;
   isTeacher: boolean;
   isStudent: boolean;
+  
+  // Profile management
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
+  
+  // Admin functions
   assignRole: (userId: string, role: 'student' | 'teacher' | 'admin') => Promise<{ error: any }>;
 }
 
@@ -141,28 +168,77 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     return () => subscription.unsubscribe();
   }, []);
 
-  // Unified signup
-  const signUp = async (
-    email: string, 
-    password: string, 
-    firstName: string, 
-    lastName: string,
-    role: 'student' | 'teacher' | 'admin'
-  ) => {
-    const { error } = await AuthService.signUp(email, password, firstName, lastName, role);
+  // Student signup
+  const signUpStudent = async (email: string, password: string, firstName: string, lastName: string) => {
+    const { error } = await AuthService.signUpStudent(email, password, firstName, lastName);
     
     if (error) {
-      console.error('❌ Sign up error:', error);
+      console.error('❌ Student sign up error:', error);
       toast({
-        title: "Sign Up Failed",
+        title: "Student Sign Up Failed",
         description: error.message,
         variant: "destructive"
       });
     } else {
-      console.log('✅ Sign up successful');
+      console.log('✅ Student sign up successful');
       toast({
         title: "Check your email",
-        description: "Please check your email for a confirmation link to complete your registration.",
+        description: "Please check your email for a confirmation link to complete your student registration.",
+      });
+    }
+
+    return { error };
+  };
+
+  // Teacher signup
+  const signUpTeacher = async (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string,
+    teacherData?: any
+  ) => {
+    const { error } = await AuthService.signUpTeacher(email, password, firstName, lastName, teacherData);
+    
+    if (error) {
+      console.error('❌ Teacher sign up error:', error);
+      toast({
+        title: "Teacher Sign Up Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      console.log('✅ Teacher sign up successful');
+      toast({
+        title: "Check your email",
+        description: "Please check your email for a confirmation link to complete your teacher registration.",
+      });
+    }
+
+    return { error };
+  };
+
+  // Admin signup
+  const signUpAdmin = async (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string
+  ) => {
+    const { error } = await AuthService.signUpAdmin(email, password, firstName, lastName);
+    
+    if (error) {
+      console.error('❌ Admin sign up error:', error);
+      toast({
+        title: "Admin Sign Up Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      console.log('✅ Admin sign up successful');
+      toast({
+        title: "Check your email",
+        description: "Please check your email for a confirmation link to complete your admin registration.",
       });
     }
 
@@ -197,8 +273,8 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
   };
 
   // Google sign in
-  const signInWithGoogle = async () => {
-    const { error } = await AuthService.signInWithGoogle();
+  const signInWithGoogle = async (role: 'student' | 'teacher' = 'student') => {
+    const { error } = await AuthService.signInWithGoogle(role);
     
     if (error) {
       console.error('❌ Google sign in error:', error);
@@ -307,7 +383,9 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
     profile,
     userRoles,
     loading,
-    signUp,
+    signUpStudent,
+    signUpTeacher,
+    signUpAdmin,
     signIn,
     signInWithGoogle,
     signOut,

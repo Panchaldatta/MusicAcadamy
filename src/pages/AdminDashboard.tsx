@@ -63,10 +63,13 @@ const AdminDashboard = () => {
         .order('created_at', { ascending: false });
       setAllUsers(allUsersData || []);
 
-      // Fetch recent classrooms
+      // Fetch recent classrooms with teacher info from profiles
       const { data: classrooms, error: classroomsError } = await supabase
         .from('classrooms')
-        .select('*')
+        .select(`
+          *,
+          teacher:profiles!teacher_id(first_name, last_name)
+        `)
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -74,45 +77,22 @@ const AdminDashboard = () => {
         console.error('Error fetching classrooms:', classroomsError);
       }
       
-      // Fetch teacher names separately
-      if (classrooms) {
-        const classroomsWithTeachers = await Promise.all(
-          classrooms.map(async (classroom) => {
-            const { data: teacher } = await supabase
-              .from('profiles')
-              .select('first_name, last_name')
-              .eq('id', classroom.teacher_id)
-              .single();
-            return { ...classroom, teacher };
-          })
-        );
-        setRecentClassrooms(classroomsWithTeachers);
-      }
+      setRecentClassrooms(classrooms || []);
 
       // Fetch ALL classrooms (for classroom management tab)
       const { data: allClassroomsData, error: allClassroomsError } = await supabase
         .from('classrooms')
-        .select('*')
+        .select(`
+          *,
+          teacher:profiles!teacher_id(first_name, last_name)
+        `)
         .order('created_at', { ascending: false });
 
       if (allClassroomsError) {
         console.error('Error fetching all classrooms:', allClassroomsError);
       }
       
-      // Fetch teacher names for all classrooms
-      if (allClassroomsData) {
-        const allClassroomsWithTeachers = await Promise.all(
-          allClassroomsData.map(async (classroom) => {
-            const { data: teacher } = await supabase
-              .from('profiles')
-              .select('first_name, last_name')
-              .eq('id', classroom.teacher_id)
-              .single();
-            return { ...classroom, teacher };
-          })
-        );
-        setAllClassrooms(allClassroomsWithTeachers);
-      }
+      setAllClassrooms(allClassroomsData || []);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       toast({
