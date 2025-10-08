@@ -59,7 +59,7 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log('🔥 AuthProvider rendering...');
   
   const [user, setUser] = useState<User | null>(null);
@@ -398,6 +398,4 @@ export const AuthProvider = React.memo<{ children: React.ReactNode }>(({ childre
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-});
-
-AuthProvider.displayName = 'AuthProvider';
+};
