@@ -20,7 +20,7 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signUp, signInWithGoogle, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user, profile, userRoles } = useAuth();
   const { toast } = useToast();
 
   const [signInData, setSignInData] = useState({
@@ -38,11 +38,25 @@ const Auth = () => {
   });
 
   useEffect(() => {
-    if (user) {
-      const from = location.state?.from?.pathname || "/";
-      navigate(from, { replace: true });
+    if (user && profile && userRoles.length > 0) {
+      // Don't redirect if coming from a specific page
+      if (location.state?.from) {
+        navigate(location.state.from.pathname, { replace: true });
+        return;
+      }
+      
+      // Redirect based on primary role (prioritize teacher > student > admin for dashboard)
+      if (userRoles.includes('teacher')) {
+        navigate('/teacher-dashboard', { replace: true });
+      } else if (userRoles.includes('student')) {
+        navigate('/student-dashboard', { replace: true });
+      } else if (userRoles.includes('admin')) {
+        navigate('/admin-dashboard', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     }
-  }, [user, navigate, location]);
+  }, [user, profile, userRoles, navigate, location]);
 
   const validateSignUpData = () => {
     if (!signUpData.firstName.trim()) {
