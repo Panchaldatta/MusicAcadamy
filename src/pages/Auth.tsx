@@ -18,10 +18,9 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signUpStudent, signUpTeacher, signInWithGoogle, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const { toast } = useToast();
 
   const [signInData, setSignInData] = useState({
@@ -35,8 +34,7 @@ const Auth = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "student",
-    age: ""
+    role: "student" as 'student' | 'teacher' | 'admin'
   });
 
   useEffect(() => {
@@ -84,10 +82,11 @@ const Auth = () => {
       return false;
     }
 
-    if (signUpData.password.length < 6) {
+    const minLength = signUpData.role === 'admin' ? 8 : 6;
+    if (signUpData.password.length < minLength) {
       toast({
         title: "Validation Error",
-        description: "Password must be at least 6 characters long",
+        description: `Password must be at least ${minLength} characters long`,
         variant: "destructive"
       });
       return false;
@@ -97,15 +96,6 @@ const Auth = () => {
       toast({
         title: "Validation Error",
         description: "Passwords do not match",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    if (!signUpData.age.trim() || parseInt(signUpData.age) < 13 || parseInt(signUpData.age) > 100) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter a valid age between 13 and 100",
         variant: "destructive"
       });
       return false;
@@ -157,34 +147,25 @@ const Auth = () => {
     console.log('🔥 Attempting email sign up for:', signUpData.email);
 
     try {
-      const signUpMethod = signUpData.role === 'teacher' ? signUpTeacher : signUpStudent;
-      const { error } = await signUpMethod(
+      const { error } = await signUp(
         signUpData.email,
         signUpData.password,
         signUpData.firstName,
-        signUpData.lastName
+        signUpData.lastName,
+        signUpData.role
       );
       
       if (!error) {
         console.log('✅ Email sign up successful');
-        toast({
-          title: "Account Created!",
-          description: "Please check your email to confirm your account before signing in.",
-        });
-        // Switch to sign in tab
         setActiveTab("signin");
-        // Clear sign up form
         setSignUpData({
           firstName: "",
           lastName: "",
           email: "",
           password: "",
           confirmPassword: "",
-          role: "student",
-          age: ""
+          role: "student"
         });
-      } else {
-        console.error('❌ Email sign up failed:', error);
       }
     } catch (err) {
       console.error('❌ Unexpected error during sign up:', err);
@@ -194,7 +175,7 @@ const Auth = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    setIsGoogleLoading(true);
+    setIsLoading(true);
     console.log('🔥 Attempting Google sign in...');
     
     try {
@@ -202,7 +183,7 @@ const Auth = () => {
     } catch (err) {
       console.error('❌ Unexpected error during Google sign in:', err);
     } finally {
-      setIsGoogleLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -238,11 +219,11 @@ const Auth = () => {
                     <div className="space-y-4">
                       <Button 
                         onClick={handleGoogleSignIn}
-                        disabled={isGoogleLoading}
+                        disabled={isLoading}
                         variant="outline"
                         className="w-full"
                       >
-                        {isGoogleLoading ? (
+                        {isLoading ? (
                           "Signing in with Google..."
                         ) : (
                           <>
@@ -325,11 +306,11 @@ const Auth = () => {
                     <div className="space-y-4">
                       <Button 
                         onClick={handleGoogleSignIn}
-                        disabled={isGoogleLoading}
+                        disabled={isLoading}
                         variant="outline"
                         className="w-full"
                       >
-                        {isGoogleLoading ? (
+                        {isLoading ? (
                           "Signing up with Google..."
                         ) : (
                           <>
@@ -339,7 +320,7 @@ const Auth = () => {
                               <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                               <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                             </svg>
-                            Continue with Google
+                            Sign up with Google
                           </>
                         )}
                       </Button>
@@ -397,33 +378,18 @@ const Auth = () => {
                           />
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="age">Age</Label>
-                            <Input
-                              id="age"
-                              type="number"
-                              value={signUpData.age}
-                              onChange={(e) => setSignUpData({...signUpData, age: e.target.value})}
-                              placeholder="25"
-                              required
-                              min="13"
-                              max="100"
-                              className="mt-1"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="role">I am a</Label>
-                            <Select value={signUpData.role} onValueChange={(value) => setSignUpData({...signUpData, role: value})}>
-                              <SelectTrigger className="mt-1">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="student">Student</SelectItem>
-                                <SelectItem value="teacher">Teacher</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
+                        <div>
+                          <Label htmlFor="role">I am a</Label>
+                          <Select value={signUpData.role} onValueChange={(value: 'student' | 'teacher' | 'admin') => setSignUpData({...signUpData, role: value})}>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="student">Student</SelectItem>
+                              <SelectItem value="teacher">Teacher</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         
                         <div>

@@ -36,51 +36,15 @@ export interface Profile {
 }
 
 export class AuthService {
-  // Student authentication
-  static async signUpStudent(
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string
-  ): Promise<AuthResponse> {
-    const redirectUrl = `${window.location.origin}/auth?tab=signin`;
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          role: 'student',
-          provider: 'email'
-        }
-      }
-    });
-
-    return {
-      user: data.user,
-      session: data.session,
-      error
-    };
-  }
-
-  // Teacher authentication
-  static async signUpTeacher(
+  // Unified signup method for all roles
+  static async signUp(
     email: string,
     password: string,
     firstName: string,
     lastName: string,
-    teacherData?: {
-      subject?: string;
-      experience?: string;
-      location?: string;
-      specialties?: string[];
-      languages?: string[];
-    }
+    role: 'student' | 'teacher' | 'admin' = 'student'
   ): Promise<AuthResponse> {
-    const redirectUrl = `${window.location.origin}/auth/teacher?tab=signin`;
+    const redirectUrl = `${window.location.origin}/auth`;
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -90,48 +54,13 @@ export class AuthService {
         data: {
           first_name: firstName,
           last_name: lastName,
-          role: 'teacher',
-          provider: 'email',
-          teacher_data: teacherData
-        }
-      }
-    });
-
-    return {
-      user: data.user,
-      session: data.session,
-      error
-    };
-  }
-
-  // Admin authentication
-  static async signUpAdmin(
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string
-  ): Promise<AuthResponse> {
-    const redirectUrl = `${window.location.origin}/auth/admin?tab=signin`;
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          role: 'admin',
+          role,
           provider: 'email'
         }
       }
     });
 
-    return {
-      user: data.user,
-      session: data.session,
-      error
-    };
+    return { user: data.user, session: data.session, error };
   }
 
   // Universal sign in
@@ -141,16 +70,12 @@ export class AuthService {
       password
     });
 
-    return {
-      user: data.user,
-      session: data.session,
-      error
-    };
+    return { user: data.user, session: data.session, error };
   }
 
-  // Google OAuth with role selection
-  static async signInWithGoogle(role: 'student' | 'teacher' = 'student'): Promise<{ error: any }> {
-    const redirectUrl = `${window.location.origin}/auth?tab=signin`;
+  // Google OAuth
+  static async signInWithGoogle(): Promise<{ error: any }> {
+    const redirectUrl = `${window.location.origin}/auth`;
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -227,73 +152,14 @@ export class AuthService {
     return { profile: profile as Profile, error };
   }
 
-  // Admin-only: Assign role to user
+  // Admin-only: Assign role to user via user_roles table
   static async assignUserRole(userId: string, role: 'student' | 'teacher' | 'admin'): Promise<{ error: any }> {
-    // Verify current user is admin
-    const { data: currentProfile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', (await supabase.auth.getUser()).data.user?.id)
-      .single();
-
-    if (currentProfile?.role !== 'admin') {
-      return { error: { message: 'Unauthorized: Only admins can assign roles' } };
-    }
-
-    // Update the user's role
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role, updated_at: new Date().toISOString() })
-      .eq('id', userId);
+    const { error } = await supabase.rpc('assign_user_role', {
+      user_id: userId,
+      new_role: role
+    });
 
     return { error };
-  }
-
-  // Teacher registration after signup
-  static async registerTeacher(teacherData: {
-    name: string;
-    subject: string;
-    experience: string;
-    location: string;
-    price?: number;
-    specialties?: string[];
-    languages?: string[];
-  }): Promise<{ teacherId: string | null; error: any }> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return { teacherId: null, error: { message: 'User not authenticated' } };
-    }
-
-    // Verify the user is a teacher
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.role !== 'teacher') {
-      return { teacherId: null, error: { message: 'Unauthorized or user is not a teacher' } };
-    }
-
-    // Create teacher record
-    const { data: teacher, error } = await supabase
-      .from('teachers')
-      .insert({
-        id: user.id,
-        name: teacherData.name,
-        subject: teacherData.subject,
-        experience: teacherData.experience,
-        location: teacherData.location,
-        price: teacherData.price || 50,
-        specialties: teacherData.specialties || [],
-        languages: teacherData.languages || ['English'],
-        verified: false
-      })
-      .select('id')
-      .single();
-
-    return { teacherId: teacher?.id || null, error };
   }
 
   // Check user permissions
