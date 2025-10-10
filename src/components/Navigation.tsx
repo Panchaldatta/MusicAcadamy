@@ -119,14 +119,8 @@ const Navigation = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate('/auth/student')}>
-                      Sign In as Student
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/auth/teacher')}>
-                      Sign In as Teacher
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/auth/admin')}>
-                      Admin Portal
+                    <DropdownMenuItem onClick={() => navigate('/auth')}>
+                      Sign In
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -137,11 +131,8 @@ const Navigation = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate('/auth/student?tab=signup')}>
-                      Join as Student
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/auth/teacher?tab=signup')}>
-                      Become a Teacher
+                    <DropdownMenuItem onClick={() => navigate('/auth?tab=signup')}>
+                      Sign Up
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -247,57 +238,24 @@ const Navigation = () => {
                     ) : (
                       <>
                         <div className="space-y-2">
-                          <p className="text-sm font-medium text-muted-foreground px-2">Sign In</p>
                           <Button 
                             variant="ghost" 
                             className="w-full justify-start"
                             onClick={() => {
-                              navigate('/auth/student');
+                              navigate('/auth');
                               setIsOpen(false);
                             }}
                           >
-                            As Student
+                            Sign In
                           </Button>
                           <Button 
-                            variant="ghost" 
-                            className="w-full justify-start"
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                             onClick={() => {
-                              navigate('/auth/teacher');
+                              navigate('/auth?tab=signup');
                               setIsOpen(false);
                             }}
                           >
-                            As Teacher
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            className="w-full justify-start"
-                            onClick={() => {
-                              navigate('/auth/admin');
-                              setIsOpen(false);
-                            }}
-                          >
-                            Admin Portal
-                          </Button>
-                        </div>
-                        <div className="space-y-2 pt-2">
-                          <p className="text-sm font-medium text-muted-foreground px-2">Get Started</p>
-                          <Button 
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                            onClick={() => {
-                              navigate('/auth/student?tab=signup');
-                              setIsOpen(false);
-                            }}
-                          >
-                            Join as Student
-                          </Button>
-                          <Button 
-                            className="w-full bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() => {
-                              navigate('/auth/teacher?tab=signup');
-                              setIsOpen(false);
-                            }}
-                          >
-                            Become a Teacher
+                            Get Started
                           </Button>
                         </div>
                       </>
