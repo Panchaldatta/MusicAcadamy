@@ -37,7 +37,7 @@ const ClassroomCard = ({ classroom, enrollmentCount = 0, onEdit, onDelete, onVie
   const monthlyRevenue = enrollmentCount * classroom.price * (classroom.sessions_per_week || 2) * 4;
 
   return (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 group cursor-pointer">
+    <Card className="bg-card/50 backdrop-blur-md border-border hover:bg-accent/50 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 group cursor-pointer">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ const ClassroomCard = ({ classroom, enrollmentCount = 0, onEdit, onDelete, onVie
           </div>
 
           {/* Revenue Info */}
-          <div className="p-3 bg-white/5 rounded-lg border border-white/10 group-hover:bg-white/10 group-hover:border-white/20 transition-all duration-200">
+          <div className="p-3 bg-muted/30 rounded-lg border border-border group-hover:bg-muted/50 group-hover:border-accent transition-all duration-200">
             <div className="flex justify-between items-center">
               <span className="text-gray-300 text-sm">Monthly Revenue</span>
               <span className="text-white font-semibold">${monthlyRevenue}</span>
@@ -113,7 +113,7 @@ const ClassroomCard = ({ classroom, enrollmentCount = 0, onEdit, onDelete, onVie
             <Button 
               size="sm" 
               variant="outline" 
-              className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 hover:shadow-lg hover:shadow-white/10 transition-all duration-200"
+              className="hover:bg-accent hover:text-accent-foreground transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit?.(classroom);

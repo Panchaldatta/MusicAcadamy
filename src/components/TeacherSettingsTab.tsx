@@ -78,7 +78,7 @@ const TeacherSettingsTab = () => {
     <div className="space-y-6 animate-fade-in-up">
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Profile Settings */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 hover:border-white/30 hover:shadow-xl hover:shadow-white/10 transition-all duration-300 group">
+        <Card className="bg-card/50 backdrop-blur-md border-border hover:bg-accent/30 hover:border-accent hover:shadow-xl transition-all duration-300 group">
           <CardHeader>
             <CardTitle className="text-white flex items-center group-hover:text-purple-200 transition-colors">
               <User className="h-5 w-5 mr-2 text-purple-400 group-hover:scale-110 transition-transform duration-200" />
@@ -96,7 +96,7 @@ const TeacherSettingsTab = () => {
                   id="firstName"
                   value={profileData.firstName}
                   onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
-                  className="bg-white/5 border-white/20 text-white hover:border-white/30 focus:border-purple-400 transition-colors"
+                  className="bg-muted/20 border-border hover:border-accent focus:border-primary transition-colors"
                 />
               </div>
               <div>
@@ -105,7 +105,7 @@ const TeacherSettingsTab = () => {
                   id="lastName"
                   value={profileData.lastName}
                   onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
-                  className="bg-white/5 border-white/20 text-white hover:border-white/30 focus:border-purple-400 transition-colors"
+                  className="bg-muted/20 border-border hover:border-accent focus:border-primary transition-colors"
                 />
               </div>
             </div>
@@ -117,7 +117,7 @@ const TeacherSettingsTab = () => {
                 type="email"
                 value={profileData.email}
                 onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                className="bg-white/5 border-white/20 text-white hover:border-white/30 focus:border-purple-400 transition-colors"
+                className="bg-muted/20 border-border hover:border-accent focus:border-primary transition-colors"
               />
             </div>
 
@@ -127,7 +127,7 @@ const TeacherSettingsTab = () => {
                 id="phone"
                 value={profileData.phone}
                 onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                className="bg-white/5 border-white/20 text-white hover:border-white/30 focus:border-purple-400 transition-colors"
+                className="bg-muted/20 border-border hover:border-accent focus:border-primary transition-colors"
               />
             </div>
 
@@ -137,7 +137,7 @@ const TeacherSettingsTab = () => {
                 id="bio"
                 value={profileData.bio}
                 onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                className="bg-white/5 border-white/20 text-white min-h-[80px] hover:border-white/30 focus:border-purple-400 transition-colors"
+                className="bg-muted/20 border-border min-h-[80px] hover:border-accent focus:border-primary transition-colors"
                 placeholder="Tell students about yourself and your teaching style..."
               />
             </div>
@@ -153,7 +153,7 @@ const TeacherSettingsTab = () => {
         </Card>
 
         {/* Notification Settings */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 hover:border-white/30 hover:shadow-xl hover:shadow-white/10 transition-all duration-300 group">
+        <Card className="bg-card/50 backdrop-blur-md border-border hover:bg-accent/30 hover:border-accent hover:shadow-xl transition-all duration-300 group">
           <CardHeader>
             <CardTitle className="text-white flex items-center group-hover:text-purple-200 transition-colors">
               <Bell className="h-5 w-5 mr-2 text-purple-400 group-hover:scale-110 transition-transform duration-200" />
@@ -164,7 +164,7 @@ const TeacherSettingsTab = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between hover:bg-white/5 p-2 rounded-lg transition-colors">
+            <div className="flex items-center justify-between hover:bg-accent/20 p-2 rounded-lg transition-colors">
               <div>
                 <Label className="text-white">Email Notifications for Bookings</Label>
                 <p className="text-sm text-gray-400">Get notified when students book your classes</p>
@@ -175,7 +175,7 @@ const TeacherSettingsTab = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between hover:bg-white/5 p-2 rounded-lg transition-colors">
+            <div className="flex items-center justify-between hover:bg-accent/20 p-2 rounded-lg transition-colors">
               <div>
                 <Label className="text-white">Email Notifications for Messages</Label>
                 <p className="text-sm text-gray-400">Receive messages from students via email</p>
@@ -186,7 +186,7 @@ const TeacherSettingsTab = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between hover:bg-white/5 p-2 rounded-lg transition-colors">
+            <div className="flex items-center justify-between hover:bg-accent/20 p-2 rounded-lg transition-colors">
               <div>
                 <Label className="text-white">Marketing Emails</Label>
                 <p className="text-sm text-gray-400">Updates about new features and tips</p>
@@ -197,7 +197,7 @@ const TeacherSettingsTab = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between hover:bg-white/5 p-2 rounded-lg transition-colors">
+            <div className="flex items-center justify-between hover:bg-accent/20 p-2 rounded-lg transition-colors">
               <div>
                 <Label className="text-white">Push Notifications</Label>
                 <p className="text-sm text-gray-400">Real-time notifications on your device</p>

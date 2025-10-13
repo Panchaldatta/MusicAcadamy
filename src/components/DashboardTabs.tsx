@@ -33,7 +33,7 @@ const DashboardTabs = ({ activeTab, onTabChange }: DashboardTabsProps) => {
           className={`transition-all duration-200 ${
             activeTab === tab.id 
               ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/25" 
-              : "border-white/30 text-white hover:bg-white/10 hover:border-white/50 hover:shadow-lg hover:shadow-white/5"
+              : "hover:bg-accent hover:text-accent-foreground"
           }`}
         >
           <tab.icon className="h-4 w-4 mr-2" />
