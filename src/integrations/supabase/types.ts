@@ -702,14 +702,8 @@ export type Database = {
         Args: { new_role: string; user_id: string }
         Returns: undefined
       }
-      get_primary_role: {
-        Args: { _user_id?: string }
-        Returns: string
-      }
-      get_user_role: {
-        Args: { user_id?: string }
-        Returns: string
-      }
+      get_primary_role: { Args: { _user_id?: string }; Returns: string }
+      get_user_role: { Args: { user_id?: string }; Returns: string }
       get_user_roles: {
         Args: { _user_id?: string }
         Returns: Database["public"]["Enums"]["app_role"][]
@@ -721,14 +715,8 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_student: {
-        Args: { user_id?: string }
-        Returns: boolean
-      }
-      is_teacher: {
-        Args: { user_id?: string }
-        Returns: boolean
-      }
+      is_student: { Args: { user_id?: string }; Returns: boolean }
+      is_teacher: { Args: { user_id?: string }; Returns: boolean }
       register_teacher: {
         Args: { teacher_data: Json; user_id: string }
         Returns: string
