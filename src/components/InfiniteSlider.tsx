@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useMusicSubjects } from '@/hooks/useMusicSubjects';
+import { InfiniteSlider as InfiniteSliderUI } from '@/components/ui/infinite-slider';
 
 const InfiniteSlider = () => {
   const { data: musicSubjects = [], isLoading } = useMusicSubjects();
@@ -66,62 +67,38 @@ const InfiniteSlider = () => {
         </div>
 
         {/* Infinite slider container */}
-        <div className="relative overflow-hidden">
-          {/* Main sliding track */}
-          <div className="flex animate-[slide_30s_linear_infinite] hover:[animation-play-state:paused]">
-            {/* First set of slides */}
-            {musicSubjects.map((subject) => (
-              <div key={`first-${subject.id}`} className="flex-shrink-0 w-80 mx-4">
-                <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:border-orange-400/50 transition-all duration-300 hover:scale-105 hover:bg-white/15">
-                  <div className="relative h-48 overflow-hidden" style={{ backgroundColor: `${subject.color}20` }}>
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-6xl" style={{ color: subject.color }}>
-                        {subject.icon}
-                      </div>
+        <InfiniteSliderUI 
+          gap={24} 
+          reverse 
+          duration={30}
+          durationOnHover={50}
+          className="w-full"
+        >
+          {musicSubjects.map((subject) => (
+            <div key={subject.id} className="flex-shrink-0 w-80">
+              <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:border-orange-400/50 transition-all duration-300 hover:scale-105 hover:bg-white/15">
+                <div className="relative h-48 overflow-hidden" style={{ backgroundColor: `${subject.color}20` }}>
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-6xl" style={{ color: subject.color }}>
+                      {subject.icon}
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
-                      {subject.name}
-                    </h3>
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      {subject.student_count} students learning this instrument
-                    </p>
-                  </div>
-                  {/* Subtle glow effect */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                 </div>
-              </div>
-            ))}
-            
-            {/* Duplicate set for seamless loop */}
-            {musicSubjects.map((subject) => (
-              <div key={`second-${subject.id}`} className="flex-shrink-0 w-80 mx-4">
-                <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:border-orange-400/50 transition-all duration-300 hover:scale-105 hover:bg-white/15">
-                  <div className="relative h-48 overflow-hidden" style={{ backgroundColor: `${subject.color}20` }}>
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-6xl" style={{ color: subject.color }}>
-                        {subject.icon}
-                      </div>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
-                      {subject.name}
-                    </h3>
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      {subject.student_count} students learning this instrument
-                    </p>
-                  </div>
-                  {/* Subtle glow effect */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
+                    {subject.name}
+                  </h3>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {subject.student_count} students learning this instrument
+                  </p>
                 </div>
+                {/* Subtle glow effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          ))}
+        </InfiniteSliderUI>
       </div>
 
       {/* Gradient fade edges */}
