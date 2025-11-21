@@ -50,29 +50,29 @@ const DashboardStats = ({ totalStudents, totalClassrooms, totalRevenue, averageR
   ];
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
       {stats.map((stat, index) => (
         <Card 
           key={index} 
           className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-white/10 group"
         >
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform duration-200`}>
-                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+          <CardContent className="p-4 sm:p-5 md:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className={`p-2 sm:p-2.5 md:p-3 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                <stat.icon className={`h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6 ${stat.color}`} />
               </div>
               <Badge 
                 variant="outline" 
-                className="border-green-500/50 text-green-400 hover:border-green-400 hover:bg-green-500/10 transition-colors"
+                className="border-green-500/50 text-green-400 hover:border-green-400 hover:bg-green-500/10 transition-colors text-xs"
               >
                 {stat.change}
               </Badge>
             </div>
             <div>
-              <p className="text-gray-300 text-sm font-medium group-hover:text-gray-200 transition-colors">
+              <p className="text-gray-300 text-xs sm:text-sm font-medium group-hover:text-gray-200 transition-colors mb-1">
                 {stat.title}
               </p>
-              <p className="text-3xl font-bold text-white group-hover:text-purple-200 transition-colors">
+              <p className="text-2xl sm:text-2xl md:text-3xl font-bold text-white group-hover:text-purple-200 transition-colors">
                 {stat.value}
               </p>
             </div>
