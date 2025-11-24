@@ -1,199 +1,173 @@
 pipeline {
-    agent any
-    
-    environment {
-        DOCKER_REGISTRY = 'your-nexus-docker-registry:8083'
-        DOCKER_IMAGE = 'music-learning-platform'
-        DOCKER_TAG = "${BUILD_NUMBER}"
-        SONAR_PROJECT_KEY = 'music-learning-platform'
-        NEXUS_CREDENTIALS_ID = 'nexus-credentials'
-        DOCKER_CREDENTIALS_ID = 'nexus-docker-credentials'
-        SONAR_HOST_URL = 'http://your-sonarqube-server:9000'
-        SONAR_TOKEN = credentials('sonarqube-token')
+    agent {
+        kubernetes {
+            yaml '''
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: sonar-scanner
+    image: sonarsource/sonar-scanner-cli
+    command: ["cat"]
+    tty: true
+
+  - name: kubectl
+    image: bitnami/kubectl:latest
+    command: ["cat"]
+    tty: true
+    securityContext:
+      runAsUser: 0
+      readOnlyRootFilesystem: false
+    env:
+      - name: KUBECONFIG
+        value: /kube/config
+    volumeMounts:
+      - name: kubeconfig-secret
+        mountPath: /kube/config
+        subPath: kubeconfig
+
+  - name: dind
+    image: docker:dind
+    args: ["--storage-driver=overlay2"]
+    securityContext:
+      privileged: true
+    env:
+      - name: DOCKER_TLS_CERTDIR
+        value: ""
+    volumeMounts:
+      - name: docker-config
+        mountPath: /etc/docker/daemon.json
+        subPath: daemon.json
+
+  volumes:
+    - name: docker-config
+      configMap:
+        name: docker-daemon-config
+    - name: kubeconfig-secret
+      secret:
+        secretName: kubeconfig-secret
+'''
+        }
     }
-    
-    tools {
-        nodejs 'NodeJS-18'
-    }
-    
+
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-                script {
-                    env.GIT_COMMIT_SHORT = sh(
-                        script: "git rev-parse --short HEAD",
-                        returnStdout: true
-                    ).trim()
-                }
-            }
-        }
-        
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm ci'
-            }
-        }
-        
-        stage('Code Quality - Lint') {
-            steps {
-                sh 'npm run lint || true'
-            }
-        }
-        
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'SonarQubeScanner'
-                    withSonarQubeEnv('SonarQube') {
-                        sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                            -Dsonar.sources=src \
-                            -Dsonar.host.url=${SONAR_HOST_URL} \
-                            -Dsonar.login=${SONAR_TOKEN} \
-                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/*.test.tsx,**/*.test.ts
-                        """
-                    }
-                }
-            }
-        }
-        
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-        
-        stage('Build Application') {
-            steps {
-                sh '''
-                    export VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
-                    export VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
-                    export VITE_SUPABASE_PROJECT_ID=${VITE_SUPABASE_PROJECT_ID}
-                    npm run build
-                '''
-            }
-        }
-        
+
+        ######################################################
+        # 1. BUILD DOCKER IMAGE FOR REACT PROJECT
+        ######################################################
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
-                    docker.build("${DOCKER_IMAGE}:latest")
+                container('dind') {
+                    sh '''
+                        echo "⏳ Waiting for Docker..."
+                        sleep 15
+
+                        echo "🚀 Building Music Academy Docker image"
+                        docker build -t music-frontend:latest .
+
+                        docker image ls
+                    '''
                 }
             }
         }
-        
-        stage('Security Scan - Trivy') {
+
+        ######################################################
+        # 2. RUN TESTS (JEST)
+        ######################################################
+        stage('Run Jest Tests') {
             steps {
-                sh """
-                    trivy image --severity HIGH,CRITICAL \
-                    --exit-code 0 \
-                    --no-progress \
-                    ${DOCKER_IMAGE}:${DOCKER_TAG}
-                """
+                container('dind') {
+                    sh '''
+                        echo "🧪 Running Jest tests..."
+
+                        docker run --rm music-frontend:latest \
+                          sh -c "npm install && npm test -- --coverage"
+
+                        echo "✔ Tests completed"
+                    '''
+                }
             }
         }
-        
-        stage('Push to Nexus Registry') {
+
+        ######################################################
+        # 3. SONARQUBE JAVASCRIPT ANALYSIS
+        ######################################################
+ stage('SonarQube Analysis') {
             steps {
-                script {
-                    docker.withRegistry("https://${DOCKER_REGISTRY}", DOCKER_CREDENTIALS_ID) {
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                        docker.image("${DOCKER_IMAGE}:latest").push()
+                container('sonar-scanner') {
+                     withCredentials([string(credentialsId: 'sonar-token-2401199', variable: 'SONAR_TOKEN')]) {
+                        sh '''
+                            sonar-scanner \
+                                -Dsonar.projectKey=2401199_attendance-system \
+                                -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
+                                -Dsonar.login=$SONAR_TOKEN \
+                                -Dsonar.python.coverage.reportPaths=coverage.xml
+                        '''
+                    '''
+                }
+            }
+        }
+
+        ######################################################
+        # 4. LOGIN TO NEXUS DOCKER REGISTRY
+        ######################################################
+        stage('Login to Docker Registry') {
+            steps {
+                container('dind') {
+                    sh '''
+                        echo "🔐 Logging into Nexus..."
+                        docker login host.docker.internal:30085 -u admin -p Change@Me123
+                    '''
+                }
+            }
+        }
+
+        ######################################################
+        # 5. TAG & PUSH TO NEXUS
+        ######################################################
+        stage('Build - Tag - Push') {
+            steps {
+                container('dind') {
+                    sh '''
+                        echo "🏷 Tagging image"
+
+                        docker tag music-frontend:latest \
+                          host.docker.internal:30085/datta-project/music-learning-platform:v1
+
+                        echo "⬆ Pushing image"
+                        docker push host.docker.internal:30085/datta-project/music-learning-platform:v1
+
+                        echo "⬇ Pulling for verification"
+                        docker pull host.docker.internal:30085/datta-project/music-learning-platform:v1
+
+                        docker image ls
+                    '''
+                }
+            }
+        }
+
+        ######################################################
+        # 6. DEPLOY TO KUBERNETES (ns-2401147)
+        ######################################################
+        stage('Deploy Music Academy to Kubernetes') {
+            steps {
+                container('kubectl') {
+                    script {
+                        dir('.') {   // k8s YAML is in repo root
+                            sh '''
+                                echo "🚀 Deploying to Kubernetes namespace: ns-2401147"
+
+                                kubectl apply -f music-academy-k8s.yaml -n ns-2401147
+
+                                echo "⏳ Waiting for rollout..."
+                                kubectl rollout status deployment/music-frontend -n ns-2401147
+
+                                echo "✔ Deployment Complete!"
+                            '''
+                        }
                     }
                 }
             }
-        }
-        
-        stage('Archive Artifacts to Nexus') {
-            steps {
-                script {
-                    sh """
-                        tar -czf dist-${BUILD_NUMBER}.tar.gz dist/
-                        curl -v -u \${NEXUS_USER}:\${NEXUS_PASSWORD} \
-                        --upload-file dist-${BUILD_NUMBER}.tar.gz \
-                        http://your-nexus-server:8081/repository/raw-repo/music-learning-platform/${BUILD_NUMBER}/dist-${BUILD_NUMBER}.tar.gz
-                    """
-                }
-            }
-        }
-        
-        stage('Deploy to Staging') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                script {
-                    sh """
-                        docker stop music-learning-staging || true
-                        docker rm music-learning-staging || true
-                        docker run -d \
-                        --name music-learning-staging \
-                        -p 8081:80 \
-                        --restart unless-stopped \
-                        -e VITE_SUPABASE_URL=${VITE_SUPABASE_URL} \
-                        -e VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY} \
-                        ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}
-                    """
-                }
-            }
-        }
-        
-        stage('Deploy to Production') {
-            when {
-                branch 'main'
-            }
-            steps {
-                input message: 'Deploy to Production?', ok: 'Deploy'
-                script {
-                    sh """
-                        docker stop music-learning-prod || true
-                        docker rm music-learning-prod || true
-                        docker run -d \
-                        --name music-learning-prod \
-                        -p 80:80 \
-                        --restart unless-stopped \
-                        -e VITE_SUPABASE_URL=${VITE_SUPABASE_URL} \
-                        -e VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY} \
-                        ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}
-                    """
-                }
-            }
-        }
-        
-        stage('Cleanup') {
-            steps {
-                sh 'docker image prune -f'
-            }
-        }
-    }
-    
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-            emailext (
-                subject: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                body: """<p>SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-                    <p>Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
-                to: 'team@example.com'
-            )
-        }
-        failure {
-            echo 'Pipeline failed!'
-            emailext (
-                subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                body: """<p>FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-                    <p>Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
-                to: 'team@example.com'
-            )
-        }
-        always {
-            cleanWs()
         }
     }
 }
