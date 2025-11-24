@@ -86,7 +86,7 @@ spec:
                         sonar-scanner \
                           -Dsonar.projectKey=music-academy \
                           -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-                          -Dsonar.login=sqp_12915a780ab9f22f008fbfa98c58839a60a38ff3 \
+                          -Dsonar.login='sqp_12915a780ab9f22f008fbfa98c58839a60a38ff3' \
                           -Dsonar.sources=src \
                           -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                     '''
