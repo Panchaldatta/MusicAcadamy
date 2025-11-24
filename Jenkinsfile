@@ -52,9 +52,6 @@ spec:
 
     stages {
 
-        ######################################################
-        # 1. BUILD DOCKER IMAGE FOR REACT PROJECT
-        ######################################################
         stage('Build Docker Image') {
             steps {
                 container('dind') {
@@ -71,9 +68,6 @@ spec:
             }
         }
 
-        ######################################################
-        # 2. RUN TESTS (JEST)
-        ######################################################
         stage('Run Jest Tests') {
             steps {
                 container('dind') {
@@ -89,9 +83,6 @@ spec:
             }
         }
 
-        ######################################################
-        # 3. SONARQUBE JAVASCRIPT ANALYSIS
-        ######################################################
  stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
@@ -108,9 +99,7 @@ spec:
             }
         }
 
-        ######################################################
-        # 4. LOGIN TO NEXUS DOCKER REGISTRY
-        ######################################################
+     
         stage('Login to Docker Registry') {
             steps {
                 container('dind') {
@@ -122,9 +111,7 @@ spec:
             }
         }
 
-        ######################################################
-        # 5. TAG & PUSH TO NEXUS
-        ######################################################
+     
         stage('Build - Tag - Push') {
             steps {
                 container('dind') {
@@ -146,9 +133,7 @@ spec:
             }
         }
 
-        ######################################################
-        # 6. DEPLOY TO KUBERNETES (ns-2401147)
-        ######################################################
+    
         stage('Deploy Music Academy to Kubernetes') {
             steps {
                 container('kubectl') {
