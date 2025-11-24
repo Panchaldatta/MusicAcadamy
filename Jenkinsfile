@@ -58,10 +58,8 @@ spec:
                     sh '''
                         echo "⏳ Waiting for Docker..."
                         sleep 15
-
                         echo "🚀 Building Music Academy Docker image"
                         docker build -t music-frontend:latest .
-
                         docker image ls
                     '''
                 }
@@ -73,33 +71,33 @@ spec:
                 container('dind') {
                     sh '''
                         echo "🧪 Running Jest tests..."
-
                         docker run --rm music-frontend:latest \
                           sh -c "npm install && npm test -- --coverage"
-
                         echo "✔ Tests completed"
                     '''
                 }
             }
         }
 
- stage('SonarQube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
-                     withCredentials([string(credentialsId: 'sonar-token-2401199', variable: 'SONAR_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'sonar-token-2401199', variable: 'SONAR_TOKEN')]) {
                         sh '''
                             sonar-scanner \
-                                -Dsonar.projectKey=2401199_attendance-system \
+                                -Dsonar.projectKey=music-academy \
                                 -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
                                 -Dsonar.login=$SONAR_TOKEN \
-                                -Dsonar.python.coverage.reportPaths=coverage.xml
+                                -Dsonar.sources=src \
+                                -Dsonar.tests=src \
+                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                                -Dsonar.exclusions=**/node_modules/**,**/dist/**
                         '''
-                    '''
+                    }
                 }
             }
         }
 
-     
         stage('Login to Docker Registry') {
             steps {
                 container('dind') {
@@ -111,13 +109,11 @@ spec:
             }
         }
 
-     
         stage('Build - Tag - Push') {
             steps {
                 container('dind') {
                     sh '''
                         echo "🏷 Tagging image"
-
                         docker tag music-frontend:latest \
                           host.docker.internal:30085/datta-project/music-learning-platform:v1
 
@@ -133,23 +129,20 @@ spec:
             }
         }
 
-    
         stage('Deploy Music Academy to Kubernetes') {
             steps {
                 container('kubectl') {
                     script {
-                        dir('.') {   // k8s YAML is in repo root
-                            sh '''
-                                echo "🚀 Deploying to Kubernetes namespace: ns-2401147"
+                        sh '''
+                            echo "🚀 Deploying to Kubernetes namespace: ns-2401147"
 
-                                kubectl apply -f music-academy-k8s.yaml -n ns-2401147
+                            kubectl apply -f music-academy-k8s.yaml -n ns-2401147
 
-                                echo "⏳ Waiting for rollout..."
-                                kubectl rollout status deployment/music-frontend -n ns-2401147
+                            echo "⏳ Waiting for rollout..."
+                            kubectl rollout status deployment/music-frontend -n ns-2401147
 
-                                echo "✔ Deployment Complete!"
-                            '''
-                        }
+                            echo "✔ Deployment Complete!"
+                        '''
                     }
                 }
             }
