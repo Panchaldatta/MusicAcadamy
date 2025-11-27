@@ -1,6 +1,4 @@
-###############################
-# 1) Builder Stage (Node)
-###############################
+
 FROM node:20-alpine AS builder
 
 # Increase memory for npm
@@ -14,7 +12,7 @@ COPY package*.json ./
 # ---- FIX: Stable install ----
 RUN npm config set fund false \
     && npm config set audit false \
-    && npm config set fetch-retry-maxtimeout 300000 \
+    && npm config set fetch-retry-maxtimeout 3000 \
     && npm config set maxsockets 1 \
     && npm install --legacy-peer-deps
 
