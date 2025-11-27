@@ -1,27 +1,35 @@
-# ---------- 1) Builder Stage ----------
+###############################
+# 1) Builder Stage (Node + Vite)
+###############################
 FROM node:20-alpine AS builder
 
+# Create app folder
 WORKDIR /app
 
-# Copy package files
+# Install dependencies FIRST (better caching)
 COPY package*.json ./
 
-# Install ALL dependencies including dev
 RUN npm install
 
-# Copy full project
+# Copy the rest of the project
 COPY . .
 
-# Build the Vite app
+# Build Vite production bundle
 RUN npm run build
 
-# ---------- 2) Production Stage ----------
+
+###############################
+# 2) Nginx Production Stage
+###############################
 FROM nginx:alpine
 
-# Copy custom nginx config
+# Remove default config
+RUN rm -rf /etc/nginx/conf.d/default.conf
+
+# Copy custom optimized nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy build output
+# Copy built assets from builder stage → Nginx html folder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
