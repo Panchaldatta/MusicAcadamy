@@ -5,19 +5,17 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Ensure devDependencies (Vite) get installed
+ENV NODE_ENV=development
+
 COPY package*.json ./
 
-# Stable NPM install (no timeout changes)
 RUN npm config set fund false \
     && npm config set audit false \
-    && npm config set maxsockets 1 \
     && npm install --legacy-peer-deps
 
-# Copy the rest
 COPY . .
 
-# Build Vite production bundle
 RUN npm run build
 
 
