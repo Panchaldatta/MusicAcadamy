@@ -64,17 +64,22 @@ spec:
             }
         }
 
-        stage('SonarQube Analysis') {
+                stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
-                    sh '''
-                        sonar-scanner \
-                          -Dsonar.projectKey=music-learning-platform \
-                          -Dsonar.host.url=http://sonarqube.imcc.com \
-                          -Dsonar.login=student \
-                          -Dsonar.password=Imccstudent@2025 \
-                          -Dsonar.sources=src \
-                          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                     withCredentials([string(credentialsId: 'sonar-token-2401147', variable: 'SONAR_TOKEN')]) {
+                        sh '''
+                            sonar-scanner \
+                                -Dsonar.projectKey=2401147-Datta \
+                                -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
+                                -Dsonar.login=$SONAR_TOKEN \
+                                 -Dsonar.sources=src \
+                                -Dsonar.exclusions=node_modules/**,dist/** \
+                                -Dsonar.tests=src \
+                                -Dsonar.test.inclusions=src/**/*.test.ts,src/**/*.test.tsx \
+                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                                -Dsonar.sourceEncoding=UTF-8
+
                     '''
                 }
             }
