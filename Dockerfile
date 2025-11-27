@@ -6,22 +6,22 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install ALL dependencies (including dev → needed for Vite)
+# Install ALL dependencies including dev
 RUN npm install
 
-# Copy project source
+# Copy full project
 COPY . .
 
-# Build the project
+# Build the Vite app
 RUN npm run build
 
 # ---------- 2) Production Stage ----------
 FROM nginx:alpine
 
-# Copy nginx config
+# Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy build output from builder
+# Copy build output
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
