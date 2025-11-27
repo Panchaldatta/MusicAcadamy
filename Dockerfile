@@ -1,44 +1,33 @@
-
+### ----------------------------
+### 1) Build Stage (Node)
+### ----------------------------
 FROM node:20-alpine AS builder
-
-# Increase memory for npm
-ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 WORKDIR /app
 
-# ---- Copy pkg files first ----
+# Copy package files
 COPY package*.json ./
 
-# ---- FIX: Stable install ----
+# Stable NPM install (no timeout changes)
 RUN npm config set fund false \
     && npm config set audit false \
-    && npm config set fetch-retry-maxtimeout 3000 \
     && npm config set maxsockets 1 \
     && npm install --legacy-peer-deps
 
-# ---- Copy rest of app ----
+# Copy the rest
 COPY . .
 
-# ---- FIX: Ensure vite PATH exists ----
-RUN npx vite --version
-
-# ---- Build App ----
+# Build Vite production bundle
 RUN npm run build
 
 
-
-###############################
-# 2) Nginx Stage
-###############################
+### ----------------------------
+### 2) Production Stage (NGINX)
+### ----------------------------
 FROM nginx:alpine
 
-# Replace default config
-RUN rm -rf /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy built dist folder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
