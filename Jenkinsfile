@@ -84,9 +84,10 @@ spec:
                 container('sonar-scanner') {
                     sh '''
                         sonar-scanner \
-                          -Dsonar.projectKey=music-academy \
-                          -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-                          -Dsonar.login='sqp_12915a780ab9f22f008fbfa98c58839a60a38ff3' \
+                          -Dsonar.projectKey=music-learning-platform \
+                          -Dsonar.host.url=http://sonarqube.imcc.com \
+                          -Dsonar.login=student \
+                          -Dsonar.password=Imccstudent@2025 \
                           -Dsonar.sources=src \
                           -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                     '''
@@ -98,7 +99,7 @@ spec:
             steps {
                 container('dind') {
                     sh '''
-                        docker login host.docker.internal:30085 -u admin -p Change@Me123
+                        docker login nexus.imcc.com:8083 -u student -p Imcc@2025
                     '''
                 }
             }
@@ -109,9 +110,14 @@ spec:
                 container('dind') {
                     sh '''
                         docker tag music-frontend:latest \
-                          host.docker.internal:30085/datta-project/music-learning-platform:v1
+                          nexus.imcc.com:8083/music-learning-platform:${BUILD_NUMBER}
 
-                        docker push host.docker.internal:30085/datta-project/music-learning-platform:v1
+                        docker push nexus.imcc.com:8083/music-learning-platform:${BUILD_NUMBER}
+                        
+                        docker tag music-frontend:latest \
+                          nexus.imcc.com:8083/music-learning-platform:latest
+
+                        docker push nexus.imcc.com:8083/music-learning-platform:latest
                     '''
                 }
             }

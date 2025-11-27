@@ -44,7 +44,7 @@ spec:
 
       containers:
       - name: music-frontend
-        image: host.docker.internal:30085/datta-project/music-learning-platform:latest
+        image: nexus.imcc.com:8083/music-learning-platform:latest
         ports:
           - containerPort: 80
 
