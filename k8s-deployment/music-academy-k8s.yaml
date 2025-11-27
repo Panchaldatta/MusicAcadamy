@@ -1,3 +1,132 @@
+# ##########################################
+# # NAMESPACE
+# ##########################################
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: "2401147"
+
+# ---
+# ##########################################
+# # SUPABASE SECRET
+# ##########################################
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: music-frontend-secret
+#   namespace: "2401147"
+# type: Opaque
+# stringData:
+#   VITE_SUPABASE_URL: "https://jzdolobncemqdqazgwoq.supabase.co"
+#   VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6ZG9sb2JuY2VtcWRxYXpnd29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0ODExMjQsImV4cCI6MjA2NjA1NzEyNH0.kuOTWWHX8Jtq3ZjN9T9iVEqSNa2Jd9wLpTrT5k-wGQA"
+
+# ---
+# ##########################################
+# # DEPLOYMENT (FRONTEND)
+# ##########################################
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: music-frontend
+#   namespace: "2401147"
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: music-frontend
+#   template:
+#     metadata:
+#       labels:
+#         app: music-frontend
+#     spec:
+#       imagePullSecrets:
+#         - name: nexus-secret
+
+#       containers:
+#       - name: music-frontend
+#         image: nexus.imcc.com:8083/music-learning-platform:latest
+#         ports:
+#           - containerPort: 80
+
+#         env:
+#         - name: VITE_SUPABASE_URL
+#           valueFrom:
+#             secretKeyRef:
+#               name: music-frontend-secret
+#               key: VITE_SUPABASE_URL
+
+#         - name: VITE_SUPABASE_ANON_KEY
+#           valueFrom:
+#             secretKeyRef:
+#               name: music-frontend-secret
+#               key: VITE_SUPABASE_ANON_KEY
+
+#         readinessProbe:
+#           httpGet:
+#             path: /
+#             port: 80
+#           initialDelaySeconds: 10
+#           periodSeconds: 10
+
+#         livenessProbe:
+#           httpGet:
+#             path: /
+#             port: 80
+#           initialDelaySeconds: 30
+#           periodSeconds: 30
+
+#         resources:
+#           requests:
+#             cpu: "500m"
+#             memory: "512Mi"
+#           limits:
+#             cpu: "1"
+#             memory: "1Gi"
+
+# ---
+# ##########################################
+# # SERVICE
+# ##########################################
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: music-frontend-service
+#   namespace: "2401147"
+# spec:
+#   selector:
+#     app: music-frontend
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 80
+#   type: ClusterIP
+
+# ---
+# ##########################################
+# # INGRESS
+# ##########################################
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: music-frontend-ingress
+#   namespace: "2401147"
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#     - host: music.imcc.com
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: music-frontend-service
+#                 port:
+#                   number: 80
+
+
 ##########################################
 # NAMESPACE
 ##########################################
@@ -8,7 +137,7 @@ metadata:
 
 ---
 ##########################################
-# SUPABASE SECRET
+# SUPABASE SECRET (USED AT BUILD TIME)
 ##########################################
 apiVersion: v1
 kind: Secret
@@ -18,11 +147,11 @@ metadata:
 type: Opaque
 stringData:
   VITE_SUPABASE_URL: "https://jzdolobncemqdqazgwoq.supabase.co"
-  VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6ZG9sb2JuY2VtcWRxYXpnd29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0ODExMjQsImV4cCI6MjA2NjA1NzEyNH0.kuOTWWHX8Jtq3ZjN9T9iVEqSNa2Jd9wLpTrT5k-wGQA"
+  VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIs..."
 
 ---
 ##########################################
-# DEPLOYMENT (FRONTEND)
+# DEPLOYMENT (FRONTEND - NGINX)
 ##########################################
 apiVersion: apps/v1
 kind: Deployment
@@ -34,10 +163,12 @@ spec:
   selector:
     matchLabels:
       app: music-frontend
+
   template:
     metadata:
       labels:
         app: music-frontend
+
     spec:
       imagePullSecrets:
         - name: nexus-secret
@@ -45,28 +176,17 @@ spec:
       containers:
       - name: music-frontend
         image: nexus.imcc.com:8083/music-learning-platform:latest
+        imagePullPolicy: Always
+
         ports:
           - containerPort: 80
-
-        env:
-        - name: VITE_SUPABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: music-frontend-secret
-              key: VITE_SUPABASE_URL
-
-        - name: VITE_SUPABASE_ANON_KEY
-          valueFrom:
-            secretKeyRef:
-              name: music-frontend-secret
-              key: VITE_SUPABASE_ANON_KEY
 
         readinessProbe:
           httpGet:
             path: /
             port: 80
-          initialDelaySeconds: 10
-          periodSeconds: 10
+          initialDelaySeconds: 5
+          periodSeconds: 5
 
         livenessProbe:
           httpGet:
@@ -77,11 +197,11 @@ spec:
 
         resources:
           requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
             cpu: "500m"
             memory: "512Mi"
-          limits:
-            cpu: "1"
-            memory: "1Gi"
 
 ---
 ##########################################
@@ -112,6 +232,8 @@ metadata:
   namespace: "2401147"
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
 spec:
   ingressClassName: nginx
   rules:
