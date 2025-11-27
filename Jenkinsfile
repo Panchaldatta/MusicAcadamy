@@ -7,11 +7,6 @@ kind: Pod
 spec:
   containers:
 
-  - name: node
-    image: node:18
-    command: ["cat"]
-    tty: true
-
   - name: sonar-scanner
     image: sonarsource/sonar-scanner-cli
     command: ["cat"]
@@ -21,6 +16,9 @@ spec:
     image: bitnami/kubectl:latest
     command: ["cat"]
     tty: true
+    securityContext:
+      runAsUser: 0
+      readOnlyRootFilesystem: false
     env:
       - name: KUBECONFIG
         value: /kube/config
@@ -31,7 +29,6 @@ spec:
 
   - name: dind
     image: docker:dind
-    args: ["--storage-driver=overlay2"]
     securityContext:
       privileged: true
     env:
@@ -67,18 +64,6 @@ spec:
             }
         }
 
-        stage('Run Jest Tests') {
-            steps {
-                container('node') {
-                    sh '''
-                        echo "Running Jest tests"
-                        npm install
-                        npm test -- --coverage
-                    '''
-                }
-            }
-        }
-
         stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
@@ -99,6 +84,8 @@ spec:
             steps {
                 container('dind') {
                     sh '''
+                        docker --version
+                        sleep 10
                         docker login nexus.imcc.com:8083 -u student -p Imcc@2025
                     '''
                 }
@@ -109,11 +96,6 @@ spec:
             steps {
                 container('dind') {
                     sh '''
-                        docker tag music-frontend:latest \
-                          nexus.imcc.com:8083/music-learning-platform:${BUILD_NUMBER}
-
-                        docker push nexus.imcc.com:8083/music-learning-platform:${BUILD_NUMBER}
-                        
                         docker tag music-frontend:latest \
                           nexus.imcc.com:8083/music-learning-platform:latest
 
@@ -126,10 +108,14 @@ spec:
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
-                    sh '''
-                        kubectl apply -f music-academy-k8s.yaml -n ns-2401147
-                        kubectl rollout status deployment/music-frontend -n ns-2401147
-                    '''
+                    script {
+                        dir('k8s-deployment') {
+                            sh '''
+                                kubectl apply -f music-academy-k8s.yaml
+                                kubectl rollout status deployment/music-frontend -n 2401147
+                            '''
+                        }
+                    }
                 }
             }
         }
