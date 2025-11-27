@@ -1,378 +1,305 @@
-# Complete Deployment Steps for Music Learning Platform
+# Deployment Steps for Music Learning Platform
 
-## Server Details
-- **SonarQube**: http://sonarqube.imcc.com/ (student / Imccstudent@2025)
-- **Nexus**: http://nexus.imcc.com/ (student / Imcc@2025)
-- **Jenkins**: http://jenkins.imcc.com/ (student / Changeme@2025)
+## Prerequisites
 
----
-
-## Pre-Deployment Setup (One-Time)
-
-### 1. Configure Nexus Docker Registry
-
-1. **Login to Nexus** (http://nexus.imcc.com/)
-2. **Create Docker Repository** (if not exists):
-   - Go to: Settings → Repositories → Create repository → docker (hosted)
-   - Name: `docker-hosted`
-   - HTTP Port: `8083`
-   - Enable Docker V1 API: ✓
-   - Deployment policy: Allow redeploy
-   - Click Create
-
-3. **Configure Docker Daemon** (on Jenkins agents):
-```json
-# /etc/docker/daemon.json
-{
-  "insecure-registries": ["nexus.imcc.com:8083"]
-}
-```
-
-Then restart Docker:
-```bash
-sudo systemctl restart docker
-```
+Your college servers are already set up:
+- **SonarQube**: http://sonarqube.imcc.com (student / Imccstudent@2025)
+- **Nexus**: http://nexus.imcc.com (student / Imcc@2025)
+- **Jenkins**: http://jenkins.imcc.com (student / Changeme@2025)
+- **Kubernetes Cluster**: Available with namespace `2401147`
 
 ---
 
-### 2. Configure SonarQube
+## Step 1: Create Nexus Docker Registry Secret in Kubernetes
 
-1. **Login to SonarQube** (http://sonarqube.imcc.com/)
-2. **Create Project**:
-   - Click "Create Project"
-   - Project key: `music-learning-platform`
-   - Display name: `Music Learning Platform`
-   - Click "Set Up"
-
-3. **Generate Token** (Optional - for better security):
-   - Go to: My Account → Security → Generate Token
-   - Name: `jenkins-music-platform`
-   - Type: Project Analysis Token
-   - Save the token (you'll use this instead of password)
-
----
-
-### 3. Configure Jenkins
-
-#### A. Install Required Plugins
-Go to Jenkins → Manage Jenkins → Plugins → Available plugins
-
-Install these if not already installed:
-- Docker Pipeline
-- Kubernetes CLI
-- SonarQube Scanner
-- Pipeline
-
-#### B. Configure Jenkins Credentials
-
-Go to Jenkins → Manage Jenkins → Credentials → System → Global credentials
-
-**Add these credentials:**
-
-1. **Docker Registry Credentials**:
-   - Kind: Username with password
-   - ID: `nexus-docker-credentials`
-   - Username: `student`
-   - Password: `Imcc@2025`
-
-2. **Kubernetes Config** (if using K8s):
-   - Kind: Secret file
-   - ID: `kubeconfig`
-   - Upload your kubeconfig file
-
-#### C. Configure Kubernetes Secret for Nexus Pull
-
-Create a Kubernetes secret for pulling images from Nexus:
+Before deploying, create a secret for pulling images from Nexus:
 
 ```bash
 kubectl create secret docker-registry nexus-secret \
-  --namespace=ns-2401147 \
   --docker-server=nexus.imcc.com:8083 \
   --docker-username=student \
-  --docker-password=Imcc@2025
+  --docker-password=Imcc@2025 \
+  -n 2401147
 ```
 
 ---
 
-## Deployment Process
+## Step 2: Create Kubernetes ConfigMap for Docker Daemon
 
-### Option 1: Jenkins Pipeline (Recommended)
+This is needed for Jenkins DIND (Docker-in-Docker):
 
-#### Step 1: Push Code to Git
 ```bash
-git add .
-git commit -m "Initial deployment setup"
-git push origin main
+kubectl create configmap docker-daemon-config \
+  --from-literal=daemon.json='{"insecure-registries":["nexus.imcc.com:8083"]}' \
+  -n default
 ```
-
-#### Step 2: Create Jenkins Pipeline Job
-
-1. **Login to Jenkins** (http://jenkins.imcc.com/)
-2. Click **"New Item"**
-3. Enter name: `music-learning-platform-pipeline`
-4. Select **"Pipeline"**
-5. Click **OK**
-
-#### Step 3: Configure Pipeline
-
-**Under Pipeline section:**
-- Definition: `Pipeline script from SCM`
-- SCM: `Git`
-- Repository URL: Your Git repository URL
-- Credentials: Add your Git credentials if private
-- Branch: `*/main`
-- Script Path: `Jenkinsfile`
-
-**Save** and click **"Build Now"**
-
-#### What the Pipeline Does:
-1. ✓ Builds Docker image
-2. ✓ Runs Jest tests with coverage
-3. ✓ Performs SonarQube code analysis
-4. ✓ Logs into Nexus registry
-5. ✓ Tags and pushes image to Nexus
-6. ✓ Deploys to Kubernetes cluster
 
 ---
 
-### Option 2: Manual Docker Deployment
+## Step 3: Create Kubernetes Secret for Kubeconfig
 
-#### Step 1: Build Docker Image
+Create a secret containing your kubeconfig file:
+
 ```bash
-docker build -t music-learning-platform:latest .
+kubectl create secret generic kubeconfig-secret \
+  --from-file=kubeconfig=$HOME/.kube/config \
+  -n default
 ```
 
-#### Step 2: Login to Nexus Registry
+---
+
+## Step 4: Set Up Jenkins Pipeline
+
+1. Log in to Jenkins: http://jenkins.imcc.com
+   - Username: `student`
+   - Password: `Changeme@2025`
+
+2. Create a new Pipeline job:
+   - Click "New Item"
+   - Name: `music-learning-platform`
+   - Select "Pipeline"
+   - Click "OK"
+
+3. Configure the pipeline:
+   - Scroll to "Pipeline" section
+   - Definition: Select "Pipeline script from SCM"
+   - SCM: Select "Git"
+   - Repository URL: Your Git repository URL
+   - Branch: `*/main`
+   - Script Path: `Jenkinsfile`
+   - Click "Save"
+
+4. Run the pipeline:
+   - Click "Build Now"
+   - Watch the pipeline stages execute
+
+---
+
+## Step 5: Verify Deployment
+
+After the Jenkins pipeline completes successfully:
+
+1. Check pods are running:
 ```bash
-docker login nexus.imcc.com:8083
-# Username: student
-# Password: Imcc@2025
+kubectl get pods -n 2401147
 ```
 
-#### Step 3: Tag and Push
+2. Check service:
 ```bash
-docker tag music-learning-platform:latest nexus.imcc.com:8083/music-learning-platform:latest
+kubectl get svc -n 2401147
+```
+
+3. Check ingress:
+```bash
+kubectl get ingress -n 2401147
+```
+
+4. Access your application:
+   - URL: http://music.imcc.com
+
+---
+
+## Pipeline Stages Explanation
+
+The Jenkins pipeline executes these stages:
+
+1. **Build Docker Image**: Builds the React app into a Docker image
+2. **SonarQube Analysis**: Analyzes code quality and security
+3. **Login to Docker Registry**: Authenticates with Nexus
+4. **Build - Tag - Push**: Tags and pushes image to Nexus
+5. **Deploy to Kubernetes**: Applies K8s manifests and deploys
+
+---
+
+## Manual Docker Build & Push (Optional)
+
+If you want to test Docker build/push locally:
+
+```bash
+# Build
+docker build -t music-frontend:latest .
+
+# Login to Nexus
+docker login nexus.imcc.com:8083 -u student -p Imcc@2025
+
+# Tag
+docker tag music-frontend:latest nexus.imcc.com:8083/music-learning-platform:latest
+
+# Push
 docker push nexus.imcc.com:8083/music-learning-platform:latest
 ```
 
-#### Step 4: Deploy to Kubernetes
-```bash
-kubectl apply -f k8s-deployment/music-academy-k8s.yaml
-```
-
-#### Step 5: Verify Deployment
-```bash
-kubectl get pods -n ns-2401147
-kubectl get service -n ns-2401147
-kubectl logs -f deployment/music-frontend -n ns-2401147
-```
-
 ---
 
-## Kubernetes Deployment Commands
+## Manual Kubernetes Deployment (Optional)
 
-### Check Deployment Status
+If you want to deploy manually without Jenkins:
+
 ```bash
-# Check pods
-kubectl get pods -n ns-2401147
-
-# Check deployment
-kubectl get deployment -n ns-2401147
-
-# Check service
-kubectl get service -n ns-2401147
-
-# View logs
-kubectl logs -f deployment/music-frontend -n ns-2401147
-```
-
-### Update Deployment
-```bash
-# After pushing new image to Nexus
-kubectl rollout restart deployment/music-frontend -n ns-2401147
+# Apply all resources
+kubectl apply -f k8s-deployment/music-academy-k8s.yaml
 
 # Check rollout status
-kubectl rollout status deployment/music-frontend -n ns-2401147
-```
+kubectl rollout status deployment/music-frontend -n 2401147
 
-### Rollback (if needed)
-```bash
-kubectl rollout undo deployment/music-frontend -n ns-2401147
+# Check pods
+kubectl get pods -n 2401147
+
+# Get logs
+kubectl logs -f deployment/music-frontend -n 2401147
 ```
 
 ---
 
-## Access Your Application
+## Update Deployment
 
-### Via Kubernetes Service
+When you make code changes and want to redeploy:
+
+1. **Via Jenkins** (Recommended):
+   - Go to Jenkins pipeline
+   - Click "Build Now"
+   - Pipeline will build, test, push, and deploy automatically
+
+2. **Manually**:
 ```bash
-# Get service details
-kubectl get service music-frontend-service -n ns-2401147
+# Rebuild and push image
+docker build -t music-frontend:latest .
+docker tag music-frontend:latest nexus.imcc.com:8083/music-learning-platform:latest
+docker push nexus.imcc.com:8083/music-learning-platform:latest
+
+# Restart deployment
+kubectl rollout restart deployment/music-frontend -n 2401147
+```
+
+---
+
+## Check Application Status
+
+```bash
+# Get all resources in namespace
+kubectl get all -n 2401147
+
+# Get pod logs
+kubectl logs -f deployment/music-frontend -n 2401147
+
+# Execute commands in pod
+kubectl exec -it deployment/music-frontend -n 2401147 -- sh
 
 # Port forward for local testing
-kubectl port-forward service/music-frontend-service 8080:80 -n ns-2401147
-# Access: http://localhost:8080
+kubectl port-forward svc/music-frontend-service 8080:80 -n 2401147
+# Then access: http://localhost:8080
 ```
-
-### Via Ingress (if configured)
-Update `music-academy-k8s.yaml` line 118:
-```yaml
-host: music.yourdomain.com   # Change to your actual domain
-```
-
-Then access via: http://music.yourdomain.com
 
 ---
 
 ## Troubleshooting
 
-### Jenkins Build Fails
+### Pipeline Fails at Docker Build
+- Check if Docker daemon is running in Jenkins pod
+- Verify Dockerfile is correct
+- Wait for DIND to fully initialize (15 second delay is included)
 
-**Issue**: Docker login fails
-```bash
-# Solution: Add insecure registry in Docker daemon
-# Edit /etc/docker/daemon.json on Jenkins agent
-{
-  "insecure-registries": ["nexus.imcc.com:8083"]
-}
-sudo systemctl restart docker
-```
-
-**Issue**: Tests fail
-```bash
-# Check test output in Jenkins console
-# Fix failing tests in your code
-```
+### Cannot Push to Nexus
+- Verify credentials: `student / Imcc@2025`
+- Check if Docker registry is configured as insecure in daemon.json
+- Ensure registry URL is correct: `nexus.imcc.com:8083`
+- Confirm Nexus Docker repository exists and is accessible
 
 ### SonarQube Analysis Fails
+- Verify SonarQube is accessible: http://sonarqube.imcc.com
+- Check credentials: `student / Imccstudent@2025`
+- Ensure project key `music-learning-platform` exists
 
-**Issue**: Authentication error
+### Kubernetes Deployment Fails
+- Verify namespace exists: `kubectl get ns 2401147`
+- Check if nexus-secret exists: `kubectl get secret nexus-secret -n 2401147`
+- Verify kubeconfig-secret: `kubectl get secret kubeconfig-secret -n default`
+- Check docker-daemon-config: `kubectl get configmap docker-daemon-config -n default`
+
+### Image Pull Error
+- Ensure nexus-secret is created correctly
+- Verify image exists in Nexus: http://nexus.imcc.com/#browse/browse:docker-hosted
+- Check image name matches: `nexus.imcc.com:8083/music-learning-platform:latest`
+
+### Pods Not Starting
+- Check pod logs: `kubectl logs <pod-name> -n 2401147`
+- Describe pod: `kubectl describe pod <pod-name> -n 2401147`
+- Verify Supabase credentials in secret
+
+---
+
+## Important Notes
+
+1. **Namespace**: Your namespace is `2401147` (not `ns-2401147`)
+2. **Ingress Host**: Application will be available at `http://music.imcc.com`
+3. **Supabase Keys**: Already configured in k8s secret
+4. **Registry**: All images go to `nexus.imcc.com:8083/music-learning-platform`
+5. **Credentials**: All hardcoded in Jenkinsfile and K8s files (no Jenkins credential setup needed)
+6. **Docker Daemon**: DIND container has 15-second initialization delay
+7. **Login Delay**: 10-second delay before Docker login to ensure daemon is ready
+
+---
+
+## Pre-Deployment Checklist
+
+- [ ] Nexus secret created: `kubectl get secret nexus-secret -n 2401147`
+- [ ] Docker daemon configmap: `kubectl get configmap docker-daemon-config -n default`
+- [ ] Kubeconfig secret: `kubectl get secret kubeconfig-secret -n default`
+- [ ] Jenkins pipeline configured with Git repository
+- [ ] Supabase credentials verified in `.env` and `k8s-deployment/music-academy-k8s.yaml`
+- [ ] Dockerfile builds successfully locally
+- [ ] All credentials correct (Nexus, SonarQube, Jenkins)
+
+---
+
+## Next Steps After Deployment
+
+1. Access your application at: http://music.imcc.com
+2. Monitor application logs: `kubectl logs -f deployment/music-frontend -n 2401147`
+3. Check SonarQube for code quality: http://sonarqube.imcc.com/dashboard?id=music-learning-platform
+4. View Docker images in Nexus: http://nexus.imcc.com/#browse/browse:docker-hosted
+5. Configure domain DNS if using custom domain
+
+---
+
+## Quick Reference Commands
+
 ```bash
-# Verify credentials in Jenkinsfile line 89
-# Or generate a token and use it instead
-```
-
-**Issue**: Project not found
-```bash
-# Create project in SonarQube first
-# Project key must match: music-learning-platform
-```
-
-### Kubernetes Deployment Issues
-
-**Issue**: ImagePullBackOff
-```bash
-# Check if nexus-secret exists
-kubectl get secret nexus-secret -n ns-2401147
-
-# If not, create it:
+# Create all secrets and configmaps
 kubectl create secret docker-registry nexus-secret \
-  --namespace=ns-2401147 \
   --docker-server=nexus.imcc.com:8083 \
   --docker-username=student \
-  --docker-password=Imcc@2025
-```
+  --docker-password=Imcc@2025 \
+  -n 2401147
 
-**Issue**: Pods not starting
-```bash
-# Check pod logs
-kubectl logs <pod-name> -n ns-2401147
+kubectl create configmap docker-daemon-config \
+  --from-literal=daemon.json='{"insecure-registries":["nexus.imcc.com:8083"]}' \
+  -n default
 
-# Check events
-kubectl describe pod <pod-name> -n ns-2401147
-```
+kubectl create secret generic kubeconfig-secret \
+  --from-file=kubeconfig=$HOME/.kube/config \
+  -n default
 
-**Issue**: Service not accessible
-```bash
-# Check service endpoints
-kubectl get endpoints -n ns-2401147
-
-# Check if pods are ready
-kubectl get pods -n ns-2401147
-```
-
----
-
-## Environment Variables
-
-The application requires these environment variables (already configured in K8s secret):
-
-- `VITE_SUPABASE_URL`: https://jzdolobncemqdqazgwoq.supabase.co
-- `VITE_SUPABASE_ANON_KEY`: Your Supabase anon key
-
-To update these:
-```bash
-kubectl edit secret music-frontend-secret -n ns-2401147
-```
-
----
-
-## Monitoring
-
-### View Application Logs
-```bash
-kubectl logs -f deployment/music-frontend -n ns-2401147 --tail=100
-```
-
-### Monitor Resources
-```bash
-kubectl top pods -n ns-2401147
-kubectl top nodes
-```
-
-### Check SonarQube Quality Gate
-Visit: http://sonarqube.imcc.com/dashboard?id=music-learning-platform
-
----
-
-## Checklist
-
-Before running the pipeline, ensure:
-
-- [ ] Git repository is accessible from Jenkins
-- [ ] Docker registry (Nexus port 8083) is configured
-- [ ] `nexus-secret` exists in namespace `ns-2401147`
-- [ ] SonarQube project `music-learning-platform` exists
-- [ ] Jenkins credentials are configured
-- [ ] Kubernetes cluster is accessible
-- [ ] Docker daemon has insecure-registries configured
-
----
-
-## Quick Commands Reference
-
-```bash
-# Build locally
-docker build -t music-learning-platform:latest .
-
-# Run locally
-docker run -p 8080:80 --env-file .env music-learning-platform:latest
-
-# Push to Nexus
-docker login nexus.imcc.com:8083
-docker tag music-learning-platform:latest nexus.imcc.com:8083/music-learning-platform:latest
-docker push nexus.imcc.com:8083/music-learning-platform:latest
-
-# Deploy to K8s
-kubectl apply -f k8s-deployment/music-academy-k8s.yaml
-
-# Check status
-kubectl get all -n ns-2401147
+# Check everything
+kubectl get all -n 2401147
+kubectl get secret -n 2401147
+kubectl get configmap -n default
 
 # View logs
-kubectl logs -f deployment/music-frontend -n ns-2401147
+kubectl logs -f deployment/music-frontend -n 2401147
 
-# Access locally
-kubectl port-forward service/music-frontend-service 8080:80 -n ns-2401147
+# Restart deployment
+kubectl rollout restart deployment/music-frontend -n 2401147
 ```
 
 ---
 
 ## Support
 
-For issues:
-1. Check Jenkins console output for build errors
-2. Check SonarQube dashboard for code quality issues
-3. Check Kubernetes pod logs for runtime errors
-4. Verify all credentials are correct
-5. Ensure all services (Jenkins, Nexus, SonarQube, K8s) are accessible
+If you encounter issues:
+1. Check Jenkins console output for pipeline failures
+2. Review pod logs: `kubectl logs <pod-name> -n 2401147`
+3. Verify all secrets and configmaps are created
+4. Ensure Supabase credentials are correct
+5. Check Docker image exists in Nexus registry
+6. Verify all three secrets exist (nexus-secret, kubeconfig-secret, docker-daemon-config)
