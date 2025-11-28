@@ -125,7 +125,7 @@ spec:
                     dir('k8s-deployment') {
                         sh '''
                             kubectl apply -f music-academy-k8s.yaml -n 2401147
-                            kubectl rollout status deployment/music-frontend -n 2401147
+                            kubectl rollout status deployment/music-frontend-deployment -n 2401147
                         '''
                     }
                 }
