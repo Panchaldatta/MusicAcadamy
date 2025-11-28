@@ -1,333 +1,15 @@
-// // pipeline {
-// //     agent {
-// //         kubernetes {
-// //             yaml '''
-// // apiVersion: v1
-// // kind: Pod
-// // spec:
-// //   containers:
-
-// //   - name: docker
-// //     image: docker:24.0
-// //     securityContext:
-// //       privileged: true
-// //     env:
-// //       - name: DOCKER_TLS_CERTDIR
-// //         value: ""
-// //     command: ["dockerd-entrypoint.sh"]
-// //     args: ["--host=tcp://0.0.0.0:2375"]
-// //     volumeMounts:
-// //       - name: docker-graph-storage
-// //         mountPath: /var/lib/docker
-
-// //   - name: dind-client
-// //     image: docker:24.0
-// //     command: ["cat"]
-// //     tty: true
-// //     env:
-// //       - name: DOCKER_HOST
-// //         value: tcp://localhost:2375
-
-// //   - name: sonar-scanner
-// //     image: sonarsource/sonar-scanner-cli
-// //     command: ["cat"]
-// //     tty: true
-
-// //   - name: kubectl
-// //     image: bitnami/kubectl:latest
-// //     command: ["cat"]
-// //     tty: true
-// //     env:
-// //       - name: KUBECONFIG
-// //         value: /kube/config
-// //     volumeMounts:
-// //       - name: kubeconfig-secret
-// //         mountPath: /kube/config
-// //         subPath: kubeconfig
-
-// //   volumes:
-// //     - name: docker-graph-storage
-// //       emptyDir: {}
-// //     - name: kubeconfig-secret
-// //       secret:
-// //         secretName: kubeconfig-secret
-// // '''
-// //         }
-// //     }
-
-// //     stages {
-
-// //         // Stage 1: Build Docker image with Supabase secrets
-// //         stage('Build Docker Image') {
-// //             steps {
-// //                 container('dind-client') {
-// //                     script {
-// //                         echo "Fetching Supabase secrets..."
-
-// //                         def supabaseUrl = sh(
-// //                             script: "kubectl get secret music-frontend-secret -n 2401147 -o jsonpath='{.data.VITE_SUPABASE_URL}' | base64 -d",
-// //                             returnStdout: true
-// //                         ).trim()
-
-// //                         def supabaseAnonKey = sh(
-// //                             script: "kubectl get secret music-frontend-secret -n 2401147 -o jsonpath='{.data.VITE_SUPABASE_ANON_KEY}' | base64 -d",
-// //                             returnStdout: true
-// //                         ).trim()
-
-// //                         echo "Building Docker image..."
-
-// //                         sh """
-// //                             docker build \
-// //                               --build-arg VITE_SUPABASE_URL='${supabaseUrl}' \
-// //                               --build-arg VITE_SUPABASE_ANON_KEY='${supabaseAnonKey}' \
-// //                               -t music-frontend:latest .
-// //                         """
-// //                     }
-// //                 }
-// //             }
-// //         }
-
-// //         // Stage 2: SonarQube Analysis
-// //         stage('SonarQube Analysis') {
-// //             steps {
-// //                 container('sonar-scanner') {
-// //                     withCredentials([string(credentialsId: 'sonar-token-2401147', variable: 'SONAR_TOKEN')]) {
-// //                         sh '''
-// //                             sonar-scanner \
-// //                               -Dsonar.projectKey=2401147-Music \
-// //                               -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-// //                               -Dsonar.login=$SONAR_TOKEN \
-// //                               -Dsonar.sources=src \
-// //                               -Dsonar.exclusions=node_modules/**,dist/** \
-// //                               -Dsonar.sourceEncoding=UTF-8
-// //                         '''
-// //                     }
-// //                 }
-// //             }
-// //         }
-
-// //         // Stage 3: Login to Docker Registry
-// //          stage('Login to Docker Registry') {
-// //             steps {
-// //                 container('dind') {
-// //                     sh 'docker --version'
-// //                     sh 'sleep 10'
-// //                     sh 'docker login nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085 -u admin -p Changeme@2025'
-// //                 }
-// //             }
-// //         }
-
-// //         // Stage 4: Tag + Push Image
-// //         stage('Build - Tag - Push') {
-// //             steps {
-// //                 container('dind-client') {
-// //                     sh '''
-// //                         docker tag music-frontend:latest nexus.imcc.com:8083/music-learning-platform:latest
-// //                         docker push nexus.imcc.com:8083/music-learning-platform:latest
-// //                     '''
-// //                 }
-// //             }
-// //         }
-
-// //         // Stage 5: Deploy to Kubernetes
-// //         stage('Deploy to Kubernetes') {
-// //             steps {
-// //                 container('kubectl') {
-// //                     script {
-// //                         dir('k8s-deployment') {
-// //                             sh '''
-// //                                 kubectl apply -f music-academy-k8s.yaml
-// //                                 kubectl rollout status deployment/music-frontend -n 2401147
-// //                             '''
-// //                         }
-// //                     }
-// //                 }
-// //             }
-// //         }
-
-// //     }
-// // }
-
-
-// pipeline {
-//     agent {
-//         kubernetes {
-//             yaml '''
-// apiVersion: v1
-// kind: Pod
-// spec:
-//   containers:
-
-//   - name: docker
-//     image: docker:24.0
-//     securityContext:
-//       privileged: true
-//     env:
-//       - name: DOCKER_TLS_CERTDIR
-//         value: ""
-//     command: ["dockerd-entrypoint.sh"]
-//     args: ["--host=tcp://0.0.0.0:2375"]
-//     volumeMounts:
-//       - name: docker-graph-storage
-//         mountPath: /var/lib/docker
-
-//   - name: dind-client
-//     image: docker:24.0
-//     command: ["cat"]
-//     tty: true
-//     env:
-//       - name: DOCKER_HOST
-//         value: tcp://localhost:2375
-
-//   - name: sonar-scanner
-//     image: sonarsource/sonar-scanner-cli
-//     command: ["cat"]
-//     tty: true
-
-//   - name: kubectl
-//     image: bitnami/kubectl:latest
-//     command: ["cat"]
-//     tty: true
-//     env:
-//       - name: KUBECONFIG
-//         value: /kube/config
-//     volumeMounts:
-//       - name: kubeconfig-secret
-//         mountPath: /kube/config
-//         subPath: kubeconfig
-
-//   volumes:
-//     - name: docker-graph-storage
-//       emptyDir: {}
-//     - name: kubeconfig-secret
-//       secret:
-//         secretName: kubeconfig-secret
-// '''
-//         }
-//     }
-
-//     stages {
-
-//         #############################################
-//         # STAGE 1: Build Docker Image
-//         #############################################
-//         stage('Build Docker Image') {
-//             steps {
-
-//                 container('kubectl') {
-//                     script {
-//                         echo "📥 Fetching Supabase secrets..."
-
-//                         env.SUPA_URL = sh(
-//                             script: "kubectl get secret music-frontend-secret -n 2401147 -o jsonpath='{.data.VITE_SUPABASE_URL}' | base64 -d",
-//                             returnStdout: true
-//                         ).trim()
-
-//                         env.SUPA_KEY = sh(
-//                             script: "kubectl get secret music-frontend-secret -n 2401147 -o jsonpath='{.data.VITE_SUPABASE_ANON_KEY}' | base64 -d",
-//                             returnStdout: true
-//                         ).trim()
-//                     }
-//                 }
-
-//                 container('dind-client') {
-//                     sh """
-//                         echo '🐳 Building Docker image...'
-
-//                         docker build \
-//                           --build-arg VITE_SUPABASE_URL='${SUPA_URL}' \
-//                           --build-arg VITE_SUPABASE_ANON_KEY='${SUPA_KEY}' \
-//                           -t music-frontend:latest .
-//                     """
-//                 }
-//             }
-//         }
-
-//         #############################################
-//         # STAGE 2: SonarQube Analysis
-//         #############################################
-//         stage('SonarQube Analysis') {
-//             steps {
-//                 container('sonar-scanner') {
-//                     withCredentials([string(credentialsId: 'sonar-token-2401147', variable: 'SONAR_TOKEN')]) {
-//                         sh '''
-//                             sonar-scanner \
-//                               -Dsonar.projectKey=2401147-Music \
-//                               -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-//                               -Dsonar.login=$SONAR_TOKEN \
-//                               -Dsonar.sources=src \
-//                               -Dsonar.exclusions=node_modules/**,dist/** \
-//                               -Dsonar.sourceEncoding=UTF-8
-//                         '''
-//                     }
-//                 }
-//             }
-//         }
-
-//         #############################################
-//         # STAGE 3: Login to Docker Registry
-//         #############################################
-//         stage('Login to Docker Registry') {
-//             steps {
-//                 container('dind-client') {
-//                     sh '''
-//                         docker --version
-//                         echo "⏳ Waiting for Docker daemon..."
-//                         sleep 10
-//                         echo "🔐 Logging into Nexus Registry..."
-//                         docker login nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085 \
-//                           -u admin -p Changeme@2025
-//                     '''
-//                 }
-//             }
-//         }
-
-//         #############################################
-//         # STAGE 4: Tag + Push Image
-//         #############################################
-//         stage('Build - Tag - Push') {
-//             steps {
-//                 container('dind-client') {
-//                     sh '''
-//                         echo "🏷 Tagging Docker image..."
-//                         docker tag music-frontend:latest nexus.imcc.com:8083/music-learning-platform:latest
-//                         echo "📤 Pushing image..."
-//                         docker push nexus.imcc.com:8083/music-learning-platform:latest
-//                     '''
-//                 }
-//             }
-//         }
-
-//         #############################################
-//         # STAGE 5: Deploy to Kubernetes
-//         #############################################
-//         stage('Deploy to Kubernetes') {
-//             steps {
-//                 container('kubectl') {
-//                     sh '''
-//                         echo "🚀 Deploying to Kubernetes..."
-//                         kubectl apply -f k8s-deployment/music-academy-k8s.yaml
-//                         kubectl rollout status deployment/music-frontend -n 2401147
-//                     '''
-//                 }
-//             }
-//         }
-
-//     }
-// }
-
-
 pipeline {
+
     agent {
         kubernetes {
-            yaml '''
+            yaml """
 apiVersion: v1
 kind: Pod
 spec:
   containers:
 
   - name: docker
-    image: docker:24.0
+    image: docker:20.10-dind
     securityContext:
       privileged: true
     env:
@@ -336,26 +18,23 @@ spec:
     command: ["dockerd-entrypoint.sh"]
     args: ["--host=tcp://0.0.0.0:2375"]
     volumeMounts:
-      - name: docker-graph-storage
+      - name: docker-storage
         mountPath: /var/lib/docker
 
   - name: dind-client
-    image: docker:24.0
-    command: ["cat"]
-    tty: true
+    image: docker:20.10
+    command: ["sleep", "infinity"]
     env:
       - name: DOCKER_HOST
         value: tcp://localhost:2375
 
   - name: sonar-scanner
     image: sonarsource/sonar-scanner-cli
-    command: ["cat"]
-    tty: true
+    command: ["sleep", "infinity"]
 
   - name: kubectl
     image: bitnami/kubectl:latest
-    command: ["cat"]
-    tty: true
+    command: ["sleep", "infinity"]
     env:
       - name: KUBECONFIG
         value: /kube/config
@@ -365,43 +44,36 @@ spec:
         subPath: kubeconfig
 
   volumes:
-    - name: docker-graph-storage
+    - name: docker-storage
       emptyDir: {}
     - name: kubeconfig-secret
       secret:
         secretName: kubeconfig-secret
-'''
+"""
         }
+    }
+
+    environment {
+        // Use your actual Supabase values here
+        VITE_SUPABASE_URL       = 'https://jzdolobncemqdqazgwoq.supabase.co'
+        VITE_SUPABASE_ANON_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6ZG9sb2JuY2VtcWRxYXpnd29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0ODExMjQsImV4cCI6MjA2NjA1NzEyNH0.kuOTWWHX8Jtq3ZjN9T9iVEqSNa2Jd9wLpTrT5k-wGQA'
     }
 
     stages {
 
         stage('Build Docker Image') {
             steps {
-
-                container('kubectl') {
-                    script {
-                        echo "Fetching Supabase secrets..."
-
-                        env.SUPA_URL = sh(
-                            script: "kubectl get secret music-frontend-secret -n 2401147 -o jsonpath='{.data.VITE_SUPABASE_URL}' | base64 -d",
-                            returnStdout: true
-                        ).trim()
-
-                        env.SUPA_KEY = sh(
-                            script: "kubectl get secret music-frontend-secret -n 2401147 -o jsonpath='{.data.VITE_SUPABASE_ANON_KEY}' | base64 -d",
-                            returnStdout: true
-                        ).trim()
-                    }
-                }
-
                 container('dind-client') {
-                    sh """
-                        docker build \
-                          --build-arg VITE_SUPABASE_URL='${SUPA_URL}' \
-                          --build-arg VITE_SUPABASE_ANON_KEY='${SUPA_KEY}' \
-                          -t music-frontend:latest .
-                    """
+                    script {
+                        echo "Building Docker image with Supabase build args"
+
+                        sh """
+                            docker build \
+                              --build-arg VITE_SUPABASE_URL='${VITE_SUPABASE_URL}' \
+                              --build-arg VITE_SUPABASE_ANON_KEY='${VITE_SUPABASE_ANON_KEY}' \
+                              -t music-frontend:latest .
+                        """
+                    }
                 }
             }
         }
@@ -410,7 +82,7 @@ spec:
             steps {
                 container('sonar-scanner') {
                     withCredentials([string(credentialsId: 'sonar-token-2401147', variable: 'SONAR_TOKEN')]) {
-                        sh '''
+                        sh """
                             sonar-scanner \
                               -Dsonar.projectKey=2401147-Music \
                               -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
@@ -418,7 +90,7 @@ spec:
                               -Dsonar.sources=src \
                               -Dsonar.exclusions=node_modules/**,dist/** \
                               -Dsonar.sourceEncoding=UTF-8
-                        '''
+                        """
                     }
                 }
             }
@@ -427,12 +99,11 @@ spec:
         stage('Login to Docker Registry') {
             steps {
                 container('dind-client') {
-                    sh '''
+                    sh """
                         docker --version
-                        sleep 10
                         docker login nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085 \
                           -u admin -p Changeme@2025
-                    '''
+                    """
                 }
             }
         }
@@ -440,10 +111,13 @@ spec:
         stage('Build - Tag - Push') {
             steps {
                 container('dind-client') {
-                    sh '''
-                        docker tag music-frontend:latest nexus.imcc.com:8083/music-learning-platform:latest
-                        docker push nexus.imcc.com:8083/music-learning-platform:latest
-                    '''
+                    sh """
+                        docker tag music-frontend:latest \
+                          nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/music-frontend:latest
+
+                        docker push \
+                          nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/music-frontend:latest
+                    """
                 }
             }
         }
@@ -451,13 +125,16 @@ spec:
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
-                    sh '''
-                        kubectl apply -f k8s-deployment/music-academy-k8s.yaml
-                        kubectl rollout status deployment/music-frontend -n 2401147
-                    '''
+                    script {
+                        dir('k8s-deployment') {
+                            sh """
+                                kubectl apply -f music-academy-k8s.yaml -n 2401147
+                                kubectl rollout status deployment/music-frontend -n 2401147
+                            """
+                        }
+                    }
                 }
             }
         }
-
     }
 }
