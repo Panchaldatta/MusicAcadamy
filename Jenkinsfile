@@ -6,14 +6,10 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
-
   containers:
 
-  # -------------------------
-  # Docker Daemon (DinD)
-  # -------------------------
   - name: dind
-    image: docker:20.10-dind
+    image: docker:dind
     securityContext:
       privileged: true
     env:
@@ -23,20 +19,14 @@ spec:
       - name: docker-storage
         mountPath: /var/lib/docker
 
-  # -------------------------
-  # Sonar Scanner
-  # -------------------------
   - name: sonar-scanner
     image: sonarsource/sonar-scanner-cli
-    command: ["sleep", "infinity"]
+    command: ["cat"]
     tty: true
 
-  # -------------------------
-  # Kubectl for deployment
-  # -------------------------
   - name: kubectl
     image: bitnami/kubectl:latest
-    command: ["sleep", "infinity"]
+    command: ["cat"]
     tty: true
     env:
       - name: KUBECONFIG
@@ -64,52 +54,41 @@ spec:
 
     stages {
 
-      
         stage('Build Docker Image') {
             steps {
                 container('dind') {
                     sh '''
-                        echo "Waiting for Docker..."
                         sleep 15
-
                         docker build \
                           --build-arg VITE_SUPABASE_URL='${VITE_SUPABASE_URL}' \
                           --build-arg VITE_SUPABASE_ANON_KEY='${VITE_SUPABASE_ANON_KEY}' \
                           -t music-frontend:latest .
-
-                        docker image ls
                     '''
                 }
             }
         }
 
-   
         stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
-                    withCredentials([string(credentialsId: 'sonar-token-2401147', variable: 'SQ_TOKEN')]) {
-
-                        sh '''
+                    withCredentials([string(credentialsId: 'sonar-token-2401147', variable: 'SONAR_TOKEN')]) {
+                        sh """
                             sonar-scanner \
-                              -Dsonar.projectKey=2401147_Music \
+                              -Dsonar.projectKey=2401147_FINAL \
                               -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-                              -Dsonar.token=$SQ_TOKEN \
+                              -Dsonar.token=$SONAR_TOKEN \
                               -Dsonar.sources=src \
-                              -Dsonar.exclusions=node_modules/**,dist/**,**/*.test.tsx,**/*.test.ts
-                        '''
+                              -Dsonar.exclusions=node_modules/**,dist/**
+                        """
                     }
                 }
             }
         }
 
-      
         stage('Login to Docker Registry') {
             steps {
                 container('dind') {
                     sh '''
-                        echo "Logging into Nexus..."
-                        sleep 5
-
                         docker login nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085 \
                           -u admin -p Changeme@2025
                     '''
@@ -117,7 +96,6 @@ spec:
             }
         }
 
-      
         stage('Build - Tag - Push') {
             steps {
                 container('dind') {
@@ -127,14 +105,11 @@ spec:
 
                         docker push \
                           nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/music-frontend:latest
-
-                        echo "Image pushed successfully!"
                     '''
                 }
             }
         }
 
-       
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
@@ -147,5 +122,6 @@ spec:
                 }
             }
         }
+
     }
 }
