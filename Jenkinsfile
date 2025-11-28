@@ -111,7 +111,7 @@ spec:
             steps {
                 container('dind-client') {
                     sh '''
-                        docker login nexus.imcc.com:8083 -u student -p Imcc@2025
+                        docker login nexus.imcc.com:8083 -u admin -p Changeme@2025
                     '''
                 }
             }
