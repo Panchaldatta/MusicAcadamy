@@ -81,16 +81,13 @@ spec:
         stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
-                    withCredentials([string(credentialsId: 'sonar-token-2401147', variable: 'SONAR_TOKEN')]) {
-                        sh """
+                     withCredentials([string(credentialsId: 'sonar-token-2401147', variable: 'SONAR_TOKEN')]) {
+                        sh '''
                             sonar-scanner \
-                              -Dsonar.projectKey=2401147-Music \
-                              -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-                              -Dsonar.login=$SONAR_TOKEN \
-                              -Dsonar.sources=src \
-                              -Dsonar.exclusions=node_modules/**,dist/** \
-                              -Dsonar.sourceEncoding=UTF-8
-                        """
+                                -Dsonar.projectKey=2401147_Music \
+                                -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
+                                -Dsonar.login=$SONAR_TOKEN \
+                        '''
                     }
                 }
             }
@@ -112,10 +109,13 @@ spec:
             steps {
                 container('dind-client') {
                     sh """
-                        docker tag music-frontend:latest \
+                        docker tag music-frontend:latest 
                           nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/music-frontend:latest
 
-                        docker push \
+                        docker push 
+                          nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/music-frontend:latest
+
+                        docker pull 
                           nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/music-frontend:latest
                     """
                 }
