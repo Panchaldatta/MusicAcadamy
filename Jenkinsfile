@@ -153,9 +153,6 @@ spec:
 
   containers:
 
-  # ----------------------------
-  # Docker Daemon (DIND)
-  # ----------------------------
   - name: docker
     image: docker:24.0-dind
     securityContext:
@@ -172,9 +169,6 @@ spec:
       - name: dind-storage
         mountPath: /var/lib/docker
 
-  # ----------------------------
-  # Docker client
-  # ----------------------------
   - name: dind-client
     image: docker:24.0
     command: ["sleep", "infinity"]
@@ -185,16 +179,10 @@ spec:
       - name: dind-storage
         mountPath: /var/lib/docker
 
-  # ----------------------------
-  # Sonar Scanner
-  # ----------------------------
   - name: sonar-scanner
     image: sonarsource/sonar-scanner-cli
     command: ["sleep", "infinity"]
 
-  # ----------------------------
-  # kubectl
-  # ----------------------------
   - name: kubectl
     image: bitnami/kubectl:latest
     command: ["sleep", "infinity"]
@@ -212,26 +200,22 @@ spec:
     - name: kubeconfig-secret
       secret:
         secretName: kubeconfig-secret
-
 """
         }
     }
 
     environment {
         VITE_SUPABASE_URL      = 'https://jzdolobncemqdqazgwoq.supabase.co'
-        VITE_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI...'
+        VITE_SUPABASE_ANON_KEY = 'eyJhbGciOi...'
     }
 
     stages {
 
-        # ----------------------------
-        # Stage 1: Build Docker Image
-        # ----------------------------
         stage('Build Docker Image') {
             steps {
                 container('dind-client') {
                     sh """
-                        echo '⏳ Waiting for Docker daemon...'
+                        echo 'Waiting for Docker daemon...'
                         sleep 15
                         docker info
 
@@ -244,9 +228,6 @@ spec:
             }
         }
 
-        # ----------------------------
-        # Stage 2: SonarQube
-        # ----------------------------
         stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
@@ -265,9 +246,6 @@ spec:
             }
         }
 
-        # ----------------------------
-        # Stage 3: Login to Nexus
-        # ----------------------------
         stage('Login to Docker Registry') {
             steps {
                 container('dind-client') {
@@ -279,9 +257,6 @@ spec:
             }
         }
 
-        # ----------------------------
-        # Stage 4: Push Image
-        # ----------------------------
         stage('Build - Tag - Push') {
             steps {
                 container('dind-client') {
@@ -296,9 +271,6 @@ spec:
             }
         }
 
-        # ----------------------------
-        # Stage 5: Deploy to Kubernetes
-        # ----------------------------
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
