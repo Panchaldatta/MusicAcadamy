@@ -13,11 +13,11 @@ spec:
     securityContext:
       privileged: true
     env:
-      - name: DOCKER_TLS_CERTDIR
-        value: ""
+    - name: DOCKER_TLS_CERTDIR
+      value: ""
     volumeMounts:
-      - name: docker-storage
-        mountPath: /var/lib/docker
+    - name: docker-storage
+      mountPath: /var/lib/docker
 
   - name: sonar-scanner
     image: sonarsource/sonar-scanner-cli
@@ -29,20 +29,20 @@ spec:
     command: ["cat"]
     tty: true
     env:
-      - name: KUBECONFIG
-        value: /kube/config
+    - name: KUBECONFIG
+      value: /kube/config
     volumeMounts:
-      - name: kubeconfig-secret
-        mountPath: /kube/config
-        subPath: kubeconfig
+    - name: kubeconfig-secret
+      mountPath: /kube/config
+      subPath: kubeconfig
 
   volumes:
-    - name: docker-storage
-      emptyDir: {}
+  - name: docker-storage
+    emptyDir: {}
 
-    - name: kubeconfig-secret
-      secret:
-        secretName: kubeconfig-secret
+  - name: kubeconfig-secret
+    secret:
+      secretName: kubeconfig-secret
 '''
         }
     }
@@ -89,6 +89,8 @@ spec:
             steps {
                 container('dind') {
                     sh '''
+                        docker --version
+                        sleep 10
                         docker login nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085 \
                           -u admin -p Changeme@2025
                     '''
@@ -101,10 +103,15 @@ spec:
                 container('dind') {
                     sh '''
                         docker tag music-frontend:latest \
-                          nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/music-frontend:latest
+                          nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/2401147-project/music-frontend:latest
 
                         docker push \
-                          nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/music-frontend:latest
+                          nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/2401147-project/music-frontend:latest
+
+                        docker pull \
+                          nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/2401147-project/music-frontend:latest
+
+                        docker image ls
                     '''
                 }
             }
