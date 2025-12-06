@@ -3,12 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Music, Mail, Lock, User, Eye, EyeOff, GraduationCap } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, GraduationCap, AlertCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
+import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
+import { 
+  signInSchema, 
+  studentSignUpSchema, 
+  validateField,
+  emailSchema,
+  nameSchema,
+  ageSchema,
+  passwordSchema
+} from "@/lib/validations";
 
 const StudentAuth = () => {
   const [searchParams] = useSearchParams();
@@ -23,6 +33,9 @@ const StudentAuth = () => {
   const { signIn, signUpStudent, signInWithGoogle, user } = useAuth();
   const { toast } = useToast();
 
+  // Field-level errors
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   const [signInData, setSignInData] = useState({
     email: "",
     password: ""
@@ -35,7 +48,6 @@ const StudentAuth = () => {
     password: "",
     age: "",
     confirmPassword: ""
-
   });
 
   useEffect(() => {
@@ -45,72 +57,69 @@ const StudentAuth = () => {
     }
   }, [user, navigate, location]);
 
+  // Real-time field validation
+  const validateFieldOnBlur = (field: string, value: string) => {
+    let error: string | null = null;
+    
+    switch (field) {
+      case 'firstName':
+      case 'lastName':
+        error = validateField(nameSchema, value);
+        break;
+      case 'email':
+        error = validateField(emailSchema, value);
+        break;
+      case 'age':
+        error = value ? validateField(ageSchema, value) : null;
+        break;
+      case 'password':
+        error = validateField(passwordSchema, value);
+        break;
+      case 'confirmPassword':
+        if (value !== signUpData.password) {
+          error = "Passwords do not match";
+        }
+        break;
+    }
+    
+    setFieldErrors(prev => ({
+      ...prev,
+      [field]: error || ''
+    }));
+  };
+
   const validateSignUpData = () => {
-    if (!signUpData.firstName.trim()) {
+    const result = studentSignUpSchema.safeParse(signUpData);
+    
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      setFieldErrors(errors);
+      
       toast({
         title: "Validation Error",
-        description: "First name is required",
+        description: result.error.errors[0]?.message || "Please fix the errors below",
         variant: "destructive"
       });
       return false;
     }
-
-    if (!signUpData.lastName.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Last name is required",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    if (!signUpData.email.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Email is required",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(signUpData.email)) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter a valid email address",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    if (signUpData.password.length < 6) {
-      toast({
-        title: "Validation Error",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    if (signUpData.password !== signUpData.confirmPassword) {
-      toast({
-        title: "Validation Error",
-        description: "Passwords do not match",
-        variant: "destructive"
-      });
-      return false;
-    }
-
+    
+    setFieldErrors({});
     return true;
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!signInData.email.trim() || !signInData.password.trim()) {
+    const result = signInSchema.safeParse(signInData);
+    
+    if (!result.success) {
       toast({
         title: "Validation Error",
-        description: "Please fill in all fields",
+        description: result.error.errors[0]?.message || "Please fill in all fields correctly",
         variant: "destructive"
       });
       return;
@@ -125,7 +134,7 @@ const StudentAuth = () => {
         navigate(from, { replace: true });
       }
     } catch (err) {
-      console.error('❌ Unexpected error during sign in:', err);
+      console.error('Sign in error');
     } finally {
       setIsLoading(false);
     }
@@ -157,9 +166,10 @@ const StudentAuth = () => {
           password: "",
           confirmPassword: ""
         });
+        setFieldErrors({});
       }
     } catch (err) {
-      console.error('❌ Unexpected error during sign up:', err);
+      console.error('Sign up error');
     } finally {
       setIsLoading(false);
     }
@@ -170,10 +180,20 @@ const StudentAuth = () => {
     try {
       await signInWithGoogle('student');
     } catch (err) {
-      console.error('❌ Unexpected error during Google sign in:', err);
+      console.error('Google sign in error');
     } finally {
       setIsGoogleLoading(false);
     }
+  };
+
+  const renderFieldError = (field: string) => {
+    if (!fieldErrors[field]) return null;
+    return (
+      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+        <AlertCircle className="h-3 w-3" />
+        {fieldErrors[field]}
+      </p>
+    );
   };
 
   return (
@@ -252,6 +272,7 @@ const StudentAuth = () => {
                             placeholder="your@email.com"
                             required
                             className="mt-1"
+                            autoComplete="email"
                           />
                         </div>
                         
@@ -269,6 +290,7 @@ const StudentAuth = () => {
                               placeholder="Enter your password"
                               required
                               className="pr-10"
+                              autoComplete="current-password"
                             />
                             <button
                               type="button"
@@ -328,62 +350,75 @@ const StudentAuth = () => {
                       <form onSubmit={handleSignUp} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="first-name">First Name</Label>
+                            <Label htmlFor="first-name">First Name *</Label>
                             <Input
                               id="first-name"
                               value={signUpData.firstName}
                               onChange={(e) => setSignUpData({...signUpData, firstName: e.target.value})}
+                              onBlur={(e) => validateFieldOnBlur('firstName', e.target.value)}
                               placeholder="John"
                               required
-                              className="mt-1"
+                              className={`mt-1 ${fieldErrors.firstName ? 'border-destructive' : ''}`}
+                              autoComplete="given-name"
                             />
+                            {renderFieldError('firstName')}
                           </div>
                           <div>
-                            <Label htmlFor="last-name">Last Name</Label>
+                            <Label htmlFor="last-name">Last Name *</Label>
                             <Input
                               id="last-name"
                               value={signUpData.lastName}
                               onChange={(e) => setSignUpData({...signUpData, lastName: e.target.value})}
+                              onBlur={(e) => validateFieldOnBlur('lastName', e.target.value)}
                               placeholder="Doe"
                               required
-                              className="mt-1"
+                              className={`mt-1 ${fieldErrors.lastName ? 'border-destructive' : ''}`}
+                              autoComplete="family-name"
                             />
+                            {renderFieldError('lastName')}
                           </div>
                         </div>
                         
                         <div>
                           <Label htmlFor="signup-email" className="flex items-center gap-2">
                             <Mail className="h-4 w-4" />
-                            Email
+                            Email *
                           </Label>
                           <Input
                             id="signup-email"
                             type="email"
                             value={signUpData.email}
                             onChange={(e) => setSignUpData({...signUpData, email: e.target.value})}
+                            onBlur={(e) => validateFieldOnBlur('email', e.target.value)}
                             placeholder="your@email.com"
                             required
-                            className="mt-1"
+                            className={`mt-1 ${fieldErrors.email ? 'border-destructive' : ''}`}
+                            autoComplete="email"
                           />
+                          {renderFieldError('email')}
                         </div>
+
                         <div>
-                          <Label htmlFor="course" className="flex items-center gap-2">
-                            Age
-                          </Label>
+                          <Label htmlFor="age">Age *</Label>
                           <Input
                             id="age"
+                            type="number"
+                            min="5"
+                            max="120"
                             value={signUpData.age}
                             onChange={(e) => setSignUpData({...signUpData, age: e.target.value})}
-                            placeholder="Enter your age"
+                            onBlur={(e) => validateFieldOnBlur('age', e.target.value)}
+                            placeholder="Enter your age (5-120)"
                             required
-                            className="mt-1"
+                            className={`mt-1 ${fieldErrors.age ? 'border-destructive' : ''}`}
                           />
+                          {renderFieldError('age')}
                         </div>
                         
                         <div>
                           <Label htmlFor="signup-password" className="flex items-center gap-2">
                             <Lock className="h-4 w-4" />
-                            Password
+                            Password *
                           </Label>
                           <div className="relative mt-1">
                             <Input
@@ -391,9 +426,11 @@ const StudentAuth = () => {
                               type={showPassword ? "text" : "password"}
                               value={signUpData.password}
                               onChange={(e) => setSignUpData({...signUpData, password: e.target.value})}
-                              placeholder="Create a password"
+                              onBlur={(e) => validateFieldOnBlur('password', e.target.value)}
+                              placeholder="Create a strong password"
                               required
-                              className="pr-10"
+                              className={`pr-10 ${fieldErrors.password ? 'border-destructive' : ''}`}
+                              autoComplete="new-password"
                             />
                             <button
                               type="button"
@@ -403,12 +440,14 @@ const StudentAuth = () => {
                               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
+                          {renderFieldError('password')}
+                          <PasswordStrengthIndicator password={signUpData.password} />
                         </div>
                         
                         <div>
                           <Label htmlFor="confirm-password" className="flex items-center gap-2">
                             <Lock className="h-4 w-4" />
-                            Confirm Password
+                            Confirm Password *
                           </Label>
                           <div className="relative mt-1">
                             <Input
@@ -416,9 +455,11 @@ const StudentAuth = () => {
                               type={showConfirmPassword ? "text" : "password"}
                               value={signUpData.confirmPassword}
                               onChange={(e) => setSignUpData({...signUpData, confirmPassword: e.target.value})}
+                              onBlur={(e) => validateFieldOnBlur('confirmPassword', e.target.value)}
                               placeholder="Confirm your password"
                               required
-                              className="pr-10"
+                              className={`pr-10 ${fieldErrors.confirmPassword ? 'border-destructive' : ''}`}
+                              autoComplete="new-password"
                             />
                             <button
                               type="button"
@@ -428,6 +469,31 @@ const StudentAuth = () => {
                               {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
+                          {renderFieldError('confirmPassword')}
+                          {signUpData.confirmPassword && signUpData.password === signUpData.confirmPassword && (
+                            <p className="text-xs text-green-500 mt-1">Passwords match</p>
+                          )}
+                        </div>
+
+                        <div className="bg-muted/50 p-3 rounded-lg text-xs text-muted-foreground">
+                          <p className="font-medium mb-1">Password Requirements:</p>
+                          <ul className="space-y-0.5">
+                            <li className={signUpData.password.length >= 8 ? 'text-green-500' : ''}>
+                              • Minimum 8 characters
+                            </li>
+                            <li className={/[A-Z]/.test(signUpData.password) ? 'text-green-500' : ''}>
+                              • At least one uppercase letter
+                            </li>
+                            <li className={/[a-z]/.test(signUpData.password) ? 'text-green-500' : ''}>
+                              • At least one lowercase letter
+                            </li>
+                            <li className={/[0-9]/.test(signUpData.password) ? 'text-green-500' : ''}>
+                              • At least one number
+                            </li>
+                            <li className={/[^A-Za-z0-9]/.test(signUpData.password) ? 'text-green-500' : ''}>
+                              • At least one special character
+                            </li>
+                          </ul>
                         </div>
 
                         <Button 
@@ -438,12 +504,6 @@ const StudentAuth = () => {
                           {isLoading ? "Creating Account..." : "Create Student Account"}
                         </Button>
                       </form>
-
-                      <div className="text-center space-y-2">
-                        <p className="text-sm text-muted-foreground">
-                          Want to teach? <a href="/auth/teacher" className="text-green-600 hover:underline">Apply as Teacher</a>
-                        </p>
-                      </div>
                     </div>
                   </TabsContent>
                 </Tabs>
