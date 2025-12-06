@@ -34,7 +34,7 @@ const CourseCatalog = () => {
       duration: "12 weeks",
       students: 890,
       rating: 4.8,
-      price: "$49",
+      price: "₹3,999",
       image: "/placeholder.svg",
       description: "Advanced vocal techniques including breath control, range extension, and performance skills.",
       features: ["Breathing exercises", "Range building", "Performance tips"]
@@ -48,7 +48,7 @@ const CourseCatalog = () => {
       duration: "10 weeks",
       students: 2100,
       rating: 4.7,
-      price: "$29",
+      price: "₹2,499",
       image: "/placeholder.svg",
       description: "Start your piano journey with proper technique and musical foundation.",
       features: ["Hand positioning", "Music theory", "Popular songs"]
@@ -62,7 +62,7 @@ const CourseCatalog = () => {
       duration: "16 weeks",
       students: 350,
       rating: 4.9,
-      price: "$89",
+      price: "₹7,499",
       image: "/placeholder.svg",
       description: "Learn the fundamentals of jazz improvisation and develop your own musical voice.",
       features: ["Scale theory", "Chord progressions", "Solo techniques"]
@@ -76,7 +76,7 @@ const CourseCatalog = () => {
       duration: "14 weeks",
       students: 670,
       rating: 4.8,
-      price: "$69",
+      price: "₹5,499",
       image: "/placeholder.svg",
       description: "Create compelling songs with strong melodies, harmonies, and lyrical content.",
       features: ["Lyric writing", "Melody creation", "Song structure"]
@@ -90,7 +90,7 @@ const CourseCatalog = () => {
       duration: "6 weeks",
       students: 540,
       rating: 4.6,
-      price: "$39",
+      price: "₹2,999",
       image: "/placeholder.svg",
       description: "Overcome stage fright and deliver powerful live performances.",
       features: ["Stage presence", "Audience engagement", "Performance anxiety"]
