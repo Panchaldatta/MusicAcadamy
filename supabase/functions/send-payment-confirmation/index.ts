@@ -1,8 +1,4 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,6 +21,16 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { email, teacherName, lessonDate, duration, amount, type = 'success' }: PaymentEmailRequest = await req.json();
+    
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    
+    if (!RESEND_API_KEY) {
+      console.error("RESEND_API_KEY not configured");
+      return new Response(
+        JSON.stringify({ error: "Email service not configured" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     const formatDate = (dateStr: string) => {
       return new Date(dateStr).toLocaleDateString('en-IN', {
@@ -139,16 +145,34 @@ const handler = async (req: Request): Promise<Response> => {
         break;
     }
 
-    const emailResponse = await resend.emails.send({
-      from: "Music Lessons <onboarding@resend.dev>",
-      to: [email],
-      subject,
-      html,
+    // Send email using Resend API directly via fetch
+    const emailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "Music Lessons <onboarding@resend.dev>",
+        to: [email],
+        subject,
+        html,
+      }),
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    const emailData = await emailResponse.json();
+    
+    if (!emailResponse.ok) {
+      console.error("Error sending email:", emailData);
+      return new Response(
+        JSON.stringify({ error: emailData.message || "Failed to send email" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
-    return new Response(JSON.stringify(emailResponse), {
+    console.log("Email sent successfully:", emailData);
+
+    return new Response(JSON.stringify(emailData), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
