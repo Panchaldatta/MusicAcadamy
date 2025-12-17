@@ -1,5 +1,119 @@
+# # -------------------------------
+# # PersistentVolumeClaim (optional)
+# # -------------------------------
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: music-frontend-pvc
+#   namespace: "2401147"
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: music-frontend-deployment
+#   namespace: "2401147"
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: music-frontend
+#   template:
+#     metadata:
+#       labels:
+#         app: music-frontend
+#     spec:
+#       automountServiceAccountToken: false
+#       imagePullSecrets:
+#         - name: nexus-secret
+
+#       containers:
+#         - name: music-frontend
+#           image: 127.0.0.1:30085/2401147-project/music-frontend:latest
+#           imagePullPolicy: Always
+
+#           ports:
+#             - containerPort: 80
+
+#           readinessProbe:
+#             httpGet:
+#               path: /
+#               port: 80
+#             initialDelaySeconds: 10
+#             periodSeconds: 10
+
+#           livenessProbe:
+#             httpGet:
+#               path: /
+#               port: 80
+#             initialDelaySeconds: 30
+#             periodSeconds: 30
+
+#           # Optional – if you want to serve static files in PVC
+#           volumeMounts:
+#             - name: static-content
+#               mountPath: /usr/share/nginx/html/static
+
+#           resources:
+#             requests:
+#               cpu: "100m"
+#               memory: "128Mi"
+#               ephemeral-storage: "1Gi"
+#             limits:
+#               cpu: "500m"
+#               memory: "512Mi"
+#               ephemeral-storage: "2Gi"
+
+#       volumes:
+#         - name: static-content
+#           persistentVolumeClaim:
+#             claimName: music-frontend-pvc
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: music-frontend-service
+#   namespace: "2401147"
+# spec:
+#   selector:
+#     app: music-frontend
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 80
+#   type: ClusterIP
+
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: music-frontend-ingress
+#   namespace: "2401147"
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#     - host: music.imcc.com
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: music-frontend-service
+#                 port:
+#                   number: 80
+
 # -------------------------------
-# PersistentVolumeClaim (optional)
+# PersistentVolumeClaim
 # -------------------------------
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -7,6 +121,7 @@ metadata:
   name: music-frontend-pvc
   namespace: "2401147"
 spec:
+  storageClassName: local-path
   accessModes:
     - ReadWriteOnce
   resources:
@@ -55,10 +170,9 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 30
 
-          # Optional – if you want to serve static files in PVC
           volumeMounts:
             - name: static-content
-              mountPath: /usr/share/nginx/html/static
+              mountPath: /app/static
 
           resources:
             requests:
