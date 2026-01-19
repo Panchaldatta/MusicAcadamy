@@ -96,8 +96,8 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Right Visual */}
-          <div className="relative animate-fade-in-right order-first lg:order-last">
+          {/* Right Visual - Hidden on mobile, shown on lg+ */}
+          <div className="relative animate-fade-in-right hidden lg:block">
             {/* Main Card */}
             <div className="relative bg-white/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/50">
               {/* Floating Music Notes */}
