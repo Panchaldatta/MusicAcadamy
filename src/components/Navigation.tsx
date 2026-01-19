@@ -34,26 +34,26 @@ const Navigation = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <Music className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">SoundSync</span>
+          <Link to="/" className="flex items-center space-x-1.5 sm:space-x-2">
+            <Music className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+            <span className="text-lg sm:text-xl font-bold text-foreground">SoundSync</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-4 xl:space-x-6">
             <NavigationMenu>
-              <NavigationMenuList>
+              <NavigationMenuList className="gap-1">
                 {navigationItems.map((item) => (
                   <NavigationMenuItem key={item.name}>
                     <NavigationMenuLink asChild>
                       <Link 
                         to={item.href}
-                        className="px-3 py-2 text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-2"
+                        className="px-2 xl:px-3 py-2 text-sm xl:text-base text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-1.5"
                       >
-                        {item.name === "Classroom History" && <Heart className="h-4 w-4" />}
+                        {item.name === "Classroom History" && <Heart className="h-3.5 w-3.5" />}
                         {item.name}
                       </Link>
                     </NavigationMenuLink>
@@ -64,7 +64,7 @@ const Navigation = () => {
           </div>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
             {user ? (
               <>
                 {isTeacher && (
@@ -141,11 +141,11 @@ const Navigation = () => {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="sm" className="p-2">
+                  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-80">
