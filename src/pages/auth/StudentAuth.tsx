@@ -199,29 +199,29 @@ const StudentAuth = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center pt-20 pb-8">
-        <div className="container mx-auto px-6">
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center pt-16 sm:pt-20 pb-6 sm:pb-8 px-4">
+        <div className="container mx-auto">
           <div className="max-w-md mx-auto">
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <GraduationCap className="h-10 w-10 text-white" />
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Student Portal</h1>
-              <p className="text-muted-foreground">Access your learning dashboard</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Student Portal</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">Access your learning dashboard</p>
             </div>
 
             <Card className="border bg-card/80 backdrop-blur-sm shadow-lg">
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl text-foreground">Student Access</CardTitle>
-                <CardDescription>
+              <CardHeader className="text-center px-4 sm:px-6 py-4 sm:py-6">
+                <CardTitle className="text-xl sm:text-2xl text-foreground">Student Access</CardTitle>
+                <CardDescription className="text-sm sm:text-base">
                   Sign in to your student account or create a new one
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-4 sm:px-6 pb-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="signin">Sign In</TabsTrigger>
-                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="signin" className="text-sm sm:text-base">Sign In</TabsTrigger>
+                    <TabsTrigger value="signup" className="text-sm sm:text-base">Sign Up</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="signin">
