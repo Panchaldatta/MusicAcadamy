@@ -20,6 +20,7 @@ import GovExamRoadmap from "./pages/GovExamRoadmap";
 import Auth from "./pages/Auth";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
+import SheetMusic from "./pages/SheetMusic";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Create QueryClient instance outside the component to avoid React context issues
@@ -50,6 +51,7 @@ function App() {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/classroom-swipe-history" element={<ClassroomSwipeHistoryPage />} />
+                <Route path="/sheet-music" element={<SheetMusic />} />
                 <Route 
                   path="/gov-exam-roadmap" 
                   element={
